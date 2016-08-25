@@ -1,4 +1,4 @@
-def hide(cleanData, val):
+def hideByte(cleanData, val):
 	hiddenData = bytearray(len(cleanData))
 	mask = 1 << 7
 	
@@ -8,7 +8,7 @@ def hide(cleanData, val):
 	
 	return hiddenData
 
-def reveal(hiddenData):
+def revealByte(hiddenData):
 	revealedText = bytearray(1)
 	
 	for i in range(len(hiddenData)):
@@ -29,18 +29,18 @@ class TestSteganographer(unittest.TestCase):
 		t = time.time() - self.startTime
 		print "Ran in %.3fs " % (t),
 	
-	def test_hide(self):
-		testBuffer = bytearray(8)
-		solutionBuff = bytearray(8)
-		solutionBuff[1] = chr(1)
-		solutionBuff[7] = chr(1)
-		self.assertEqual(hide(testBuffer, 'A'), solutionBuff)
+	def test_hideByte(self):
+		testData = bytearray(8)
+		solutionData = bytearray(8)
+		solutionData[1] = chr(1)
+		solutionData[7] = chr(1)
+		self.assertEqual(hideByte(testData, 'A'), solutionData)
 		
-	def test_reveal(self):
-		testBuffer = bytearray(8)
-		testBuffer[1] = chr(1)
-		testBuffer[7] = chr(1)
-		self.assertEqual(reveal(testBuffer), 'A')
+	def test_revealbyte(self):
+		testData = bytearray(8)
+		testData[1] = chr(1)
+		testData[7] = chr(1)
+		self.assertEqual(revealByte(testData), 'A')
 	
 if __name__ == '__main__':
 	print "Preparing tests..."
