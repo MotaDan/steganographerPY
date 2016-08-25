@@ -2,22 +2,22 @@ byteLen = 8
 
 def hideByte(cleanData, val):
 	hiddenData = bytearray(len(cleanData))
-	mask = 1 << 7
+	mask = 1 << (byteLen - 1)
 	
 	for i in range(byteLen):
-		maskedBit = (ord(val) & (mask >> i)) >> (7 - i)
+		maskedBit = (ord(val) & (mask >> i)) >> (byteLen - 1 - i)
 		hiddenData[i] = cleanData[i] | maskedBit
 	
 	return hiddenData
 
 def revealByte(hiddenData):
-	revealedText = bytearray(1)
+	revealedData = bytearray(1)
 	
 	for i in range(len(hiddenData)):
 		leastSigBit = hiddenData[i] & 1
-		revealedText[0] = revealedText[0] | (leastSigBit << (7 - i))
+		revealedData[0] = revealedData[0] | (leastSigBit << (byteLen - 1 - i))
 	
-	return str(revealedText)
+	return revealedData
 
 def hideString(cleanData, val):
 	hiddenData = bytearray(1)
