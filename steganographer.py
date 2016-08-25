@@ -94,7 +94,7 @@ class TestSteganographer(unittest.TestCase):
 		
 	def test_steganographerNullData(self):
 		testString = "This is a test String."
-		blankData = bytearray(len(testString))
+		blankData = bytearray(len(testString) * byteLen)
 		
 		hiddenData = hideString(blankData, testString)
 		revealedString = revealString(hiddenData)
