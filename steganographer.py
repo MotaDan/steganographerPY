@@ -6,7 +6,7 @@ def hideByte(cleanData, val):
 	hiddenData = bytearray(len(cleanData))
 	mask = 1 << (byteLen - 1)
 	
-	for i in range(byteLen):
+	for i in range(len(hiddenData)):
 		maskedBit = (ord(val) & (mask >> i)) >> (byteLen - 1 - i)
 		hiddenData[i] = cleanData[i] | maskedBit
 	
@@ -113,7 +113,7 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(testString[:len(testString) - 1], revealedString)
 		
 	# Testing that when the data is too small, by a half byte, that everything that can be returned is.
-	def test_steganographerShortData(self):
+	def test_steganographerShortPartialData(self):
 		testString = "This is a test String"
 		blankData = bytearray(len(testString) * byteLen - byteLen / 2)
 		
