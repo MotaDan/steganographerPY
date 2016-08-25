@@ -29,7 +29,7 @@ def hideString(cleanData, val):
 	
 	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
 		hiddenByte = hideByte(cleanData[dataIndex:dataIndex + byteLen], val[strIndex])
-		hiddenData.extend(hiddenBytes)
+		hiddenData.extend(hiddenByte)
 	
 	return hiddenData
 
@@ -91,6 +91,15 @@ class TestSteganographer(unittest.TestCase):
 		testData[22] = chr(1)
 		testData[23] = chr(1)
 		self.assertEqual(revealString(testData), 'ABC')
+		
+	def test_steganographerNullData(self):
+		testString = "This is a test String."
+		blankData = bytearray(len(testString))
+		
+		hiddenData = hideString(blankData, testString)
+		revealedString = revealString(hiddenData)
+		
+		self.assertEqual(testString, revealedString)
 	
 if __name__ == '__main__':
 	print "Preparing tests..."
