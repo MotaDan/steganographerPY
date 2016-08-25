@@ -1,5 +1,7 @@
 byteLen = 8
 
+# Expects a bytearray of length 8 and a character value. Will return a bytearray with the character's bits 
+# hidden in the least significant bit.
 def hideByte(cleanData, val):
 	hiddenData = bytearray(len(cleanData))
 	mask = 1 << (byteLen - 1)
@@ -10,6 +12,7 @@ def hideByte(cleanData, val):
 	
 	return hiddenData
 
+# Expects a bytearray of length 8. Will pull out the least significant bit from each byte and return them.
 def revealByte(hiddenData):
 	revealedData = bytearray(1)
 	
@@ -19,11 +22,19 @@ def revealByte(hiddenData):
 	
 	return revealedData
 
+# Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits 
+# hidden in the least significant bits.
 def hideString(cleanData, val):
-	hiddenData = bytearray(1)
+	hiddenData = bytearray()
+	
+	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
+		hiddenByte = hideByte(cleanData[dataIndex:dataIndex + byteLen], val[strIndex])
+		hiddenData.extend(hiddenBytes)
 	
 	return hiddenData
 
+# Expects a bytearray of any length. Will pull out the least significant bits from each byte and 
+# return them as a string.
 def revealString(hiddenData):
 	revealedStrLen = len(hiddenData) / byteLen
 	revealedData = ''
