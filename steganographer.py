@@ -1,8 +1,8 @@
-def hide(buffer, data)
-	return 'A'
+def hide(buffer, data):
+	return ''
 
-def reveal(buffer)
-	return 'A'
+def reveal(buffer):
+	return ''
 
 # Testing class
 import unittest
@@ -17,11 +17,16 @@ class TestSoccerSuperstition(unittest.TestCase):
 		print "Ran in %.3fs " % (t),
 	
 	def test_hide(self):
-		testBuffer = [1, 2, 3]
-		self.assertEqual(hide(testBuffer, "A"), [[1, 2, 3], [2, 3, 1], [3, 1, 2]])
+		testBuffer = bytearray(8)
+		solutionBuff = bytearray(8)
+		solutionBuff[1] = chr(1)
+		solutionBuff[7] = chr(1)
+		self.assertEqual(hide(testBuffer, 'A'), solutionBuff)
 		
 	def test_reveal(self):
-		testBuffer = [1, 2, 3]
+		testBuffer = bytearray(8)
+		testBuffer[1] = chr(1)
+		testBuffer[7] = chr(1)
 		self.assertEqual(reveal(testBuffer), 'A')
 	
 if __name__ == '__main__':
