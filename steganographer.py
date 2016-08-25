@@ -1,14 +1,21 @@
 def hide(cleanData, val):
-	return ''
+	hiddenData = bytearray(len(cleanData))
+	mask = 1 << 7
+	
+	for i in range(8):
+		maskedBit = (ord(val) & (mask >> i)) >> (7 - i)
+		hiddenData[i] = cleanData[i] | maskedBit
+	
+	return hiddenData
 
 def reveal(hiddenData):
-	hiddenText = bytearray(1)
+	revealedText = bytearray(1)
 	
 	for i in range(len(hiddenData)):
 		leastSigBit = hiddenData[i] & 1
-		hiddenText[0] = hiddenText[0] | (leastSigBit << (7 - i))
+		revealedText[0] = revealedText[0] | (leastSigBit << (7 - i))
 	
-	return str(hiddenText)
+	return str(revealedText)
 
 # Testing class
 import unittest
