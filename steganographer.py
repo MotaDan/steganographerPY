@@ -91,15 +91,36 @@ class TestSteganographer(unittest.TestCase):
 		testData[22] = chr(1)
 		testData[23] = chr(1)
 		self.assertEqual(revealString(testData), 'ABC')
-		
+
+	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
 	def test_steganographerNullData(self):
-		testString = "This is a test String."
+		testString = "This is a test String"
 		blankData = bytearray(len(testString) * byteLen)
 		
 		hiddenData = hideString(blankData, testString)
 		revealedString = revealString(hiddenData)
 		
 		self.assertEqual(testString, revealedString)
+		
+	# Testing that when the data is too small, by a full byte, that everything that can be returned is.
+	def test_steganographerShortData(self):
+		testString = "This is a test String"
+		blankData = bytearray(len(testString) * byteLen - byteLen)
+		
+		hiddenData = hideString(blankData, testString)
+		revealedString = revealString(hiddenData)
+		
+		self.assertEqual(testString[:len(testString) - 1], revealedString)
+		
+	# Testing that when the data is too small, by a half byte, that everything that can be returned is.
+	def test_steganographerShortData(self):
+		testString = "This is a test String"
+		blankData = bytearray(len(testString) * byteLen - byteLen / 2)
+		
+		hiddenData = hideString(blankData, testString)
+		revealedString = revealString(hiddenData)
+		
+		self.assertEqual(testString[:len(testString) - 1], revealedString)
 	
 if __name__ == '__main__':
 	print "Preparing tests..."
