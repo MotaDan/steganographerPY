@@ -1,14 +1,20 @@
-def hide(buffer, data):
+def hide(cleanData, val):
 	return ''
 
-def reveal(buffer):
-	return ''
+def reveal(hiddenData):
+	hiddenText = bytearray(1)
+	
+	for i in range(len(hiddenData)):
+		leastSigBit = hiddenData[i] & 1
+		hiddenText[0] = hiddenText[0] | (leastSigBit << (7 - i))
+	
+	return str(hiddenText)
 
 # Testing class
 import unittest
 import time
 
-class TestSoccerSuperstition(unittest.TestCase):
+class TestSteganographer(unittest.TestCase):
 	def setUp(self):
 		self.startTime = time.time()
 	
