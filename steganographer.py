@@ -47,7 +47,13 @@ def revealString(hiddenData):
 # Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's bits 
 # hidden in the least significant bits ofteh cleanData.
 def hideData(cleanData, val):
-	pass
+	hiddenData = bytearray()
+	
+	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
+		hiddenByte = hideByte(cleanData[dataIndex:dataIndex + byteLen], val[strIndex])
+		hiddenData.extend(hiddenByte)
+	
+	return hiddenData
 
 # Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
 # return them as a byteArray.
