@@ -52,7 +52,18 @@ def hideData(cleanData, val):
 # Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
 # return them as a byteArray.
 def revealData(hiddenData):
-	pass
+	revealedDataLen = len(hiddenData) / byteLen
+	revealedData = bytearray()
+	
+	for i in range(0, revealedDataLen * byteLen, byteLen):
+		revealedData.extend(revealByte(hiddenData[i:i + byteLen]))
+	
+	revealedDataLenRemainder = len(hiddenData) % byteLen
+	
+	if revealedDataLenRemainder > 0:
+		revealedData.extend(revealByte(hiddenData[-1 * revealedDataLenRemainder:]))
+	
+	return revealedData
 
 # Testing class
 import unittest
@@ -125,6 +136,18 @@ class TestSteganographer(unittest.TestCase):
 		testData[22] = chr(1)
 		testData[23] = chr(1)
 		self.assertEqual(revealData(testData), solutionData)
+		
+	def test_revealDataPartial(self):
+		solutionData = bytearray('AB@')
+		testData = bytearray(byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
+		testData[1] = chr(1)
+		testData[7] = chr(1)
+		testData[9] = chr(1)
+		testData[14] = chr(1)
+		testData[17] = chr(1)
+		testData[22] = chr(1)
+		testData[23] = chr(1)
+		self.assertEqual(revealData(testData[:len(testData) - byteLen/2]), solutionData)
 
 	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
 	def test_steganographerNullData(self):
