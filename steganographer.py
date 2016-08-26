@@ -112,10 +112,10 @@ class TestSteganographer(unittest.TestCase):
 		solutionData[17] = chr(1)
 		solutionData[22] = chr(1)
 		solutionData[23] = chr(1)
-		#self.assertEqual(hideString(testData, 'ABC'), solutionData)
-		hideData(testData, 'ABC')
+		self.assertEqual(hideData(testData, 'ABC'), solutionData)
 	
 	def test_revealData(self):
+		solutionData = bytearray('ABC')
 		testData = bytearray(byteLen * 3)
 		testData[1] = chr(1)
 		testData[7] = chr(1)
@@ -124,8 +124,7 @@ class TestSteganographer(unittest.TestCase):
 		testData[17] = chr(1)
 		testData[22] = chr(1)
 		testData[23] = chr(1)
-		#self.assertEqual(revealString(testData), 'ABC')
-		revealData(testData)
+		self.assertEqual(revealData(testData), solutionData)
 
 	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
 	def test_steganographerNullData(self):
