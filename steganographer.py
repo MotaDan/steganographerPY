@@ -30,13 +30,7 @@ def hideString(cleanData, val):
 # Expects a bytearray of any length. Will pull out the least significant bits from each byte and 
 # return them as a string.
 def revealString(hiddenData):
-	revealedStrLen = len(hiddenData) / byteLen
-	revealedData = ''
-	
-	for i in range(0, revealedStrLen * byteLen, byteLen):
-		revealedData += revealByte(hiddenData[i:i + byteLen])
-	
-	return revealedData
+	return str(revealData(hiddenData))
 	
 # Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's bits 
 # hidden in the least significant bits of cleanData.
