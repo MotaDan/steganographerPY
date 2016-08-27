@@ -7,7 +7,7 @@ def hideByte(cleanData, val):
 	mask = 1 << (byteLen - 1)
 	
 	for i in range(len(hiddenData)):
-		maskedBit = (ord(val) & (mask >> i)) >> (byteLen - 1 - i)
+		maskedBit = (val & (mask >> i)) >> (byteLen - 1 - i)
 		hiddenData[i] = cleanData[i] | maskedBit
 	
 	return hiddenData
@@ -25,13 +25,7 @@ def revealByte(hiddenData):
 # Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits 
 # hidden in the least significant bits.
 def hideString(cleanData, val):
-	hiddenData = bytearray()
-	
-	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
-		hiddenByte = hideByte(cleanData[dataIndex:dataIndex + byteLen], val[strIndex])
-		hiddenData.extend(hiddenByte)
-	
-	return hiddenData
+	return hideData(cleanData, bytearray(val))
 
 # Expects a bytearray of any length. Will pull out the least significant bits from each byte and 
 # return them as a string.
@@ -45,7 +39,7 @@ def revealString(hiddenData):
 	return revealedData
 	
 # Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's bits 
-# hidden in the least significant bits ofteh cleanData.
+# hidden in the least significant bits of cleanData.
 def hideData(cleanData, val):
 	hiddenData = bytearray()
 	
@@ -85,10 +79,11 @@ class TestSteganographer(unittest.TestCase):
 	
 	def test_hideByte(self):
 		testData = bytearray(byteLen)
+		dataToHide = bytearray('A')
 		solutionData = bytearray(byteLen)
 		solutionData[1] = chr(1)
 		solutionData[7] = chr(1)
-		self.assertEqual(hideByte(testData, 'A'), solutionData)
+		self.assertEqual(hideByte(testData, dataToHide[0]), solutionData)
 		
 	def test_revealByte(self):
 		testData = bytearray(byteLen)
@@ -121,6 +116,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	def test_hideData(self):
 		testData = bytearray(byteLen * 3)
+		dataToHide = bytearray('ABC')
 		solutionData = bytearray(byteLen * 3)
 		solutionData[1] = chr(1)
 		solutionData[7] = chr(1)
@@ -129,7 +125,8 @@ class TestSteganographer(unittest.TestCase):
 		solutionData[17] = chr(1)
 		solutionData[22] = chr(1)
 		solutionData[23] = chr(1)
-		self.assertEqual(hideData(testData, 'ABC'), solutionData)
+		self.assertEqual(hideData(testData, dataToHide), solutionData)
+		self.assertEqual(hideData(testData[:4], dataToHide), solutionData[:4])
 	
 	def test_revealData(self):
 		solutionData = bytearray('ABC')
