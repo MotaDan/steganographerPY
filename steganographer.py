@@ -76,7 +76,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	def tearDown(self):
 		t = time.time() - self.startTime
-		print("Ran in %.3fs " % (t))
+		print("Ran in %.3fs " % (t), end=" ")
 	
 	
 	# Testing that the hideByte function does hide a byte and returns the testData with that byte hidden.
