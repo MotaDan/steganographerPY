@@ -174,7 +174,7 @@ class TestSteganographer(unittest.TestCase):
 		hiddenData = hideString(blankData, testString)
 		revealedString = revealString(hiddenData)
 		
-		self.assertEqual(testString[:len(testString) - 1], revealedString)
+		self.assertEqual(testString[:len(testString) - 1] + chr(ord(testString[-1]) >> (byteLen/2) << (byteLen/2)), revealedString)
 	
 if __name__ == '__main__':
 	print "Preparing tests..."
