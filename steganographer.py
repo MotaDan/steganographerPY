@@ -83,7 +83,8 @@ class TestSteganographer(unittest.TestCase):
 		testData = bytearray(byteLen)
 		testData[1] = chr(1)
 		testData[7] = chr(1)
-		self.assertEqual(revealByte(testData), 'A')
+		solutionData = bytearray('A')
+		self.assertEqual(revealByte(testData), solutionData)
 	
 	def test_hideString(self):
 		testData = bytearray(byteLen * 3)
@@ -120,6 +121,19 @@ class TestSteganographer(unittest.TestCase):
 		solutionData[22] = chr(1)
 		solutionData[23] = chr(1)
 		self.assertEqual(hideData(testData, dataToHide), solutionData)
+		
+	def test_hideDataPartial(self):
+		testData = bytearray(byteLen * 3)
+		dataToHide = bytearray('ABC')
+		solutionData = bytearray(byteLen * 3)
+		solutionData[1] = chr(1)
+		solutionData[7] = chr(1)
+		solutionData[9] = chr(1)
+		solutionData[14] = chr(1)
+		solutionData[17] = chr(1)
+		solutionData[22] = chr(1)
+		solutionData[23] = chr(1)
+		# Testing when only half a byte is passed in for the data that contains the hidden text.
 		self.assertEqual(hideData(testData[:4], dataToHide), solutionData[:4])
 	
 	def test_revealData(self):
@@ -149,32 +163,47 @@ class TestSteganographer(unittest.TestCase):
 	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
 	def test_steganographerNullData(self):
 		testString = "This is a test String"
+		testData = bytearray(testString)
 		blankData = bytearray(len(testString) * byteLen)
 		
-		hiddenData = hideString(blankData, testString)
-		revealedString = revealString(hiddenData)
+		hiddenString = hideString(blankData, testString)
+		revealedString = revealString(hiddenString)
+		
+		hiddenData = hideData(blankData, testData)
+		revealedData = revealData(hiddenData)
 		
 		self.assertEqual(testString, revealedString)
+		self.assertEqual(testData, revealedData)
 		
 	# Testing that when the data is too small, by a full byte, that everything that can be returned is.
 	def test_steganographerShortData(self):
 		testString = "This is a test String"
+		testData = bytearray(testString)
 		blankData = bytearray(len(testString) * byteLen - byteLen)
 		
-		hiddenData = hideString(blankData, testString)
-		revealedString = revealString(hiddenData)
+		hiddenString = hideString(blankData, testString)
+		revealedString = revealString(hiddenString)
+		
+		hiddenData = hideData(blankData, testData)
+		revealedData = revealData(hiddenData)
 		
 		self.assertEqual(testString[:len(testString) - 1], revealedString)
+		self.assertEqual(testData[:len(testData) - 1], revealedData)
 		
 	# Testing that when the data is too small, by a half byte, that everything that can be returned is.
 	def test_steganographerShortPartialData(self):
 		testString = "This is a test String"
+		testData = bytearray(testString)
 		blankData = bytearray(len(testString) * byteLen - byteLen / 2)
 		
-		hiddenData = hideString(blankData, testString)
-		revealedString = revealString(hiddenData)
+		hiddenString = hideString(blankData, testString)
+		revealedString = revealString(hiddenString)
+		
+		hiddenData = hideData(blankData, testData)
+		revealedData = revealData(hiddenData)
 		
 		self.assertEqual(testString[:len(testString) - 1] + chr(ord(testString[-1]) >> (byteLen/2) << (byteLen/2)), revealedString)
+		self.assertEqual(testData[:len(testData) - 1] + chr(testData[-1] >> (byteLen/2) << (byteLen/2)), revealedData)
 	
 if __name__ == '__main__':
 	print "Preparing tests..."
