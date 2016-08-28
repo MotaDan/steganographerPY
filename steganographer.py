@@ -51,7 +51,7 @@ def hideData(cleanData, val):
 # Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
 # return them as a byteArray.
 def revealData(hiddenData):
-	revealedDataLen = int(len(hiddenData) / byteLen)
+	revealedDataLen = len(hiddenData) // byteLen
 	revealedData = bytearray()
 	
 	for i in range(0, revealedDataLen * byteLen, byteLen):
@@ -76,7 +76,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	def tearDown(self):
 		t = time.time() - self.startTime
-		print("Ran in %.3fs " % (t), end=" ")
+		#print("Ran in %.3fs " % (t))
 	
 	
 	# Testing that the hideByte function does hide a byte and returns the testData with that byte hidden.
@@ -189,7 +189,7 @@ class TestSteganographer(unittest.TestCase):
 		testData[23] = 1
 		solutionData = bytearray('AB@', 'utf-8')
 		
-		self.assertEqual(revealData(testData[:-int(byteLen/2)]), solutionData)
+		self.assertEqual(revealData(testData[:-byteLen // 2]), solutionData)
 	
 	
 	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
@@ -227,11 +227,11 @@ class TestSteganographer(unittest.TestCase):
 	# Testing that when the data is too small, by a half byte, that everything that can be returned is returned.
 	def test_steganographerShortPartialData(self):
 		testString = "This is a test String"
-		solutionString = testString[:-1] + chr(ord(testString[-1]) >> int(byteLen/2) << int(byteLen/2))
+		solutionString = testString[:-1] + chr(ord(testString[-1]) >> byteLen // 2 << byteLen // 2)
 		testData = bytearray(testString, 'utf-8')
 		solutionData = testData
-		solutionData[-1] = solutionData[-1] >> int(byteLen/2) << int(byteLen/2)
-		blankData = bytearray(len(testString) * byteLen - int(byteLen / 2))
+		solutionData[-1] = solutionData[-1] >> byteLen // 2 << byteLen // 2
+		blankData = bytearray(len(testString) * byteLen - byteLen // 2)
 		
 		hiddenString = hideString(blankData, testString)
 		revealedString = revealString(hiddenString)
