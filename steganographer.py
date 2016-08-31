@@ -173,9 +173,9 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that hideData will hide one bytearray inside another.
 	def test_hideData(self):
-		testData = bytearray(byteLen * 3)
+		testData = bytearray(byteLen * 4)
 		dataToHide = bytearray('ABC', 'utf-8')
-		solutionData = bytearray(byteLen * 3)
+		solutionData = bytearray(byteLen * 4)
 		solutionData[1] = 1
 		solutionData[7] = 1
 		solutionData[9] = 1
