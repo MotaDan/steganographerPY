@@ -25,15 +25,26 @@ def revealByte(hiddenData):
 
 
 # Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits 
-# hidden in the least significant bits.
+# hidden in the least significant bits. Adds null terminator to the end of the string.
 def hideString(cleanData, val):
+	val += '\0'
 	return hideData(cleanData, bytearray(val, 'utf-8'))
 
 
 # Expects a bytearray of any length. Will pull out the least significant bits from each byte and 
 # return them as a string.
 def revealString(hiddenData):
-	return revealData(hiddenData).decode()
+	revealedData = revealData(hiddenData)
+	nullPos = 0
+	
+	for i in range(len(revealedData)):
+		if revealedData[i] != 0:
+			nullPos += 1
+		else:
+			break
+	
+	revealedData = revealedData[:nullPos]
+	return revealedData.decode()
 
 
 # Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's bits 
@@ -44,6 +55,8 @@ def hideData(cleanData, val):
 	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
 		hiddenByte = hideByte(cleanData[dataIndex:dataIndex + byteLen], val[strIndex])
 		hiddenData.extend(hiddenByte)
+	
+	hiddenData = hiddenData + cleanData[len(hiddenData):]
 	
 	return hiddenData
 
@@ -146,7 +159,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that revealString returns a string of the data that was hidden in testData.
 	def test_revealString(self):
-		testData = bytearray(byteLen * 3)
+		testData = bytearray(byteLen * 4)
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
