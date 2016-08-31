@@ -65,6 +65,20 @@ def revealData(hiddenData):
 	return revealedData
 
 
+# Reads the file fname and returns bytes for all it's data.
+def openCleanFile(fname):
+	fimage = open(fname, 'rb')
+	imagebytes = fimage.read()
+	
+	return imagebytes
+
+
+# Create a file fname and writes the passed in data to it.
+def writeDirtyFile(fname, data):
+	fdirty = open(fname, 'wb')
+	fdirty.write(data)
+
+
 # Testing class
 import unittest
 import time
@@ -190,6 +204,19 @@ class TestSteganographer(unittest.TestCase):
 		solutionData = bytearray('AB@', 'utf-8')
 		
 		self.assertEqual(revealData(testData[:-byteLen // 2]), solutionData)
+	
+	
+	# Testing that opening the file works.
+	def test_openCleanFile(self):
+		openCleanFile("testImageClean.png")
+	
+	
+	# Testing taht writing the file works as expected.
+	def test_writeDirtyFile(self):
+		data = openCleanFile("testImageClean.png")
+		writeDirtyFile("testImageDirty.png", data)
+		
+		self.assertEqual(open("testImageClean.png", 'rb').read(), open("testImageDirty.png", 'rb').read())
 	
 	
 	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
