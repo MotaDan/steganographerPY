@@ -79,6 +79,21 @@ def writeDirtyFile(fname, data):
 	fdirty.write(data)
 
 
+# Takes in a clean image file name, a dirty image file name and text that will be hidden. 
+# Hides the text in cleanImageFile and outputs it to dirtyImageFile.
+def steganographerHide(cleanImageFile, dirtyImageFile, text=''):
+	cleanData = openCleanFile(cleanImageFile)
+	dirtyData = hideString(cleanData, text)
+	writeDirtyFile(dirtyImageFile, dirtyData)
+
+
+# Reveals whatever string is hidden in the fimage.
+def steganographerReveal(fimage):
+	dirtyData = openCleanFile(fimage)
+	revealedString = revealString(dirtyData)
+	return revealedString
+
+
 # Testing class
 import unittest
 import time
@@ -211,13 +226,35 @@ class TestSteganographer(unittest.TestCase):
 		openCleanFile("testImageClean.png")
 	
 	
-	# Testing taht writing the file works as expected.
+	# Testing that writing the file works as expected.
 	def test_writeDirtyFile(self):
-		data = openCleanFile("testImageClean.png")
-		writeDirtyFile("testImageDirty.png", data)
+		cleanFile = "testImageClean.png"
+		dirtyFile = "testImageDirty.png"
+		data = hideString(openCleanFile("testImageClean.png"), "Text that should be hidden.")
+		writeDirtyFile(dirtyFile, data)
 		
-		self.assertEqual(open("testImageClean.png", 'rb').read(), open("testImageDirty.png", 'rb').read())
+		self.assertFalse(open(cleanFile, 'rb').read() == open(dirtyFile, 'rb').read())
 	
+	
+	# Testing that a string will correctly be hidden in a new image.
+	def test_steganographerHide(self):
+		cleanImage = "testImageClean.png"
+		dirtyImage = "testImageDirty.png"
+		steganographerHide(cleanImage, dirtyImage, "Text that should be hidden.")
+		
+		self.assertFalse(open(cleanImage, 'rb').read() == open(dirtyImage, 'rb').read())
+	
+	
+	# Testing that a string is found in the dirty image.
+	def test_steganographerReveal(self):
+		cleanImage = "testImageClean.png"
+		dirtyImage = "testImageDirty.png"
+		hiddenMessage = "Text that should be hidden."
+		steganographerHide(cleanImage, dirtyImage, hiddenMessage)
+		
+		print(steganographerReveal(dirtyImage))
+		self.assertEqual(steganographerReveal(dirtyImage), hiddenMessage)
+		
 	
 	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
 	def test_steganographerNullData(self):
