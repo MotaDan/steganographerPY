@@ -148,7 +148,7 @@ class TestSteganographer(unittest.TestCase):
 	def test_steganographerHide(self):
 		cleanImage = "testImageClean.png"
 		dirtyImage = "testImageDirty.png"
-		steganographerHide(cleanImage, dirtyImage, "Text that should be hidden.")
+		steganographerHide(cleanImage, "Text that should be hidden.", dirtyImage)
 		
 		self.assertFalse(open(cleanImage, 'rb').read() == open(dirtyImage, 'rb').read())
 	
