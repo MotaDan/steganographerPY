@@ -7,8 +7,14 @@ def hideByte(cleanData, val):
 	mask = 1 << (byteLen - 1)
 	
 	for i in range(len(hiddenData)):
-		maskedBit = (val & (mask >> i)) >> (byteLen - 1 - i)
-		hiddenData[i] = cleanData[i] | maskedBit
+		maskedBit = val & (mask >> i)
+		
+		if maskedBit > 0:
+			maskedBit = maskedBit >> (byteLen - 1 - i)
+			hiddenData[i] = cleanData[i] | maskedBit
+		else:
+			maskedBit = ~(mask >> (byteLen - 1))
+			hiddenData[i] = cleanData[i] & maskedBit
 	
 	return hiddenData
 
