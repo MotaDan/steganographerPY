@@ -274,7 +274,6 @@ class TestSteganographer(unittest.TestCase):
 		hiddenMessage = "Text that should be hidden."
 		steganographerHide(cleanImage, dirtyImage, hiddenMessage)
 		
-		print(steganographerReveal(dirtyImage))
 		self.assertEqual(steganographerReveal(dirtyImage), hiddenMessage)
 		
 	
