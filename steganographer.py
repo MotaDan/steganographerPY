@@ -236,7 +236,10 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that opening the file works.
 	def test_openCleanFile(self):
-		openCleanFile("testImageClean.png")
+		cleanFile = "testImageClean.png"
+		fileData = openCleanFile(cleanFile)
+		
+		self.assertEqual(fileData, open(cleanFile, 'rb').read())
 	
 	
 	# Testing that writing the file works as expected.
