@@ -123,7 +123,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that the hideByte function does hide a byte and returns the testData with that byte hidden.
 	def test_hideByte(self):
-		testData = bytearray(byteLen)
+		testData = bytearray(b'\x01' * byteLen)
 		dataToHide = bytearray('A', 'utf-8')
 		solutionData = bytearray(byteLen)
 		solutionData[1] = 1
@@ -134,7 +134,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that the revealByte function returns a bytearray of the hidden byte. 
 	def test_revealByte(self):
-		testData = bytearray(byteLen)
+		testData = bytearray(b'\x01' * byteLen)
 		testData[1] = 1
 		testData[7] = 1
 		solutionData = bytearray('A', 'utf-8')
@@ -144,7 +144,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that hideString takes in a string and bytearray and hides the string in that bytearray.
 	def test_hideString(self):
-		testData = bytearray(byteLen * 3)
+		testData = bytearray(b'\x01' * byteLen * 3)
 		solutionData = bytearray(byteLen * 3)
 		solutionData[1] = 1
 		solutionData[7] = 1
@@ -159,7 +159,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that revealString returns a string of the data that was hidden in testData.
 	def test_revealString(self):
-		testData = bytearray(byteLen * 4)
+		testData = bytearray(b'\x01' * byteLen * 4)
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
@@ -173,7 +173,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that hideData will hide one bytearray inside another.
 	def test_hideData(self):
-		testData = bytearray(byteLen * 4)
+		testData = bytearray(b'\x01' * byteLen * 4)
 		dataToHide = bytearray('ABC', 'utf-8')
 		solutionData = bytearray(byteLen * 4)
 		solutionData[1] = 1
@@ -189,7 +189,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that hideData will work correctly when given a testData bytearray that is too short to contain the data given.
 	def test_hideDataPartial(self):
-		testData = bytearray(byteLen * 3)
+		testData = bytearray(b'\x01' * byteLen * 3)
 		dataToHide = bytearray('ABC', 'utf-8')
 		solutionData = bytearray(byteLen * 3)
 		solutionData[1] = 1
@@ -206,7 +206,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that revealData will return the correct data that is hidden inside the testData.
 	def test_revealData(self):
-		testData = bytearray(byteLen * 3)
+		testData = bytearray(b'\x01' * byteLen * 3)
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
@@ -221,7 +221,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that reveal data will return as much data as possible when the testData passed in is too small for the data to be hidden.
 	def test_revealDataPartial(self):
-		testData = bytearray(byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
+		testData = bytearray(b'\x01' * byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
@@ -273,7 +273,7 @@ class TestSteganographer(unittest.TestCase):
 	def test_steganographerNullData(self):
 		testString = "This is a test String"
 		testData = bytearray(testString, 'utf-8')
-		blankData = bytearray(len(testString) * byteLen)
+		blankData = bytearray(b'\x01' * len(testString) * byteLen)
 		
 		hiddenString = hideString(blankData, testString)
 		revealedString = revealString(hiddenString)
@@ -289,7 +289,7 @@ class TestSteganographer(unittest.TestCase):
 	def test_steganographerShortData(self):
 		testString = "This is a test String"
 		testData = bytearray(testString, 'utf-8')
-		blankData = bytearray(len(testString) * byteLen - byteLen)
+		blankData = bytearray(b'\x01' * (len(testString) * byteLen - byteLen))
 		
 		hiddenString = hideString(blankData, testString)
 		revealedString = revealString(hiddenString)
@@ -308,7 +308,7 @@ class TestSteganographer(unittest.TestCase):
 		testData = bytearray(testString, 'utf-8')
 		solutionData = testData
 		solutionData[-1] = solutionData[-1] >> byteLen // 2 << byteLen // 2
-		blankData = bytearray(len(testString) * byteLen - byteLen // 2)
+		blankData = bytearray(b'\x01' * (len(testString) * byteLen - byteLen // 2))
 		
 		hiddenString = hideString(blankData, testString)
 		revealedString = revealString(hiddenString)
