@@ -140,7 +140,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that the revealByte function returns a bytearray of the hidden byte. 
 	def test_revealByte(self):
-		testData = bytearray(b'\x01' * byteLen)
+		testData = bytearray(byteLen)
 		testData[1] = 1
 		testData[7] = 1
 		solutionData = bytearray('A', 'utf-8')
@@ -165,7 +165,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that revealString returns a string of the data that was hidden in testData.
 	def test_revealString(self):
-		testData = bytearray(b'\x01' * byteLen * 4)
+		testData = bytearray(byteLen * 4)
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
@@ -212,7 +212,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that revealData will return the correct data that is hidden inside the testData.
 	def test_revealData(self):
-		testData = bytearray(b'\x01' * byteLen * 3)
+		testData = bytearray(byteLen * 3)
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
@@ -227,7 +227,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that reveal data will return as much data as possible when the testData passed in is too small for the data to be hidden.
 	def test_revealDataPartial(self):
-		testData = bytearray(b'\x01' * byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
+		testData = bytearray(byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
 		testData[1] = 1
 		testData[7] = 1
 		testData[9] = 1
