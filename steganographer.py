@@ -102,9 +102,15 @@ def writeDirtyFile(fname, data):
 
 # Takes in a clean image file name, a dirty image file name and text that will be hidden. 
 # Hides the text in cleanImageFile and outputs it to dirtyImageFile.
-def steganographerHide(cleanImageFile, dirtyImageFile, text=''):
+def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
 	cleanData = openCleanFile(cleanImageFile)
 	dirtyData = hideString(cleanData, text)
+	
+	if dirtyImageFile == '':
+		cleanName = cleanImageFile.split('.')[0]
+		cleanExtension = cleanImageFile.split('.')[1]
+		dirtyImageFile = cleanName + "Steganogrified." + cleanExtension
+		
 	writeDirtyFile(dirtyImageFile, dirtyData)
 
 
@@ -120,8 +126,16 @@ if __name__ == '__main__':
 	parser.add_argument("input", help="file to hide a message in or file to reveal a message from")
 	parser.add_argument("-m", "--message", help="message to be hidden in the input file")
 	parser.add_argument("-o", "--output", help="name of output file to hide message in")
-	parser.add_argument("-t", "--test", help="runs the internal tests", action="store_true")
 	args = parser.parse_args()
 	
-	print(steganographerReveal(args.input))
+	if args.input:
+		if args.message:
+			if args.output:
+				steganographerHide(args.input, args.message, args.output)
+			else:
+				steganographerHide(args.input, args.message)
+			print("The message has been hidden.")
+		else:
+			print("The hidden message was...")
+			print(steganographerReveal(args.input))
 	
