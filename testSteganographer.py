@@ -126,8 +126,33 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealData(testData[:-byteLen // 2]), solutionData)
 	
 	
+	# Testing that unpacking returns a bytes full of all the pixels flattened.
 	def test_unpackImage(self):
-		pass
+		pixel = 1, 2, 3, 4
+		solutionPixels = bytes(list(pixel * 4))
+		testPixels = []
+		
+		for i in range(4):
+			testPixels.append(pixel)
+		
+		unpacked = unpackImage(testPixels)
+		
+		self.assertEqual(unpacked, solutionPixels)
+	
+	
+	# Testing that packing returns a list with tuples of length 4.
+	def test_packImage(self):
+		pixel = 1, 2, 3, 4
+		testPixels = list(pixel * 4)
+		solutionPixels = []
+		
+		for i in range(4):
+			solutionPixels.append(pixel)
+		
+		packed = packImage(testPixels)
+		
+		self.assertEqual(packed, solutionPixels)
+	
 	
 	# Testing that opening the file works.
 	def test_openCleanFile(self):
