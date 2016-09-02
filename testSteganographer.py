@@ -2,6 +2,7 @@
 import unittest
 import time
 from steganographer import *
+import os
 
 class TestSteganographer(unittest.TestCase):
 	def setUp(self):
@@ -169,7 +170,14 @@ class TestSteganographer(unittest.TestCase):
 		data = hideString(openCleanFile("testImageClean.png"), "Text that should be hidden.")
 		writeDirtyFile(dirtyFile, data)
 		
+		cf = open(cleanFile, 'rb')
+		cf.seek(0,2)
+
+		df = open(dirtyFile, 'rb')
+		df.seek(0,2)
+		
 		self.assertFalse(open(cleanFile, 'rb').read() == open(dirtyFile, 'rb').read())
+		self.assertEqual(cf.tell(), df.tell())
 	
 	
 	# Testing that a string will correctly be hidden in a new image.

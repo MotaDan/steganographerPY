@@ -121,7 +121,8 @@ def openCleanFile(fname):
 def writeDirtyFile(fname, data):
 	#fdirty = open(fname, 'wb')
 	#fdirty.write(data)
-	im = Image.open("testImageClean.png")
+	ogim = Image.open("testImageClean.png")
+	im = Image.new(ogim.mode, ogim.size)
 	im.putdata(packImage(data))
 	im.save("testImageDirty.png")
 
