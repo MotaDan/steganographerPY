@@ -126,6 +126,9 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealData(testData[:-byteLen // 2]), solutionData)
 	
 	
+	def test_unpackImage(self):
+		pass
+	
 	# Testing that opening the file works.
 	def test_openCleanFile(self):
 		cleanFile = "testImageClean.png"
