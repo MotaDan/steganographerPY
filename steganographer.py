@@ -1,4 +1,5 @@
 import argparse
+from PIL import Image
 
 byteLen = 8
 
@@ -86,18 +87,43 @@ def revealData(hiddenData):
 	return revealedData
 
 
+def unpackImage(pixels):
+	unpackedPixels = []
+	
+	for pix in (pixels):
+		for val in pix:
+			unpackedPixels.append(val)
+			
+	return bytes(unpackedPixels)
+
+
+def packImage(pixels):
+	packedPixels = []
+	pixelLength = 4
+	
+	for i in range(0, len(pixels), pixelLength):
+		packedPixels.append(tuple(pixels[i:i+pixelLength]))
+	
+	return packedPixels
+
 # Reads the file fname and returns bytes for all it's data.
 def openCleanFile(fname):
-	fimage = open(fname, 'rb')
-	imagebytes = fimage.read()
-	
-	return imagebytes
+	#fimage = open(fname, 'rb')
+	#imagebytes = fimage.read()
+	im = Image.open("testImageClean.png")
+	pixels = im.getdata()
+	#print(im.getdata()[0])
+	return unpackImage(pixels)
+	#return imagebytes
 
 
 # Create a file fname and writes the passed in data to it.
 def writeDirtyFile(fname, data):
-	fdirty = open(fname, 'wb')
-	fdirty.write(data)
+	#fdirty = open(fname, 'wb')
+	#fdirty.write(data)
+	im = Image.open("testImageClean.png")
+	im.putdata(packImage(data))
+	im.save("testImageDirty.png")
 
 
 # Takes in a clean image file name, a dirty image file name and text that will be hidden. 
@@ -138,4 +164,10 @@ if __name__ == '__main__':
 		else:
 			print("The hidden message was...")
 			print(steganographerReveal(args.input))
+			
+	'''im = Image.open("testImageClean.png")
+	pixels = im.getdata()
+	print(im.getdata()[0])
+	print(unpackImage(pixels))
+	print(pixels[0])'''
 	
