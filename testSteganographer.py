@@ -257,8 +257,11 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(solutionString, revealedString)
 		self.assertEqual(solutionData, revealedData)
 	
+	
+	def main():
+		print("Preparing tests...")
+		runner = unittest.TextTestRunner(verbosity = 2)
+		unittest.main(testRunner = runner)
 
 if __name__ == '__main__':
-	print("Preparing tests...")
-	runner = unittest.TextTestRunner(verbosity = 2)
-	unittest.main(testRunner = runner)
+	main()
