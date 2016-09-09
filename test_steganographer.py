@@ -15,6 +15,10 @@ class TestSteganographer(unittest.TestCase):
 		
 		if os.path.isfile("testImageDirty.png"):
 			os.remove("testImageDirty.png")
+		
+		if os.path.isfile("testImageCleanSteganogrified.png"):
+			os.remove("testImageCleanSteganogrified.png")
+			
 		#print("Ran in %.3fs " % (t))
 	
 	
