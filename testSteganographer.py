@@ -2,6 +2,8 @@
 import unittest
 import time
 from steganographer import *
+import os
+import os.path
 
 class TestSteganographer(unittest.TestCase):
 	def setUp(self):
@@ -10,6 +12,9 @@ class TestSteganographer(unittest.TestCase):
 	
 	def tearDown(self):
 		t = time.time() - self.startTime
+		
+		if os.path.isfile("testImageDirty.png"):
+			os.remove("testImageDirty.png")
 		#print("Ran in %.3fs " % (t))
 	
 	
@@ -126,22 +131,58 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealData(testData[:-byteLen // 2]), solutionData)
 	
 	
+	# Testing that unpacking returns a bytes full of all the pixels flattened.
+	def test_unpackImage(self):
+		pixel = 1, 2, 3, 4
+		solutionPixels = bytes(list(pixel * 4))
+		testPixels = []
+		
+		for i in range(4):
+			testPixels.append(pixel)
+		
+		unpacked = unpackImage(testPixels)
+		
+		self.assertEqual(unpacked, solutionPixels)
+	
+	
+	# Testing that packing returns a list with tuples of length 4.
+	def test_packImage(self):
+		pixel = 1, 2, 3, 4
+		testPixels = list(pixel * 4)
+		solutionPixels = []
+		
+		for i in range(4):
+			solutionPixels.append(pixel)
+		
+		packed = packImage(testPixels)
+		
+		self.assertEqual(packed, solutionPixels)
+	
+	
 	# Testing that opening the file works.
-	def test_openCleanFile(self):
+	def test_openBinFile(self):
 		cleanFile = "testImageClean.png"
-		fileData = openCleanFile(cleanFile)
+		fileData = openBinFile(cleanFile)
 		
 		self.assertEqual(fileData, open(cleanFile, 'rb').read())
 	
 	
 	# Testing that writing the file works as expected.
-	def test_writeDirtyFile(self):
+	def test_writeBinFile(self):
 		cleanFile = "testImageClean.png"
 		dirtyFile = "testImageDirty.png"
-		data = hideString(openCleanFile("testImageClean.png"), "Text that should be hidden.")
-		writeDirtyFile(dirtyFile, data)
+		data = hideString(openBinFile("testImageClean.png"), "Hidden text from writeBinFile test.")
+		writeBinFile(dirtyFile, data)
+		
+		cf = open(cleanFile, 'rb')
+		cf.seek(0,2)
+
+		df = open(dirtyFile, 'rb')
+		df.seek(0,2)
 		
 		self.assertFalse(open(cleanFile, 'rb').read() == open(dirtyFile, 'rb').read())
+		# Asserting that the files are the same size.
+		self.assertEqual(cf.tell(), df.tell())
 	
 	
 	# Testing that a string will correctly be hidden in a new image.
@@ -151,6 +192,9 @@ class TestSteganographer(unittest.TestCase):
 		steganographerHide(cleanImage, "Text that should be hidden.", dirtyImage)
 		
 		self.assertFalse(open(cleanImage, 'rb').read() == open(dirtyImage, 'rb').read())
+		
+		steganographerHide(cleanImage, "Text that should be hidden.")
+		self.assertTrue(os.path.isfile("testImageCleanSteganogrified.png"))
 	
 	
 	# Testing that a string is found in the dirty image.

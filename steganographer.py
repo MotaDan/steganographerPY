@@ -1,4 +1,5 @@
 import argparse
+from PIL import Image
 
 byteLen = 8
 
@@ -52,6 +53,7 @@ def revealString(hiddenData):
 			break
 	
 	revealedData = revealedData[:nullPos]
+	
 	return revealedData.decode()
 
 
@@ -86,8 +88,28 @@ def revealData(hiddenData):
 	return revealedData
 
 
+def unpackImage(pixels):
+	unpackedPixels = []
+	
+	for pix in (pixels):
+		for val in pix:
+			unpackedPixels.append(val)
+			
+	return bytes(unpackedPixels)
+
+
+def packImage(pixels):
+	packedPixels = []
+	pixelLength = 4
+	
+	for i in range(0, len(pixels), pixelLength):
+		packedPixels.append(tuple(pixels[i:i+pixelLength]))
+	
+	return packedPixels
+
+
 # Reads the file fname and returns bytes for all it's data.
-def openCleanFile(fname):
+def openBinFile(fname):
 	fimage = open(fname, 'rb')
 	imagebytes = fimage.read()
 	
@@ -95,15 +117,31 @@ def openCleanFile(fname):
 
 
 # Create a file fname and writes the passed in data to it.
-def writeDirtyFile(fname, data):
+def writeBinFile(fname, data):
 	fdirty = open(fname, 'wb')
 	fdirty.write(data)
+
+
+# Reads the file fname and returns bytes for all it's data.
+def openImageFile(fname):
+	im = Image.open(fname)
+	pixels = im.getdata()
+	
+	return unpackImage(pixels)
+
+
+# Create a image fname and writes the passed in data to it. Gets image properties from ogFname.
+def writeImageFile(fname, ogFname, data):
+	ogim = Image.open(ogFname)
+	im = Image.new(ogim.mode, ogim.size)
+	im.putdata(packImage(data))
+	im.save(fname)
 
 
 # Takes in a clean image file name, a dirty image file name and text that will be hidden. 
 # Hides the text in cleanImageFile and outputs it to dirtyImageFile.
 def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
-	cleanData = openCleanFile(cleanImageFile)
+	cleanData = openImageFile(cleanImageFile)
 	dirtyData = hideString(cleanData, text)
 	
 	if dirtyImageFile == '':
@@ -111,12 +149,12 @@ def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
 		cleanExtension = cleanImageFile.split('.')[1]
 		dirtyImageFile = cleanName + "Steganogrified." + cleanExtension
 		
-	writeDirtyFile(dirtyImageFile, dirtyData)
+	writeImageFile(dirtyImageFile, cleanImageFile, dirtyData)
 
 
 # Reveals whatever string is hidden in the fimage.
 def steganographerReveal(fimage):
-	dirtyData = openCleanFile(fimage)
+	dirtyData = openImageFile(fimage)
 	revealedString = revealString(dirtyData)
 	return revealedString
 
@@ -138,4 +176,4 @@ if __name__ == '__main__':
 		else:
 			print("The hidden message was...")
 			print(steganographerReveal(args.input))
-	
+			
