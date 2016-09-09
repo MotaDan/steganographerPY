@@ -12,6 +12,9 @@ class TestSteganographer(unittest.TestCase):
 	
 	def tearDown(self):
 		t = time.time() - self.startTime
+		
+		if os.path.isfile("testImageDirty.png"):
+			os.remove("testImageDirty.png")
 		#print("Ran in %.3fs " % (t))
 	
 	
@@ -157,19 +160,19 @@ class TestSteganographer(unittest.TestCase):
 	
 	
 	# Testing that opening the file works.
-	def test_openCleanFile(self):
+	def test_openBinFile(self):
 		cleanFile = "testImageClean.png"
-		fileData = openCleanFile(cleanFile)
+		fileData = openBinFile(cleanFile)
 		
 		self.assertEqual(fileData, open(cleanFile, 'rb').read())
 	
 	
 	# Testing that writing the file works as expected.
-	def test_writeDirtyFile(self):
+	def test_writeBinFile(self):
 		cleanFile = "testImageClean.png"
 		dirtyFile = "testImageDirty.png"
-		data = hideString(openCleanFile("testImageClean.png"), "Text that should be hidden.")
-		writeDirtyFile(dirtyFile, data)
+		data = hideString(openBinFile("testImageClean.png"), "Hidden text from writeBinFile test.")
+		writeBinFile(dirtyFile, data)
 		
 		cf = open(cleanFile, 'rb')
 		cf.seek(0,2)
@@ -178,6 +181,7 @@ class TestSteganographer(unittest.TestCase):
 		df.seek(0,2)
 		
 		self.assertFalse(open(cleanFile, 'rb').read() == open(dirtyFile, 'rb').read())
+		# Asserting that the files are the same size.
 		self.assertEqual(cf.tell(), df.tell())
 	
 	
