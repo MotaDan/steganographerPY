@@ -53,6 +53,7 @@ def revealString(hiddenData):
 			break
 	
 	revealedData = revealedData[:nullPos]
+	
 	return revealedData.decode()
 
 
@@ -110,8 +111,9 @@ def packImage(pixels):
 def openCleanFile(fname):
 	#fimage = open(fname, 'rb')
 	#imagebytes = fimage.read()
-	im = Image.open("testImageClean.png")
+	im = Image.open(fname)
 	pixels = im.getdata()
+	
 	#print(im.getdata()[0])
 	return unpackImage(pixels)
 	#return imagebytes
@@ -124,7 +126,7 @@ def writeDirtyFile(fname, data):
 	ogim = Image.open("testImageClean.png")
 	im = Image.new(ogim.mode, ogim.size)
 	im.putdata(packImage(data))
-	im.save("testImageDirty.png")
+	im.save(fname)
 
 
 # Takes in a clean image file name, a dirty image file name and text that will be hidden. 
