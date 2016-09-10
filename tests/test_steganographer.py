@@ -16,11 +16,11 @@ class TestSteganographer(unittest.TestCase):
 	def tearDown(self):
 		t = time.time() - self.startTime
 		
-		if os.path.isfile("testImageDirty.png"):
-			os.remove("testImageDirty.png")
+		if os.path.isfile("tests/testImageDirty.png"):
+			os.remove("tests/testImageDirty.png")
 		
-		if os.path.isfile("testImageCleanSteganogrified.png"):
-			os.remove("testImageCleanSteganogrified.png")
+		if os.path.isfile("tests/testImageCleanSteganogrified.png"):
+			os.remove("tests/testImageCleanSteganogrified.png")
 			
 		#print("Ran in %.3fs " % (t))
 	
@@ -168,7 +168,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that opening the file works.
 	def test_openBinFile(self):
-		cleanFile = "testImageClean.png"
+		cleanFile = "tests/testImageClean.png"
 		fileData = openBinFile(cleanFile)
 		
 		self.assertEqual(fileData, open(cleanFile, 'rb').read())
@@ -176,9 +176,9 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that writing the file works as expected.
 	def test_writeBinFile(self):
-		cleanFile = "testImageClean.png"
-		dirtyFile = "testImageDirty.png"
-		data = hideString(openBinFile("testImageClean.png"), "Hidden text from writeBinFile test.")
+		cleanFile = "tests/testImageClean.png"
+		dirtyFile = "tests/testImageDirty.png"
+		data = hideString(openBinFile(cleanFile), "Hidden text from writeBinFile test.")
 		writeBinFile(dirtyFile, data)
 		
 		cf = open(cleanFile, 'rb')
@@ -194,20 +194,20 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that a string will correctly be hidden in a new image.
 	def test_steganographerHide(self):
-		cleanImage = "testImageClean.png"
-		dirtyImage = "testImageDirty.png"
+		cleanImage = "tests/testImageClean.png"
+		dirtyImage = "tests/testImageDirty.png"
 		steganographerHide(cleanImage, "Text that should be hidden.", dirtyImage)
 		
 		self.assertFalse(open(cleanImage, 'rb').read() == open(dirtyImage, 'rb').read())
 		
 		steganographerHide(cleanImage, "Text that should be hidden.")
-		self.assertTrue(os.path.isfile("testImageCleanSteganogrified.png"))
+		self.assertTrue(os.path.isfile("tests/testImageCleanSteganogrified.png"))
 	
 	
 	# Testing that a string is found in the dirty image.
 	def test_steganographerReveal(self):
-		cleanImage = "testImageClean.png"
-		dirtyImage = "testImageDirty.png"
+		cleanImage = "tests/testImageClean.png"
+		dirtyImage = "tests/testImageDirty.png"
 		hiddenMessage = "Text that should be hidden."
 		steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 		
