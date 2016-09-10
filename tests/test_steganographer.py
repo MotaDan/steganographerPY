@@ -1,7 +1,7 @@
 # Testing class
 import unittest
 import time
-from steganographer import *
+from steganographer.steganographer import *
 import os
 import os.path
 
