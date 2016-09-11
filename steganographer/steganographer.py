@@ -158,8 +158,7 @@ def steganographerReveal(fimage):
 	revealedString = revealString(dirtyData)
 	return revealedString
 
-def main(args):
-	args = parse_args(args)
+def main():
 	parser = argparse.ArgumentParser(description="hides a message in a file or returns a message hidden in a file")
 	parser.add_argument("input", help="file to hide a message in or file to reveal a message from")
 	parser.add_argument("-m", "--message", help="message to be hidden in the input file")
@@ -178,9 +177,5 @@ def main(args):
 			print(steganographerReveal(args.input))
 
 
-def run():
-	main(sys.argv[1:])
-
-
 if __name__ == '__main__':
-	run()
+	main()

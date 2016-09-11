@@ -2,11 +2,10 @@
 import unittest
 import time
 import sys
+import os
 import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from steganographer.steganographer import *
-import os
-#import os.path
 
 class TestSteganographer(unittest.TestCase):
 	def setUp(self):
@@ -263,6 +262,21 @@ class TestSteganographer(unittest.TestCase):
 		
 		self.assertEqual(solutionString, revealedString)
 		self.assertEqual(solutionData, revealedData)
+	
+	
+	# Testing that arguments passed o the main function work as expected.
+	def test_main(self):
+		hiddenMessage = '"test_main hidden message"'
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.png -m ' + hiddenMessage + ' -o tests/testImageDirty.png')
+		#out = sys.stdout.getvalue().strip()
+		self.assertEqual(result, 0)
+		#self.assertEqual(out, "The message has been hidden.")
+		
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.png -m ' + hiddenMessage)
+		self.assertEqual(result, 0)
+		
+		result = os.system("python steganographer/steganographer.py tests/testImageDirty.png")
+		self.assertEqual(result, 0)
 	
 	
 	def main():
