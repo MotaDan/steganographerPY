@@ -1,5 +1,6 @@
 import argparse
 from PIL import Image
+import sys
 
 byteLen = 8
 
@@ -110,33 +111,50 @@ def packImage(pixels):
 
 # Reads the file fname and returns bytes for all it's data.
 def openBinFile(fname):
-	fimage = open(fname, 'rb')
-	imagebytes = fimage.read()
+	try:
+		fimage = open(fname, 'rb')
+		imagebytes = fimage.read()
+		
+		return imagebytes
 	
-	return imagebytes
+	except FileNotFoundError:
+		print("Could not read file", fname)
+		sys.exit()
 
 
 # Create a file fname and writes the passed in data to it.
 def writeBinFile(fname, data):
-	fdirty = open(fname, 'wb')
-	fdirty.write(data)
-
+	try:
+		fdirty = open(fname, 'wb')
+		fdirty.write(data)
+		
+	except FileNotFoundError:
+		print("Could not read file", fname)
+		sys.exit()
 
 # Reads the file fname and returns bytes for all it's data.
 def openImageFile(fname):
-	im = Image.open(fname)
-	pixels = im.getdata()
-	
-	return unpackImage(pixels)
+	try:
+		im = Image.open(fname)
+		pixels = im.getdata()
+		return unpackImage(pixels)
+		
+	except FileNotFoundError:
+		print("Could not read file", fname)
+		sys.exit()
 
 
 # Create a image fname and writes the passed in data to it. Gets image properties from ogFname.
 def writeImageFile(fname, ogFname, data):
-	ogim = Image.open(ogFname)
-	im = Image.new(ogim.mode, ogim.size)
-	im.putdata(packImage(data))
-	im.save(fname)
-
+	try:
+		ogim = Image.open(ogFname)
+		im = Image.new(ogim.mode, ogim.size)
+		im.putdata(packImage(data))
+		im.save(fname)
+		
+	except FileNotFoundError:
+		print("Could not read file", fname)
+		sys.exit()
 
 # Takes in a clean image file name, a dirty image file name and text that will be hidden. 
 # Hides the text in cleanImageFile and outputs it to dirtyImageFile.
@@ -173,8 +191,9 @@ def main():
 				steganographerHide(args.input, args.message)
 			print("The message has been hidden.")
 		else:
+			hiddenMessage = steganographerReveal(args.input)
 			print("The hidden message was...")
-			print(steganographerReveal(args.input))
+			print(hiddenMessage)
 
 
 if __name__ == '__main__':

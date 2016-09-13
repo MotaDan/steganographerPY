@@ -173,6 +173,9 @@ class TestSteganographer(unittest.TestCase):
 		fileData = openBinFile(cleanFile)
 		
 		self.assertEqual(fileData, open(cleanFile, 'rb').read())
+		
+		with self.assertRaises(SystemExit):
+			fileData = openBinFile("FileThatDoesNotExist.nope")
 	
 	
 	# Testing that writing the file works as expected.
@@ -182,15 +185,18 @@ class TestSteganographer(unittest.TestCase):
 		data = hideString(openBinFile(cleanFile), "Hidden text from writeBinFile test.")
 		writeBinFile(dirtyFile, data)
 		
+		self.assertFalse(open(cleanFile, 'rb').read() == open(dirtyFile, 'rb').read())
+		
+		# Asserting that the files are the same size.
 		cf = open(cleanFile, 'rb')
 		cf.seek(0,2)
+		cleanFileSize = cf.tell()
 
 		df = open(dirtyFile, 'rb')
 		df.seek(0,2)
+		dirtyFileSize = df.tell()
 		
-		self.assertFalse(open(cleanFile, 'rb').read() == open(dirtyFile, 'rb').read())
-		# Asserting that the files are the same size.
-		self.assertEqual(cf.tell(), df.tell())
+		self.assertEqual(cleanFileSize, dirtyFileSize)
 	
 	
 	# Testing that a string will correctly be hidden in a new image.
