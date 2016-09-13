@@ -8,6 +8,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from steganographer.steganographer import *
 
 class TestSteganographer(unittest.TestCase):
+	cleanPNGLocation = "tests/testImageClean.png"
+	
 	def setUp(self):
 		self.startTime = time.time()
 	
@@ -167,7 +169,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that opening the file works.
 	def test_openBinFile(self):
-		cleanFile = "tests/testImageClean.png"
+		cleanFile = TestSteganographer.cleanPNGLocation
 		fileData = openBinFile(cleanFile)
 		
 		self.assertEqual(fileData, open(cleanFile, 'rb').read())
@@ -175,7 +177,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that writing the file works as expected.
 	def test_writeBinFile(self):
-		cleanFile = "tests/testImageClean.png"
+		cleanFile = TestSteganographer.cleanPNGLocation
 		dirtyFile = "tests/testImageDirty.png"
 		data = hideString(openBinFile(cleanFile), "Hidden text from writeBinFile test.")
 		writeBinFile(dirtyFile, data)
@@ -193,7 +195,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that a string will correctly be hidden in a new image.
 	def test_steganographerHide(self):
-		cleanImage = "tests/testImageClean.png"
+		cleanImage = TestSteganographer.cleanPNGLocation
 		dirtyImage = "tests/testImageDirty.png"
 		steganographerHide(cleanImage, "Text that should be hidden.", dirtyImage)
 		
@@ -205,7 +207,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	# Testing that a string is found in the dirty image.
 	def test_steganographerReveal(self):
-		cleanImage = "tests/testImageClean.png"
+		cleanImage = TestSteganographer.cleanPNGLocation
 		dirtyImage = "tests/testImageDirty.png"
 		hiddenMessage = "Text that should be hidden."
 		steganographerHide(cleanImage, hiddenMessage, dirtyImage)
@@ -279,10 +281,21 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(result, 0)
 	
 	
+	# Testing that jpegs can have a message hidden and revealed.
+	def test_jpegs(self):
+		hiddenMessage = '"test_jpeg hidden message"'
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + ' -o tests/testImageDirty.jpg')
+		self.assertEqual(result, 0)
+		
+		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
+		self.assertEqual(result, 0)
+		
+	
 	def main():
 		print("Preparing tests...")
 		runner = unittest.TextTestRunner(verbosity = 2)
 		unittest.main(testRunner = runner)
+
 
 if __name__ == '__main__':
 	main()
