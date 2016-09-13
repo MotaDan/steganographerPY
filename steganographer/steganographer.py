@@ -150,7 +150,7 @@ def writeImageFile(fname, ogFname, data):
 		ogim = Image.open(ogFname)
 		im = Image.new(ogim.mode, ogim.size)
 		im.putdata(packImage(data))
-		im.save(fname)
+		im.save(fname, ogim.format)
 		
 	except FileNotFoundError:
 		print("Could not read file", fname)
