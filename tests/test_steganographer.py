@@ -291,6 +291,16 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(result, 0)
 		
 	
+	# Testing that jpegs can have a message hidden and revealed.
+	def test_bmps(self):
+		hiddenMessage = '"test_bmps hidden message"'
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + ' -o tests/testImageDirty.bmp')
+		self.assertEqual(result, 0)
+		
+		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
+		self.assertEqual(result, 0)
+		
+	
 	def main():
 		print("Preparing tests...")
 		runner = unittest.TextTestRunner(verbosity = 2)
