@@ -16,13 +16,6 @@ class TestSteganographer(unittest.TestCase):
 	
 	def tearDown(self):
 		t = time.time() - self.startTime
-		
-		if os.path.isfile("tests/testImageDirty.png"):
-			os.remove("tests/testImageDirty.png")
-		
-		if os.path.isfile("tests/testImageCleanSteganogrified.png"):
-			os.remove("tests/testImageCleanSteganogrified.png")
-			
 		#print("Ran in %.3fs " % (t))
 	
 	
