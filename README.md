@@ -13,10 +13,3 @@ Description
 ===========
 
 Given an image and a message steganographer will hide the message in the bits of the iamge. Currently only works for pngs.
-
-
-Note
-====
-
-This project has been set up using PyScaffold 2.5.6. For details and usage
-information on PyScaffold see http://pyscaffold.readthedocs.org/.
