@@ -284,7 +284,7 @@ class TestSteganographer(unittest.TestCase):
 		result = os.system("python steganographer/steganographer.py tests/testImageDirty.png")
 		self.assertEqual(result, 0)
 	
-	
+	'''
 	# Testing that jpegs can have a message hidden and revealed.
 	def test_jpegs(self):
 		hiddenMessage = '"test_jpeg hidden message"'
@@ -303,7 +303,7 @@ class TestSteganographer(unittest.TestCase):
 		
 		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
 		self.assertEqual(result, 0)
-		
+		'''
 	
 	def main():
 		print("Preparing tests...")
