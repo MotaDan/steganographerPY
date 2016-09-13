@@ -175,6 +175,10 @@ class TestSteganographer(unittest.TestCase):
 	def test_writeBinFile(self):
 		cleanFile = TestSteganographer.cleanPNGLocation
 		dirtyFile = "tests/testImageDirty.png"
+		# Removing dirty file if it is there from another test.
+		if os.path.isfile(dirtyFile):
+			os.remove(dirtyFile)
+		
 		data = hideString(openBinFile(cleanFile), "Hidden text from writeBinFile test.")
 		writeBinFile(dirtyFile, data)
 		
@@ -196,11 +200,12 @@ class TestSteganographer(unittest.TestCase):
 	def test_steganographerHide(self):
 		cleanImage = TestSteganographer.cleanPNGLocation
 		dirtyImage = "tests/testImageDirty.png"
-		steganographerHide(cleanImage, "Text that should be hidden.", dirtyImage)
+		hiddenMessage = "Hidden text from test_steganographerHide test."
+		steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 		
 		self.assertFalse(open(cleanImage, 'rb').read() == open(dirtyImage, 'rb').read())
 		
-		steganographerHide(cleanImage, "Text that should be hidden.")
+		steganographerHide(cleanImage, hiddenMessage)
 		self.assertTrue(os.path.isfile("tests/testImageCleanSteganogrified.png"))
 	
 	
@@ -208,7 +213,7 @@ class TestSteganographer(unittest.TestCase):
 	def test_steganographerReveal(self):
 		cleanImage = TestSteganographer.cleanPNGLocation
 		dirtyImage = "tests/testImageDirty.png"
-		hiddenMessage = "Text that should be hidden."
+		hiddenMessage = "Hidden text from test_steganographerReveal test."
 		steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 		
 		self.assertEqual(steganographerReveal(dirtyImage), hiddenMessage)
