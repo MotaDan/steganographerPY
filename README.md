@@ -12,4 +12,4 @@ Hide messages inside an image.
 Description
 ===========
 
-Given an image and a message steganographer will hide the message in the bits of the iamge. Currently only works for pngs.
+Given an image and a message steganographer will hide the message in the bits of the image. Currently only works for pngs.
