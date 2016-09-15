@@ -288,28 +288,28 @@ class TestSteganographer(unittest.TestCase):
 		result = os.system("python steganographer/steganographer.py tests/testImageDirty.png")
 		self.assertEqual(result, 0)
 	
-	"""
-	def test_jpegs(self):
-		#Testing that jpegs can have a message hidden and revealed.
-		hiddenMessage = '"test_jpeg hidden message"'
-		result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + 
-							' -o tests/testImageDirty.jpg')
-		self.assertEqual(result, 0)
+	
+	# def test_jpegs(self):
+		# """Testing that jpegs can have a message hidden and revealed."""
+		# hiddenMessage = '"test_jpeg hidden message"'
+		# result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + 
+							# ' -o tests/testImageDirty.jpg')
+		# self.assertEqual(result, 0)
 		
-		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
-		self.assertEqual(result, 0)
+		# result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
+		# self.assertEqual(result, 0)
 		
 	
-	def test_bmps(self):
-		#Testing that jpegs can have a message hidden and revealed.
-		hiddenMessage = '"test_bmps hidden message"'
-		result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + 
-							' -o tests/testImageDirty.bmp')
-		self.assertEqual(result, 0)
+	# def test_bmps(self):
+		# """Testing that jpegs can have a message hidden and revealed."""
+		# hiddenMessage = '"test_bmps hidden message"'
+		# result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + 
+							# ' -o tests/testImageDirty.bmp')
+		# self.assertEqual(result, 0)
 		
-		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
-		self.assertEqual(result, 0)
-	"""
+		# result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
+		# self.assertEqual(result, 0)
+	
 	
 	def main(argv):
 		"""Running all the tests contained."""
