@@ -30,6 +30,7 @@ setup(
 
 	# The project's main homepage.
 	url='https://github.com/MotaDan/steganographerPY',
+	download_url='https://github.com/MotaDan/steganographerPY/tarball/1.0',
 
 	# Author details
 	author='Daniel Mota',
