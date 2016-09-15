@@ -8,7 +8,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from steganographer.steganographer import *
 
 class TestSteganographer(unittest.TestCase):
+
 	"""The class that contains the tests."""
+	
 	cleanPNGLocation = "tests/testImageClean.png"
 	
 	def setUp(self):
@@ -120,8 +122,11 @@ class TestSteganographer(unittest.TestCase):
 	
 	
 	def test_revealDataPartial(self):
-		"""Testing that reveal data will return as much data as possible when the testData passed in is too small for 
-		the data to be hidden."""
+		"""
+		Testing that reveal data will return as much data as possible.
+		
+		When the testData passed in is too small for the data to be hidden.
+		"""
 		testData = bytearray(byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
 		testData[1] = 1
 		testData[7] = 1

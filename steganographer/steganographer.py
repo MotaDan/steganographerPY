@@ -6,8 +6,12 @@ byteLen = 8
 
 
 def hideByte(cleanData, val):
-	"""Expects a bytearray of length 8 and a character value. Will return a bytearray with the character's bits hidden 
-	in the least significant bit."""
+	"""
+	Hides a byte val in data. Returns bytearray.
+	
+	Expects a bytearray of length 8 and a character value. Will return a bytearray with the character's bits hidden 
+	in the least significant bit.
+	"""
 	hiddenData = bytearray(len(cleanData))
 	mask = 1 << (byteLen - 1)
 	
@@ -36,15 +40,23 @@ def revealByte(hiddenData):
 
 
 def hideString(cleanData, val):
-	"""Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits hidden 
-	in the least significant bits. Adds null terminator to the end of the string."""
+	"""
+	Hides a string val in cleanData. Returns a bytearray.
+	
+	Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits hidden 
+	in the least significant bits. Adds null terminator to the end of the string.
+	"""
 	val += '\0'
 	return hideData(cleanData, bytearray(val, 'utf-8'))
 
 
 def revealString(hiddenData):
-	"""Expects a bytearray of any length. Will pull out the least significant bits from each byte and return them as 
-	a string."""
+	"""
+	Returns a string hidden in hiddenData.
+	
+	Expects a bytearray of any length. Will pull out the least significant bits from each byte and return them as 
+	a string.
+	"""
 	revealedData = revealData(hiddenData)
 	nullPos = 0
 	
@@ -60,8 +72,12 @@ def revealString(hiddenData):
 
 
 def hideData(cleanData, val):
-	"""Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's 
-	bits hidden in the least significant bits of cleanData."""
+	"""
+	Hides val inside cleanData. Returns a bytearray.
+	
+	Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's 
+	bits hidden in the least significant bits of cleanData.
+	"""
 	hiddenData = bytearray()
 	
 	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
@@ -74,8 +90,12 @@ def hideData(cleanData, val):
 
 
 def revealData(hiddenData):
-	"""Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
-	return them as a byteArray."""
+	"""
+	Returns the data hidden in hiddenData.
+	
+	Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
+	return them as a byteArray.
+	"""
 	revealedDataLen = len(hiddenData) // byteLen
 	revealedData = bytearray()
 	
@@ -162,8 +182,12 @@ def writeImageFile(fname, ogFname, data):
 
 
 def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
-	"""Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in 
-	cleanImageFile and outputs it to dirtyImageFile."""
+	"""
+	Hides text inside CleanImageFile and outputs dirtyImageFile.
+	
+	Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in 
+	cleanImageFile and outputs it to dirtyImageFile.
+	"""
 	cleanData = openImageFile(cleanImageFile)
 	dirtyData = hideString(cleanData, text)
 	

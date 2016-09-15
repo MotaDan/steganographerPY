@@ -1,3 +1,4 @@
+"""The main routine."""
 import sys
 import argparse
 from steganographer.steganographer import steganographerHide, steganographerReveal
