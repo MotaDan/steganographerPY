@@ -1,4 +1,4 @@
-# Testing class
+"""Testing script"""
 import unittest
 import time
 import sys
@@ -8,6 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from steganographer.steganographer import *
 
 class TestSteganographer(unittest.TestCase):
+	"""The class that contains the tests."""
 	cleanPNGLocation = "tests/testImageClean.png"
 	
 	def setUp(self):
@@ -15,12 +16,13 @@ class TestSteganographer(unittest.TestCase):
 	
 	
 	def tearDown(self):
-		t = time.time() - self.startTime
+		#t = time.time() - self.startTime
 		#print("Ran in %.3fs " % (t))
+		pass
 	
 	
-	# Testing that the hideByte function does hide a byte and returns the testData with that byte hidden.
 	def test_hideByte(self):
+		"""Testing that the hideByte function does hide a byte and returns the testData with that byte hidden."""
 		testData = bytearray(b'\x01' * byteLen)
 		dataToHide = bytearray('A', 'utf-8')
 		solutionData = bytearray(byteLen)
@@ -30,8 +32,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(hideByte(testData, dataToHide[0]), solutionData)
 	
 	
-	# Testing that the revealByte function returns a bytearray of the hidden byte. 
 	def test_revealByte(self):
+		"""Testing that the revealByte function returns a bytearray of the hidden byte."""
 		testData = bytearray(byteLen)
 		testData[1] = 1
 		testData[7] = 1
@@ -40,8 +42,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealByte(testData), solutionData)
 	
 	
-	# Testing that hideString takes in a string and bytearray and hides the string in that bytearray.
 	def test_hideString(self):
+		"""Testing that hideString takes in a string and bytearray and hides the string in that bytearray."""
 		testData = bytearray(b'\x01' * byteLen * 3)
 		solutionData = bytearray(byteLen * 3)
 		solutionData[1] = 1
@@ -55,8 +57,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(hideString(testData, 'ABC'), solutionData)
 	
 	
-	# Testing that revealString returns a string of the data that was hidden in testData.
 	def test_revealString(self):
+		"""Testing that revealString returns a string of the data that was hidden in testData."""
 		testData = bytearray(byteLen * 4)
 		testData[1] = 1
 		testData[7] = 1
@@ -69,8 +71,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealString(testData), 'ABC')
 	
 	
-	# Testing that hideData will hide one bytearray inside another.
 	def test_hideData(self):
+		"""Testing that hideData will hide one bytearray inside another."""
 		testData = bytearray(b'\x01' * byteLen * 4)
 		dataToHide = bytearray('ABC', 'utf-8')
 		solutionData = bytearray(byteLen * 3) + bytearray(b'\x01' * byteLen)
@@ -85,8 +87,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(hideData(testData, dataToHide), solutionData)
 	
 	
-	# Testing that hideData will work correctly when given a testData bytearray that is too short to contain the data given.
 	def test_hideDataPartial(self):
+		"""Testing that hideData will work when given a testData bytearray that is too short to hold the data"""
 		testData = bytearray(b'\x01' * byteLen * 3)
 		dataToHide = bytearray('ABC', 'utf-8')
 		solutionData = bytearray(byteLen * 3)
@@ -102,8 +104,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(hideData(testData[:4], dataToHide), solutionData[:4])
 	
 	
-	# Testing that revealData will return the correct data that is hidden inside the testData.
 	def test_revealData(self):
+		"""Testing that revealData will return the correct data that is hidden inside the testData."""
 		testData = bytearray(byteLen * 3)
 		testData[1] = 1
 		testData[7] = 1
@@ -117,8 +119,9 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealData(testData), solutionData)
 	
 	
-	# Testing that reveal data will return as much data as possible when the testData passed in is too small for the data to be hidden.
 	def test_revealDataPartial(self):
+		"""Testing that reveal data will return as much data as possible when the testData passed in is too small for 
+		the data to be hidden."""
 		testData = bytearray(byteLen * 3)	#Will contain 'ABC' but will be truncated when passed to revealData
 		testData[1] = 1
 		testData[7] = 1
@@ -132,13 +135,13 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(revealData(testData[:-byteLen // 2]), solutionData)
 	
 	
-	# Testing that unpacking returns a bytes full of all the pixels flattened.
 	def test_unpackImage(self):
+		"""Testing that unpacking returns a bytes full of all the pixels flattened."""
 		pixel = 1, 2, 3, 4
 		solutionPixels = bytes(list(pixel * 4))
 		testPixels = []
 		
-		for i in range(4):
+		for _ in range(4):
 			testPixels.append(pixel)
 		
 		unpacked = unpackImage(testPixels)
@@ -146,13 +149,13 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(unpacked, solutionPixels)
 	
 	
-	# Testing that packing returns a list with tuples of length 4.
 	def test_packImage(self):
+		"""Testing that packing returns a list with tuples of length 4."""
 		pixel = 1, 2, 3, 4
 		testPixels = list(pixel * 4)
 		solutionPixels = []
 		
-		for i in range(4):
+		for _ in range(4):
 			solutionPixels.append(pixel)
 		
 		packed = packImage(testPixels)
@@ -160,8 +163,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(packed, solutionPixels)
 	
 	
-	# Testing that opening the file works.
 	def test_openBinFile(self):
+		"""Testing that opening the file works."""
 		cleanFile = TestSteganographer.cleanPNGLocation
 		fileData = openBinFile(cleanFile)
 		
@@ -171,8 +174,8 @@ class TestSteganographer(unittest.TestCase):
 			fileData = openBinFile("FileThatDoesNotExist.nope")
 	
 	
-	# Testing that writing the file works as expected.
 	def test_writeBinFile(self):
+		"""Testing that writing the file works as expected."""
 		cleanFile = TestSteganographer.cleanPNGLocation
 		dirtyFile = "tests/testImageDirty.png"
 		# Removing dirty file if it is there from another test.
@@ -196,8 +199,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(cleanFileSize, dirtyFileSize)
 	
 	
-	# Testing that a string will correctly be hidden in a new image.
 	def test_steganographerHide(self):
+		"""Testing that a string will correctly be hidden in a new image."""
 		cleanImage = TestSteganographer.cleanPNGLocation
 		dirtyImage = "tests/testImageDirty.png"
 		hiddenMessage = "Hidden text from test_steganographerHide test."
@@ -209,8 +212,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertTrue(os.path.isfile("tests/testImageCleanSteganogrified.png"))
 	
 	
-	# Testing that a string is found in the dirty image.
 	def test_steganographerReveal(self):
+		"""Testing that a string is found in the dirty image."""
 		cleanImage = TestSteganographer.cleanPNGLocation
 		dirtyImage = "tests/testImageDirty.png"
 		hiddenMessage = "Hidden text from test_steganographerReveal test."
@@ -219,8 +222,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(steganographerReveal(dirtyImage), hiddenMessage)
 		
 	
-	# Testing that the string entered is the string returned. The data it is stored in is the exact length needed.
 	def test_steganographerNullData(self):
+		"""Testing that the string entered is the string returned. The data is the exact length needed."""
 		testString = "This is a test String"
 		testData = bytearray(testString, 'utf-8')
 		blankData = bytearray(b'\x01' * len(testString) * byteLen)
@@ -235,8 +238,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(testData, revealedData)
 	
 	
-	# Testing that when the data is too small, by a full byte, that everything that can be returned is returned.
 	def test_steganographerShortData(self):
+		"""Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
 		testString = "This is a test String"
 		testData = bytearray(testString, 'utf-8')
 		blankData = bytearray(b'\x01' * (len(testString) * byteLen - byteLen))
@@ -251,8 +254,8 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(testData[:-1], revealedData)
 	
 	
-	# Testing that when the data is too small, by a half byte, that everything that can be returned is returned.
 	def test_steganographerShortPartialData(self):
+		"""Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
 		testString = "This is a test String"
 		solutionString = testString[:-1] + chr(ord(testString[-1]) >> byteLen // 2 << byteLen // 2)
 		testData = bytearray(testString, 'utf-8')
@@ -270,10 +273,11 @@ class TestSteganographer(unittest.TestCase):
 		self.assertEqual(solutionData, revealedData)
 	
 	
-	# Testing that arguments passed o the main function work as expected.
 	def test_main(self):
+		"""Testing that arguments passed o the main function work as expected."""
 		hiddenMessage = '"test_main hidden message"'
-		result = os.system('python steganographer/steganographer.py tests/testImageClean.png -m ' + hiddenMessage + ' -o tests/testImageDirty.png')
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.png -m ' + hiddenMessage + 
+							' -o tests/testImageDirty.png')
 		#out = sys.stdout.getvalue().strip()
 		self.assertEqual(result, 0)
 		#self.assertEqual(out, "The message has been hidden.")
@@ -284,32 +288,35 @@ class TestSteganographer(unittest.TestCase):
 		result = os.system("python steganographer/steganographer.py tests/testImageDirty.png")
 		self.assertEqual(result, 0)
 	
-	'''
-	# Testing that jpegs can have a message hidden and revealed.
+	"""
 	def test_jpegs(self):
+		"""Testing that jpegs can have a message hidden and revealed."""
 		hiddenMessage = '"test_jpeg hidden message"'
-		result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + ' -o tests/testImageDirty.jpg')
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + 
+							' -o tests/testImageDirty.jpg')
 		self.assertEqual(result, 0)
 		
 		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
 		self.assertEqual(result, 0)
 		
 	
-	# Testing that jpegs can have a message hidden and revealed.
 	def test_bmps(self):
+		"""Testing that jpegs can have a message hidden and revealed."""
 		hiddenMessage = '"test_bmps hidden message"'
-		result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + ' -o tests/testImageDirty.bmp')
+		result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + 
+							' -o tests/testImageDirty.bmp')
 		self.assertEqual(result, 0)
 		
 		result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
 		self.assertEqual(result, 0)
-		'''
+	"""
 	
-	def main():
+	def main(argv):
+		"""Running all the tests contained."""
 		print("Preparing tests...")
 		runner = unittest.TextTestRunner(verbosity = 2)
 		unittest.main(testRunner = runner)
 
 
 if __name__ == '__main__':
-	main()
+	TestSteganographer.main(sys.argv)

@@ -1,11 +1,12 @@
+"""Given an image and a message steganographer will hide the message in the bits of the image."""
 from PIL import Image
 import sys
 
 byteLen = 8
 
-# Expects a bytearray of length 8 and a character value. Will return a bytearray with the character's bits 
-# hidden in the least significant bit.
+
 def hideByte(cleanData, val):
+	"""Expects a bytearray of length 8 and a character value. Will return a bytearray with the character's bits hidden in the least significant bit."""
 	hiddenData = bytearray(len(cleanData))
 	mask = 1 << (byteLen - 1)
 	
@@ -22,8 +23,8 @@ def hideByte(cleanData, val):
 	return hiddenData
 
 
-# Expects a bytearray of length 8. Will pull out the least significant bit from each byte and return them.
 def revealByte(hiddenData):
+	"""Expects a bytearray of length 8. Will pull out the least significant bit from each byte and return them."""
 	revealedData = bytearray(1)
 	
 	for i in range(len(hiddenData)):
@@ -33,16 +34,14 @@ def revealByte(hiddenData):
 	return revealedData
 
 
-# Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits 
-# hidden in the least significant bits. Adds null terminator to the end of the string.
 def hideString(cleanData, val):
+	"""Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits hidden in the least significant bits. Adds null terminator to the end of the string."""
 	val += '\0'
 	return hideData(cleanData, bytearray(val, 'utf-8'))
 
 
-# Expects a bytearray of any length. Will pull out the least significant bits from each byte and 
-# return them as a string.
 def revealString(hiddenData):
+	"""Expects a bytearray of any length. Will pull out the least significant bits from each byte and return them as a string."""
 	revealedData = revealData(hiddenData)
 	nullPos = 0
 	
@@ -57,9 +56,8 @@ def revealString(hiddenData):
 	return revealedData.decode()
 
 
-# Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's bits 
-# hidden in the least significant bits of cleanData.
 def hideData(cleanData, val):
+	"""Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's bits hidden in the least significant bits of cleanData."""
 	hiddenData = bytearray()
 	
 	for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
@@ -71,9 +69,8 @@ def hideData(cleanData, val):
 	return hiddenData
 
 
-# Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
-# return them as a byteArray.
 def revealData(hiddenData):
+	"""Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and return them as a byteArray."""
 	revealedDataLen = len(hiddenData) // byteLen
 	revealedData = bytearray()
 	
@@ -89,6 +86,7 @@ def revealData(hiddenData):
 
 
 def unpackImage(pixels):
+	"""Do flatten out 2d pixels and return bytes of list."""
 	unpackedPixels = []
 	
 	for pix in (pixels):
@@ -99,6 +97,7 @@ def unpackImage(pixels):
 
 
 def packImage(pixels):
+	"""Do create 2d list of pixels and return the list."""
 	packedPixels = []
 	pixelLength = 4
 	
@@ -108,8 +107,8 @@ def packImage(pixels):
 	return packedPixels
 
 
-# Reads the file fname and returns bytes for all it's data.
 def openBinFile(fname):
+	"""Reads the file fname and returns bytes for all it's data."""
 	try:
 		fimage = open(fname, 'rb')
 		imagebytes = fimage.read()
@@ -121,8 +120,8 @@ def openBinFile(fname):
 		sys.exit()
 
 
-# Create a file fname and writes the passed in data to it.
 def writeBinFile(fname, data):
+	"""Create a file fname and writes the passed in data to it."""
 	try:
 		fdirty = open(fname, 'wb')
 		fdirty.write(data)
@@ -131,8 +130,9 @@ def writeBinFile(fname, data):
 		print("Could not read file", fname)
 		sys.exit()
 
-# Reads the file fname and returns bytes for all it's data.
+
 def openImageFile(fname):
+	"""Reads the file fname and returns bytes for all it's data."""
 	try:
 		im = Image.open(fname)
 		pixels = im.getdata()
@@ -143,8 +143,8 @@ def openImageFile(fname):
 		sys.exit()
 
 
-# Create a image fname and writes the passed in data to it. Gets image properties from ogFname.
 def writeImageFile(fname, ogFname, data):
+	"""Create a image fname and writes the passed in data to it. Gets image properties from ogFname."""
 	try:
 		ogim = Image.open(ogFname)
 		im = Image.new(ogim.mode, ogim.size)
@@ -155,9 +155,9 @@ def writeImageFile(fname, ogFname, data):
 		print("Could not read file", fname)
 		sys.exit()
 
-# Takes in a clean image file name, a dirty image file name and text that will be hidden. 
-# Hides the text in cleanImageFile and outputs it to dirtyImageFile.
+
 def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
+	"""Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in cleanImageFile and outputs it to dirtyImageFile."""
 	cleanData = openImageFile(cleanImageFile)
 	dirtyData = hideString(cleanData, text)
 	
@@ -169,8 +169,8 @@ def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
 	writeImageFile(dirtyImageFile, cleanImageFile, dirtyData)
 
 
-# Reveals whatever string is hidden in the fimage.
 def steganographerReveal(fimage):
+	"""Reveals whatever string is hidden in the fimage."""
 	dirtyData = openImageFile(fimage)
 	revealedString = revealString(dirtyData)
 	return revealedString
