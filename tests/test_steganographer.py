@@ -290,7 +290,7 @@ class TestSteganographer(unittest.TestCase):
 	
 	"""
 	def test_jpegs(self):
-		"""Testing that jpegs can have a message hidden and revealed."""
+		#Testing that jpegs can have a message hidden and revealed.
 		hiddenMessage = '"test_jpeg hidden message"'
 		result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + 
 							' -o tests/testImageDirty.jpg')
@@ -301,7 +301,7 @@ class TestSteganographer(unittest.TestCase):
 		
 	
 	def test_bmps(self):
-		"""Testing that jpegs can have a message hidden and revealed."""
+		#Testing that jpegs can have a message hidden and revealed.
 		hiddenMessage = '"test_bmps hidden message"'
 		result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + 
 							' -o tests/testImageDirty.bmp')
