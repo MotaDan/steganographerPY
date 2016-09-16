@@ -12,7 +12,7 @@ def main(args=None):
 	parser.add_argument("input", help="file to hide a message in or file to reveal a message from")
 	parser.add_argument("-m", "--message", help="message to be hidden in the input file")
 	parser.add_argument("-o", "--output", 
-						help="name of output file to hide message in. If not given will append Steganogrified to input name.")
+					help="name of output file to hide message in. If not given will append Steganogrified to input.")
 	args = parser.parse_args()
 	
 	if args.input:
