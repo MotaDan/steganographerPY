@@ -1,6 +1,5 @@
 """Testing script"""
 import pytest
-import time
 import sys
 import os
 import os.path
@@ -302,14 +301,3 @@ def test_main():
 	
 	# result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
 	# assert result == 0
-
-
-def main(argv):
-	"""Running all the tests contained."""
-	print("Preparing tests...")
-	runner = unittest.TextTestRunner(verbosity = 2)
-	unittest.main(testRunner = runner)
-
-
-if __name__ == '__main__':
-	main(sys.argv)
