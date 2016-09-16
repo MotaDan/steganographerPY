@@ -291,7 +291,7 @@ def test_main(capfd):
 	assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
 
 
-@pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.")
+@pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.", run=False)
 def test_jpegs():
 	"""Testing that jpegs can have a message hidden and revealed."""
 	hiddenMessage = '"test_jpeg hidden message"'
@@ -303,7 +303,7 @@ def test_jpegs():
 	assert result == 0
 	
 
-@pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.")
+@pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.", run=False)
 def test_bmps():
 	"""Testing that jpegs can have a message hidden and revealed."""
 	hiddenMessage = '"test_bmps hidden message"'
