@@ -267,25 +267,28 @@ def test_steganographerShortPartialData():
 
 def test_main(capfd):
 	"""Testing that arguments passed o the main function work as expected."""
+	lineEnd = '\n'
+	if sys.platform == 'win32':
+		lineEnd = '\r\n'
 	hiddenMessage = 'test_main hidden message'
 	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + 
 						'" -o tests/testImageDirty.png')
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == "The message has been hidden.\r\n"
+	assert out == "The message has been hidden." + lineEnd
 	
 	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + '"')
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == "The message has been hidden.\r\n"
+	assert out == "The message has been hidden." + lineEnd
 	
 	result = os.system("python -m steganographer tests/testImageDirty.png")
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == ("The hidden message was...\r\n" + hiddenMessage + "\r\n")
+	assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
 
 
 # def test_jpegs():
