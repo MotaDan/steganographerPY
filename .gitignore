@@ -1,4 +1,7 @@
-.*
+.cache/
+.coverage
+.eggs/
+.pypirc
 !.gitignore
 __pycache__/
 build/
