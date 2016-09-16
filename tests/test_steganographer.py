@@ -291,23 +291,25 @@ def test_main(capfd):
 	assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
 
 
-# def test_jpegs():
-	# """Testing that jpegs can have a message hidden and revealed."""
-	# hiddenMessage = '"test_jpeg hidden message"'
-	# result = os.system('python steganographer/steganographer.py tests/testImageClean.jpg -m ' + hiddenMessage + 
-						# ' -o tests/testImageDirty.jpg')
-	# assert result == 0
+@pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.")
+def test_jpegs():
+	"""Testing that jpegs can have a message hidden and revealed."""
+	hiddenMessage = '"test_jpeg hidden message"'
+	result = os.system('python -m steganographer tests/testImageClean.jpg -m ' + hiddenMessage + 
+						' -o tests/testImageDirty.jpg')
+	assert result == 0
 	
-	# result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
-	# assert result == 0
+	result = os.system("python -m steganographer tests/testImageDirty.jpg")
+	assert result == 0
 	
 
-# def test_bmps():
-	# """Testing that jpegs can have a message hidden and revealed."""
-	# hiddenMessage = '"test_bmps hidden message"'
-	# result = os.system('python steganographer/steganographer.py tests/testImageClean.bmp -m ' + hiddenMessage + 
-						# ' -o tests/testImageDirty.bmp')
-	# assert result == 0
+@pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.")
+def test_bmps():
+	"""Testing that jpegs can have a message hidden and revealed."""
+	hiddenMessage = '"test_bmps hidden message"'
+	result = os.system('python -m steganographer tests/testImageClean.bmp -m ' + hiddenMessage + 
+						' -o tests/testImageDirty.bmp')
+	assert result == 0
 	
-	# result = os.system("python steganographer/steganographer.py tests/testImageDirty.jpg")
-	# assert result == 0
+	result = os.system("python -m steganographer tests/testImageDirty.bmp")
+	assert result == 0
