@@ -202,12 +202,20 @@ def test_steganographerHide():
 	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
 	assert os.path.isfile(dirtyImage)
 	assert hiddenFname == dirtyImage
+	try:
+		Image.open(dirtyImage)
+	except OSError:
+		pytest.fail("Image is corrupt " + dirtyImage)
 	
 	hiddenFname = steganographerHide(cleanImage, hiddenMessage)
 	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
 	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
 	assert os.path.isfile(steganogrifiedFname)
 	assert hiddenFname == steganogrifiedFname
+	try:
+		Image.open(steganogrifiedFname)
+	except OSError:
+		pytest.fail("Image is corrupt " + steganogrifiedFname)
 
 
 def test_steganographerReveal():
@@ -277,18 +285,29 @@ def test_main(capfd):
 	if sys.platform == 'win32':
 		lineEnd = '\r\n'
 	hiddenMessage = 'test_main hidden message'
+	dirtyFname = "tests/testImageDirty.png"
+	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
+	
 	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + 
-						'" -o tests/testImageDirty.png')
+						'" -o ' + dirtyFname)
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == "The message has been hidden in tests/testImageDirty.png" + lineEnd
+	assert out == "The message has been hidden in " + dirtyFname + lineEnd
+	try:
+		Image.open(dirtyFname)
+	except OSError:
+		pytest.fail("Image is corrupt " + dirtyFname)
 	
 	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + '"')
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == "The message has been hidden in tests/testImageCleanSteganogrified.png" + lineEnd
+	assert out == "The message has been hidden in " + steganogrifiedFname + lineEnd
+	try:
+		Image.open(steganogrifiedFname)
+	except OSError:
+		pytest.fail("Image is corrupt " + steganogrifiedFname)
 	
 	result = os.system("python -m steganographer tests/testImageDirty.png")
 	out, _ = capfd.readouterr()
