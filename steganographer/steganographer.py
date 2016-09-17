@@ -197,6 +197,8 @@ def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
 		dirtyImageFile = cleanName + "Steganogrified." + cleanExtension
 		
 	writeImageFile(dirtyImageFile, cleanImageFile, dirtyData)
+	
+	return dirtyImageFile
 
 
 def steganographerReveal(fimage):

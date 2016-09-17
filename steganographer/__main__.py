@@ -17,11 +17,12 @@ def main(args=None):
 	
 	if args.input:
 		if args.message:
+			hiddenFname = ''
 			if args.output:
-				steganographerHide(args.input, args.message, args.output)
+				hiddenFname = steganographerHide(args.input, args.message, args.output)
 			else:
-				steganographerHide(args.input, args.message)
-			print("The message has been hidden.")
+				hiddenFname = steganographerHide(args.input, args.message)
+			print("The message has been hidden in " + hiddenFname)
 		else:
 			hiddenMessage = steganographerReveal(args.input)
 			print("The hidden message was...")

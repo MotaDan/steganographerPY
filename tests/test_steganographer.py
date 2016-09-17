@@ -196,12 +196,18 @@ def test_steganographerHide():
 	cleanImage = cleanPNGLocation
 	dirtyImage = "tests/testImageDirty.png"
 	hiddenMessage = "Hidden text from test_steganographerHide test."
-	steganographerHide(cleanImage, hiddenMessage, dirtyImage)
+	hiddenFname = ''
 	
+	hiddenFname = steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
+	assert os.path.isfile(dirtyImage)
+	assert hiddenFname == dirtyImage
 	
-	steganographerHide(cleanImage, hiddenMessage)
-	assert os.path.isfile("tests/testImageCleanSteganogrified.png")
+	hiddenFname = steganographerHide(cleanImage, hiddenMessage)
+	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
+	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
+	assert os.path.isfile(steganogrifiedFname)
+	assert hiddenFname == steganogrifiedFname
 
 
 def test_steganographerReveal():
@@ -276,13 +282,13 @@ def test_main(capfd):
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == "The message has been hidden." + lineEnd
+	assert out == "The message has been hidden in tests/testImageDirty.png" + lineEnd
 	
 	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + '"')
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
-	assert out == "The message has been hidden." + lineEnd
+	assert out == "The message has been hidden in tests/testImageCleanSteganogrified.png" + lineEnd
 	
 	result = os.system("python -m steganographer tests/testImageDirty.png")
 	out, _ = capfd.readouterr()
