@@ -1,5 +1,6 @@
 """Testing script"""
 import pytest
+from PIL import ImageChops
 import sys
 import os
 import os.path
@@ -202,6 +203,7 @@ def test_steganographerHide():
 	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
 	assert os.path.isfile(dirtyImage)
 	assert hiddenFname == dirtyImage
+	assert compare_images(cleanImage, dirtyImage) < 500
 	try:
 		Image.open(dirtyImage)
 	except OSError:
@@ -212,6 +214,7 @@ def test_steganographerHide():
 	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
 	assert os.path.isfile(steganogrifiedFname)
 	assert hiddenFname == steganogrifiedFname
+	assert compare_images(cleanImage, steganogrifiedFname) < 500
 	try:
 		Image.open(steganogrifiedFname)
 	except OSError:
@@ -279,6 +282,24 @@ def test_steganographerShortPartialData():
 	assert solutionData == revealedData
 
 
+def compare_images(img1, img2):
+	img1 = Image.open(img1)
+	img2 = Image.open(img2)
+
+	# calculate the difference and its norms
+	diff = ImageChops.difference(img1, img2)
+	m_norm = sum(unpackImage(diff.getdata()))  # Manhattan norm
+	
+	return m_norm
+
+
+def normalize(arr):
+	rng = arr.max()-arr.min()
+	amin = arr.min()
+	
+	return (arr-amin)*255/rng
+
+
 def test_main(capfd):
 	"""Testing that arguments passed o the main function work as expected."""
 	lineEnd = '\n'
@@ -294,6 +315,7 @@ def test_main(capfd):
 	
 	assert result == 0
 	assert out == "The message has been hidden in " + dirtyFname + lineEnd
+	assert compare_images("tests/testImageClean.png", dirtyFname) < 500
 	try:
 		Image.open(dirtyFname)
 	except OSError:
@@ -304,6 +326,7 @@ def test_main(capfd):
 	
 	assert result == 0
 	assert out == "The message has been hidden in " + steganogrifiedFname + lineEnd
+	assert compare_images("tests/testImageClean.png", steganogrifiedFname) < 500
 	try:
 		Image.open(steganogrifiedFname)
 	except OSError:
@@ -322,7 +345,9 @@ def test_jpegs():
 	hiddenMessage = '"test_jpeg hidden message"'
 	result = os.system('python -m steganographer tests/testImageClean.jpg -m ' + hiddenMessage + 
 						' -o tests/testImageDirty.jpg')
+	
 	assert result == 0
+	assert compare_images("tests/testImageClean.jpg", "tests/testImageDirty.jpg") < 500
 	
 	result = os.system("python -m steganographer tests/testImageDirty.jpg")
 	assert result == 0
@@ -334,7 +359,9 @@ def test_bmps():
 	hiddenMessage = '"test_bmps hidden message"'
 	result = os.system('python -m steganographer tests/testImageClean.bmp -m ' + hiddenMessage + 
 						' -o tests/testImageDirty.bmp')
+						
 	assert result == 0
+	assert compare_images("tests/testImageClean.bmp", "tests/testImageDirty.bmp") < 500
 	
 	result = os.system("python -m steganographer tests/testImageDirty.bmp")
 	assert result == 0
