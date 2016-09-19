@@ -151,8 +151,8 @@ def writeBinFile(fname, data):
 		fdirty = open(fname, 'wb')
 		fdirty.write(data)
 		
-	except FileNotFoundError:
-		print("Could not read file", fname)
+	except IOError: # pragma: no cover
+		print("Could not create file", fname)
 		sys.exit()
 
 
@@ -177,7 +177,7 @@ def writeImageFile(fname, ogFname, data):
 		im.save(fname, ogim.format)
 		
 	except FileNotFoundError:
-		print("Could not read file", fname)
+		print("Could not read file", ogFname)
 		sys.exit()
 
 

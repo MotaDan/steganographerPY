@@ -164,7 +164,7 @@ def test_openBinFile():
 	assert fileData == open(cleanFile, 'rb').read()
 	
 	with pytest.raises(SystemExit):
-		fileData = openBinFile("FileThatDoesNotExist.nope")
+		fileData = openBinFile("OpenBinFileThatDoesNotExist.nope")
 
 
 def test_writeBinFile():
@@ -190,6 +190,38 @@ def test_writeBinFile():
 	dirtyFileSize = df.tell()
 	
 	assert cleanFileSize == dirtyFileSize
+
+
+def test_openImageFile():
+	"""Testing that opening an image file works."""
+	cleanFile = cleanPNGLocation
+	imageData = openImageFile(cleanFile)
+	
+	im = Image.open(cleanFile)
+	pixels = im.getdata()
+	
+	assert imageData == unpackImage(pixels)
+	
+	with pytest.raises(SystemExit):
+		fileData = openImageFile("OpenImageFileThatDoesNotExist.nope")
+	
+
+def test_writeImageFile():
+	"""Testing that writing out an image works. File sizes will be different if the input was not created by PIL."""
+	cleanFile = cleanPNGLocation
+	dirtyFile = "tests/testImageDirty.png"
+	# Removing dirty file if it is there from another test.
+	if os.path.isfile(dirtyFile):
+		os.remove(dirtyFile)
+	
+	dirtyData = hideString(openImageFile(cleanFile), "Hidden text from writeBinFile test.")
+	writeImageFile(dirtyFile, cleanFile, dirtyData)
+	
+	assert open(cleanFile, 'rb').read() != open(dirtyFile, 'rb').read()
+	assert compare_images(cleanFile, dirtyFile) < 500
+	
+	with pytest.raises(SystemExit):
+		fileData = writeImageFile(cleanFile, "WriteImageFileThatDoesNotExist.nope", dirtyData)
 
 
 def test_steganographerHide():
@@ -283,6 +315,7 @@ def test_steganographerShortPartialData():
 
 
 def compare_images(img1, img2):
+	"""Expects strings of the locations of two images. Will return an integer representing their difference"""
 	img1 = Image.open(img1)
 	img2 = Image.open(img2)
 
@@ -294,6 +327,7 @@ def compare_images(img1, img2):
 
 
 def normalize(arr):
+	"""Normalizes a list of pixels."""
 	rng = arr.max()-arr.min()
 	amin = arr.min()
 	
