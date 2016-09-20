@@ -13,8 +13,8 @@ cleanPNGLocation = "tests/testImageClean.png"
 
 def test_hideByte():
 	"""Testing that the hideByte function does hide a byte and returns the testData with that byte hidden."""
-	testData = bytearray(b'\x01' * byteLen)
-	dataToHide = bytearray('A', 'utf-8')
+	testData = bytes(b'\x01' * byteLen)
+	dataToHide = bytes('A', 'utf-8')
 	solutionData = bytearray(byteLen)
 	solutionData[1] = 1
 	solutionData[7] = 1
@@ -23,18 +23,18 @@ def test_hideByte():
 
 
 def test_revealByte():
-	"""Testing that the revealByte function returns a bytearray of the hidden byte."""
+	"""Testing that the revealByte function returns a bytes of the hidden byte."""
 	testData = bytearray(byteLen)
 	testData[1] = 1
 	testData[7] = 1
-	solutionData = bytearray('A', 'utf-8')
+	solutionData = bytes('A', 'utf-8')
 	
 	assert revealByte(testData) == solutionData
 
 
 def test_hideString():
-	"""Testing that hideString takes in a string and bytearray and hides the string in that bytearray."""
-	testData = bytearray(b'\x01' * byteLen * 3)
+	"""Testing that hideString takes in a string and bytes and hides the string in that bytes."""
+	testData = bytes(b'\x01' * byteLen * 3)
 	solutionData = bytearray(byteLen * 3)
 	solutionData[1] = 1
 	solutionData[7] = 1
@@ -62,9 +62,9 @@ def test_revealString():
 
 
 def test_hideData():
-	"""Testing that hideData will hide one bytearray inside another."""
-	testData = bytearray(b'\x01' * byteLen * 4)
-	dataToHide = bytearray('ABC', 'utf-8')
+	"""Testing that hideData will hide one bytes inside another."""
+	testData = bytes(b'\x01' * byteLen * 4)
+	dataToHide = bytes('ABC', 'utf-8')
 	solutionData = bytearray(byteLen * 3) + bytearray(b'\x01' * byteLen)
 	solutionData[1] = 1
 	solutionData[7] = 1
@@ -78,9 +78,9 @@ def test_hideData():
 
 
 def test_hideDataPartial():
-	"""Testing that hideData will work when given a testData bytearray that is too short to hold the data"""
-	testData = bytearray(b'\x01' * byteLen * 3)
-	dataToHide = bytearray('ABC', 'utf-8')
+	"""Testing that hideData will work when given a testData bytes that is too short to hold the data"""
+	testData = bytes(b'\x01' * byteLen * 3)
+	dataToHide = bytes('ABC', 'utf-8')
 	solutionData = bytearray(byteLen * 3)
 	solutionData[1] = 1
 	solutionData[7] = 1
@@ -104,7 +104,7 @@ def test_revealData():
 	testData[17] = 1
 	testData[22] = 1
 	testData[23] = 1
-	solutionData = bytearray('ABC', 'utf-8')
+	solutionData = bytes('ABC', 'utf-8')
 	
 	assert revealData(testData) == solutionData
 
@@ -123,7 +123,7 @@ def test_revealDataPartial():
 	testData[17] = 1
 	testData[22] = 1
 	testData[23] = 1
-	solutionData = bytearray('AB@', 'utf-8')
+	solutionData = bytes('AB@', 'utf-8')
 	
 	assert revealData(testData[:-byteLen // 2]) == solutionData
 
@@ -266,8 +266,8 @@ def test_steganographerReveal():
 def test_steganographerNullData():
 	"""Testing that the string entered is the string returned. The data is the exact length needed."""
 	testString = "This is a test String"
-	testData = bytearray(testString, 'utf-8')
-	blankData = bytearray(b'\x01' * len(testString) * byteLen)
+	testData = bytes(testString, 'utf-8')
+	blankData = bytes(b'\x01' * len(testString) * byteLen)
 	
 	hiddenString = hideString(blankData, testString)
 	revealedString = revealString(hiddenString)
@@ -282,8 +282,8 @@ def test_steganographerNullData():
 def test_steganographerShortData():
 	"""Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
 	testString = "This is a test String"
-	testData = bytearray(testString, 'utf-8')
-	blankData = bytearray(b'\x01' * (len(testString) * byteLen - byteLen))
+	testData = bytes(testString, 'utf-8')
+	blankData = bytes(b'\x01' * (len(testString) * byteLen - byteLen))
 	
 	hiddenString = hideString(blankData, testString)
 	revealedString = revealString(hiddenString)
@@ -299,10 +299,10 @@ def test_steganographerShortPartialData():
 	"""Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
 	testString = "This is a test String"
 	solutionString = testString[:-1] + chr(ord(testString[-1]) >> byteLen // 2 << byteLen // 2)
-	testData = bytearray(testString, 'utf-8')
-	solutionData = testData
+	testData = bytes(testString, 'utf-8')
+	solutionData = bytearray(testData)
 	solutionData[-1] = solutionData[-1] >> byteLen // 2 << byteLen // 2
-	blankData = bytearray(b'\x01' * (len(testString) * byteLen - byteLen // 2))
+	blankData = bytes(b'\x01' * (len(testString) * byteLen - byteLen // 2))
 	
 	hiddenString = hideString(blankData, testString)
 	revealedString = revealString(hiddenString)

@@ -7,9 +7,9 @@ byteLen = 8
 
 def hideByte(cleanData, val):
 	"""
-	Hides a byte val in data. Returns bytearray.
+	Hides a byte val in data. Returns bytes.
 	
-	Expects a bytearray of length 8 and a character value. Will return a bytearray with the character's bits hidden 
+	Expects a bytes of length 8 and a character value. Will return a bytes with the character's bits hidden 
 	in the least significant bit.
 	"""
 	hiddenData = bytearray(len(cleanData))
@@ -25,36 +25,36 @@ def hideByte(cleanData, val):
 			maskedBit = ~(mask >> (byteLen - 1))
 			hiddenData[i] = cleanData[i] & maskedBit
 	
-	return hiddenData
+	return bytes(hiddenData)
 
 
 def revealByte(hiddenData):
-	"""Expects a bytearray of length 8. Will pull out the least significant bit from each byte and return them."""
+	"""Expects a bytes of length 8. Will pull out the least significant bit from each byte and return them."""
 	revealedData = bytearray(1)
 	
 	for i in range(len(hiddenData)):
 		leastSigBit = hiddenData[i] & 1
 		revealedData[0] = revealedData[0] | (leastSigBit << (byteLen - 1 - i))
 	
-	return revealedData
+	return bytes(revealedData)
 
 
 def hideString(cleanData, val):
 	"""
-	Hides a string val in cleanData. Returns a bytearray.
+	Hides a string val in cleanData. Returns a bytes.
 	
-	Expects a bytearray of any length and a string value. Will return a bytearray with the string's bits hidden 
+	Expects a bytes of any length and a string value. Will return a bytes with the string's bits hidden 
 	in the least significant bits. Adds null terminator to the end of the string.
 	"""
 	val += '\0'
-	return hideData(cleanData, bytearray(val, 'utf-8'))
+	return hideData(cleanData, bytes(val, 'utf-8'))
 
 
 def revealString(hiddenData):
 	"""
 	Returns a string hidden in hiddenData.
 	
-	Expects a bytearray of any length. Will pull out the least significant bits from each byte and return them as 
+	Expects a bytes of any length. Will pull out the least significant bits from each byte and return them as 
 	a string.
 	"""
 	revealedData = revealData(hiddenData)
@@ -73,9 +73,9 @@ def revealString(hiddenData):
 
 def hideData(cleanData, val):
 	"""
-	Hides val inside cleanData. Returns a bytearray.
+	Hides val inside cleanData. Returns a bytes.
 	
-	Expects a bytearray cleanData of any length and another bytearray val. Will return a bytearray with the val's 
+	Expects a bytes cleanData of any length and another bytes val. Will return a bytes with the val's 
 	bits hidden in the least significant bits of cleanData.
 	"""
 	hiddenData = bytearray()
@@ -86,15 +86,15 @@ def hideData(cleanData, val):
 	
 	hiddenData = hiddenData + cleanData[len(hiddenData):]
 	
-	return hiddenData
+	return bytes(hiddenData)
 
 
 def revealData(hiddenData):
 	"""
 	Returns the data hidden in hiddenData.
 	
-	Expects a bytearray hiddenData of any length. Will pull out the least significant bits from each byte and 
-	return them as a byteArray.
+	Expects a bytes hiddenData of any length. Will pull out the least significant bits from each byte and 
+	return them as a bytes.
 	"""
 	revealedDataLen = len(hiddenData) // byteLen
 	revealedData = bytearray()
@@ -107,7 +107,7 @@ def revealData(hiddenData):
 	if revealedDataLenRemainder > 0:
 		revealedData.extend(revealByte(hiddenData[-1 * revealedDataLenRemainder:]))
 	
-	return revealedData
+	return bytes(revealedData)
 
 
 def unpackImage(pixels):
