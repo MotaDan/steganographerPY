@@ -1,13 +1,20 @@
 language: python
 python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev"
-  - "nightly"
-# command to install dependencies
-install: "pip install -r requirements.txt"
-# command to run tests
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+- 3.5-dev
+- nightly
+install: pip install -r requirements.txt
 script: py.test
-# command to run after success
 after_success: coveralls
+deploy:
+  provider: pypi
+  user: AndroidKing
+  password:
+    secure: ieeS3jz+L1OMwQiYAr5q7bps9mQaWH43Mz7dwMHMho53AtbEV1DCaIQCoTyubn6Ap07LkC0H8V2TJ51/IzTRYNMb+Q/MoNiMvyKAyFym0pjqIOQ0c6vq9Car5Vck5SVqdJElC/icKr6rzvngBhvzxXXXPfxLWEhLS74viVjCV4h7HC+SOOXfKUdwN3SnLWJUUF924hWJ06vprE67mJLrVuCt16wPgX13MfbiaepfKC+Ur9j5n6ODQOSx+bV8yN1SpyoPsEbuLNrKW8FUr9Kc8uk0CnrefkhVjsqC9oTYTunpabbhBXRdduZF+7uHsBIVqwsjMmqOFyBB6vLYXb7J8SZ7ljvQ95B7e3OeSrBiDKwBuv4RlMPnDqOUuh6IEs6lS3YyG7W0jr8qjVSqZLOuDgaSktc2qDBAZ/cvaCm4vlPq3I6mp06miZ/GVrDpmUa+j9IwtCH2ACjTaA8NxUW4sIy8KZR6kTLrQQ2mHJARI+jrhwTDszr+SG5mptCHow2XhFLxOilJ9oRE3EpjxYe0pulQwIFGLHY8WTw8L3cZTBFD1Yur7a+9/EJvZQqwD2N0HU115sPxb9obkm/6WUNWVK+hTpDbP0jHjcCNZEMTTYyrdlcgxog+bIuJ0BNMojGIf8zpJyxPeqeDe8nKyURvJhdRdrMUxg6ycnSv/mF5Lg4=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: MotaDan/steganographerPY
