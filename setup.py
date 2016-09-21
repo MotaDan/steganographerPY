@@ -24,7 +24,7 @@ setup(
 	# Versions should comply with PEP440.  For a discussion on single-sourcing
 	# the version across setup.py and the project code, see
 	# https://packaging.python.org/en/latest/single_source_version.html
-	version='1.0.2',
+	version='1.0.3',
 
 	description='Hides a message inside an image.',
 	long_description=long_description,
@@ -46,12 +46,10 @@ setup(
 		#   3 - Alpha
 		#   4 - Beta
 		#   5 - Production/Stable
-		'Development Status :: 4 - Beta',
+		'Development Status :: 5 - Production/Stable',
 
 		# Indicate who your project is intended for
 		'Intended Audience :: Developers',
-		'Intended Audience :: Education',
-		'Intended Audience :: End Users/Desktop',
 		'Intended Audience :: Information Technology',
 
 		# Pick your license as you wish (should match "license" above)
@@ -69,8 +67,7 @@ setup(
 		
 		'Natural Language :: English',
 		'Operating System :: Microsoft :: Windows',
-		'Operating System :: Microsoft :: Windows :: Windows 7',
-		'Topic :: Multimedia :: Graphics :: Editors',
+		'Operating System :: POSIX :: Linux',
 		'Topic :: Other/Nonlisted Topic',
 		'Topic :: Utilities',
 	],
@@ -97,7 +94,6 @@ setup(
 	# for example:
 	# $ pip install -e .[dev,test]
 	extras_require={
-		'dev': ['check-manifest'],
 		'test': ['coverage', 'pytest-cov', 'coveralls'],
 	},
 
