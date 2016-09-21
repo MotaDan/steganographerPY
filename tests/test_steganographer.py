@@ -203,7 +203,7 @@ def test_openImageFile():
 	assert imageData == unpackImage(pixels)
 	
 	with pytest.raises(SystemExit):
-		fileData = openImageFile("OpenImageFileThatDoesNotExist.nope")
+		openImageFile("OpenImageFileThatDoesNotExist.nope")
 	
 
 def test_writeImageFile():
@@ -221,7 +221,7 @@ def test_writeImageFile():
 	assert compare_images(cleanFile, dirtyFile) < 500
 	
 	with pytest.raises(SystemExit):
-		fileData = writeImageFile(cleanFile, "WriteImageFileThatDoesNotExist.nope", dirtyData)
+		writeImageFile(cleanFile, "WriteImageFileThatDoesNotExist.nope", dirtyData)
 
 
 def test_steganographerHide():
