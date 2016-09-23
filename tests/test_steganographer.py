@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from steganographer.steganographer import *
 
 
-cleanPNGLocation = "tests/testImageClean.png"
+cleanPNGLocation = "tests/cleanImage.png"
 
 
 def test_hideByte():
@@ -170,7 +170,7 @@ def test_openBinFile():
 def test_writeBinFile():
 	"""Testing that writing the file works as expected."""
 	cleanFile = cleanPNGLocation
-	dirtyFile = "tests/testImageDirty.png"
+	dirtyFile = "tests/dirtyImage.png"
 	# Removing dirty file if it is there from another test.
 	if os.path.isfile(dirtyFile):
 		os.remove(dirtyFile)
@@ -209,7 +209,7 @@ def test_openImageFile():
 def test_writeImageFile():
 	"""Testing that writing out an image works. File sizes will be different if the input was not created by PIL."""
 	cleanFile = cleanPNGLocation
-	dirtyFile = "tests/testImageDirty.png"
+	dirtyFile = "tests/dirtyImage.png"
 	# Removing dirty file if it is there from another test.
 	if os.path.isfile(dirtyFile):
 		os.remove(dirtyFile)
@@ -227,7 +227,7 @@ def test_writeImageFile():
 def test_steganographerHide():
 	"""Testing that a string will correctly be hidden in a new image."""
 	cleanImage = cleanPNGLocation
-	dirtyImage = "tests/testImageDirty.png"
+	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerHide test."
 	hiddenFname = ''
 	
@@ -242,7 +242,7 @@ def test_steganographerHide():
 		pytest.fail("Image is corrupt " + dirtyImage)
 	
 	hiddenFname = steganographerHide(cleanImage, hiddenMessage)
-	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
+	steganogrifiedFname = "tests/cleanImageSteganogrified.png"
 	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
 	assert os.path.isfile(steganogrifiedFname)
 	assert hiddenFname == steganogrifiedFname
@@ -256,7 +256,7 @@ def test_steganographerHide():
 def test_steganographerReveal():
 	"""Testing that a string is found in the dirty image."""
 	cleanImage = cleanPNGLocation
-	dirtyImage = "tests/testImageDirty.png"
+	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerReveal test."
 	steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 	
@@ -340,33 +340,33 @@ def test_main(capfd):
 	if sys.platform == 'win32':
 		lineEnd = '\r\n'
 	hiddenMessage = 'test_main hidden message'
-	dirtyFname = "tests/testImageDirty.png"
-	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
+	dirtyFname = "tests/dirtyImage.png"
+	steganogrifiedFname = "tests/cleanImageSteganogrified.png"
 	
-	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + 
+	result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + 
 						'" -o ' + dirtyFname)
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
 	assert out == "The message has been hidden in " + dirtyFname + lineEnd
-	assert compare_images("tests/testImageClean.png", dirtyFname) < 500
+	assert compare_images(cleanPNGLocation, dirtyFname) < 500
 	try:
 		Image.open(dirtyFname)
 	except OSError:
 		pytest.fail("Image is corrupt " + dirtyFname)
 	
-	result = os.system('python -m steganographer tests/testImageClean.png -m "' + hiddenMessage + '"')
+	result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + '"')
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
 	assert out == "The message has been hidden in " + steganogrifiedFname + lineEnd
-	assert compare_images("tests/testImageClean.png", steganogrifiedFname) < 500
+	assert compare_images(cleanPNGLocation, steganogrifiedFname) < 500
 	try:
 		Image.open(steganogrifiedFname)
 	except OSError:
 		pytest.fail("Image is corrupt " + steganogrifiedFname)
 	
-	result = os.system("python -m steganographer tests/testImageDirty.png")
+	result = os.system("python -m steganographer tests/dirtyImage.png")
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
@@ -377,13 +377,13 @@ def test_main(capfd):
 def test_jpegs():
 	"""Testing that jpegs can have a message hidden and revealed."""
 	hiddenMessage = '"test_jpeg hidden message"'
-	result = os.system('python -m steganographer tests/testImageClean.jpg -m ' + hiddenMessage + 
-						' -o tests/testImageDirty.jpg')
+	result = os.system('python -m steganographer tests/cleanImage.jpg -m ' + hiddenMessage + 
+						' -o tests/dirtyImage.jpg')
 	
 	assert result == 0
-	assert compare_images("tests/testImageClean.jpg", "tests/testImageDirty.jpg") < 500
+	assert compare_images("tests/cleanImage.jpg", "tests/dirtyImage.jpg") < 500
 	
-	result = os.system("python -m steganographer tests/testImageDirty.jpg")
+	result = os.system("python -m steganographer tests/dirtyImage.jpg")
 	assert result == 0
 	
 
@@ -391,13 +391,13 @@ def test_jpegs():
 def test_bmps():
 	"""Testing that jpegs can have a message hidden and revealed."""
 	hiddenMessage = '"test_bmps hidden message"'
-	result = os.system('python -m steganographer tests/testImageClean.bmp -m ' + hiddenMessage + 
-						' -o tests/testImageDirty.bmp')
+	result = os.system('python -m steganographer tests/cleanImage.bmp -m ' + hiddenMessage + 
+						' -o tests/dirtyImage.bmp')
 						
 	assert result == 0
-	assert compare_images("tests/testImageClean.bmp", "tests/testImageDirty.bmp") < 500
+	assert compare_images("tests/cleanImage.bmp", "tests/dirtyImage.bmp") < 500
 	
-	result = os.system("python -m steganographer tests/testImageDirty.bmp")
+	result = os.system("python -m steganographer tests/dirtyImage.bmp")
 	assert result == 0
 
 
@@ -405,6 +405,6 @@ def test_unicode():
 	"""Testing that unicode charaters are correctly hidden and returned."""
 	hiddenMessage = "Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ"
 	
-	assert hiddenMessage == steganographerReveal(steganographerHide("tests/testImageClean.png", hiddenMessage,
-																	"tests/testImageDirty.png"))
+	assert hiddenMessage == steganographerReveal(steganographerHide(cleanPNGLocation, hiddenMessage,
+																	"tests/dirtyImage.png"))
 	
