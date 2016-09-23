@@ -400,11 +400,9 @@ def test_bmps():
 	result = os.system("python -m steganographer tests/dirtyImage.bmp")
 	assert result == 0
 	
-def test_steganographerRevealWhaaaaaaat():
-	"""Testing that a string is found in the dirty image."""
-	cleanImage = cleanPNGLocation
-	dirtyImage = "tests/dirtyImage.png"
-	hiddenMessage = "Hidden text from test_steganographerReveal test."
-	steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 	
-	assert steganographerReveal(dirtyImage) == hiddenMessage
+def test_unicode():
+	"""Testing that unicode characters are hidden and revealed."""
+	message = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ"
+	
+	assert message == steganographerReveal(steganographerHide(cleanPNGLocation, message, "tests/dirtyImage.png"))
