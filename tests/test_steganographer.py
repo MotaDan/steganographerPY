@@ -339,7 +339,7 @@ def test_main(capfd):
 	lineEnd = '\n'
 	if sys.platform == 'win32':
 		lineEnd = '\r\n'
-	hiddenMessage = 'test_main hidden message 𓁈'
+	hiddenMessage = 'test_main hidden message'
 	dirtyFname = "tests/testImageDirty.png"
 	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
 	
