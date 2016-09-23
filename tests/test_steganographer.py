@@ -31,7 +31,13 @@ def test_revealByte():
 	
 	assert revealByte(testData) == solutionData
 
-
+def test_hideRevealByteAreInverse():
+	"""Testing that anything hidden by hideByte is revealed by revealByte."""
+	cleanData = bytes(b'\x01' * 8)
+	dataToHide = bytes('T', 'utf-8')
+	
+	assert revealByte(hideByte(cleanData, dataToHide[0])) == dataToHide
+	
 def test_hideString():
 	"""Testing that hideString takes in a string and bytes and hides the string in that bytes."""
 	testData = bytes(b'\x01' * byteLen * 3)
