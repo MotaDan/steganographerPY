@@ -401,11 +401,11 @@ def test_bmps():
 	assert result == 0
 
 
-def test_unicodeCorrect():
+def test_unicode():
 	"""Testing that unicode charaters are correctly hidden and returned."""
-	hiddenMessage = "test_unicode hidden message. "
+	hiddenMessage = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬs"
 	#hiddenFile = steganographerHide(cleanPNGLocation, hiddenMessage, "tests/dirtyImage.png")
 	#revealedMessage = steganographerReveal(hiddenFile)
 	
-	assert hiddenMessage == hiddenMessage
+	#assert hiddenMessage == hiddenMessage
 	
