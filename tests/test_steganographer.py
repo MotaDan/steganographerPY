@@ -403,7 +403,7 @@ def test_bmps():
 
 def test_unicode():
 	"""Testing that unicode charaters are correctly hidden and returned."""
-	hiddenMessage = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ"
+	hiddenMessage = "test_unicode hidden message. "
 	#hiddenFile = steganographerHide(cleanPNGLocation, hiddenMessage, "tests/dirtyImage.png")
 	#revealedMessage = steganographerReveal(hiddenFile)
 	
