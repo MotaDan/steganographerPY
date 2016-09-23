@@ -372,7 +372,16 @@ def test_main(capfd):
 	assert result == 0
 	assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
 
-
+	
+def test_unicode():
+	"""Testing that unicode charaters are correctly hidden and returned."""
+	hiddenMessage = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬs"
+	hiddenFile = steganographerHide(cleanPNGLocation, hiddenMessage, "tests/dirtyImage.png")
+	revealedMessage = steganographerReveal(hiddenFile)
+	
+	assert hiddenMessage == hiddenMessage
+	
+	
 @pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.", run=False)
 def test_jpegs():
 	"""Testing that jpegs can have a message hidden and revealed."""
@@ -399,13 +408,4 @@ def test_bmps():
 	
 	result = os.system("python -m steganographer tests/dirtyImage.bmp")
 	assert result == 0
-
-
-def test_unicode():
-	"""Testing that unicode charaters are correctly hidden and returned."""
-	hiddenMessage = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬs"
-	#hiddenFile = steganographerHide(cleanPNGLocation, hiddenMessage, "tests/dirtyImage.png")
-	#revealedMessage = steganographerReveal(hiddenFile)
-	
-	#assert hiddenMessage == hiddenMessage
 	
