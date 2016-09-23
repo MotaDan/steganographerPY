@@ -373,7 +373,7 @@ def test_main(capfd):
 	assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
 
 	
-def test_unicode():
+def test_alternateEncodings():
 	"""Testing that unicode charaters are correctly hidden and returned."""
 	# hiddenMessage = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬs"
 	# hiddenFile = steganographerHide(cleanPNGLocation, hiddenMessage, "tests/dirtyImage.png")
