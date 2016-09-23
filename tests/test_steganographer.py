@@ -401,7 +401,7 @@ def test_bmps():
 	assert result == 0
 
 
-def test_unicode():
+def test_unicodeCorrect():
 	"""Testing that unicode charaters are correctly hidden and returned."""
 	hiddenMessage = "test_unicode hidden message. "
 	#hiddenFile = steganographerHide(cleanPNGLocation, hiddenMessage, "tests/dirtyImage.png")
