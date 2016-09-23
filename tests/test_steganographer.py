@@ -400,7 +400,7 @@ def test_bmps():
 	result = os.system("python -m steganographer tests/dirtyImage.bmp")
 	assert result == 0
 	
-def test_steganographerRevealUnicode():
+def test_steganographerRevealWhaaaaaaat():
 	"""Testing that a string is found in the dirty image."""
 	cleanImage = cleanPNGLocation
 	dirtyImage = "tests/dirtyImage.png"
