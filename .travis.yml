@@ -17,3 +17,6 @@ deploy:
     tags: true
     distributions: "sdist bdist_wheel"
     repo: MotaDan/steganographerPY
+matrix:
+	allow_failures:
+	- python: nightly
