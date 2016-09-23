@@ -67,6 +67,14 @@ def test_revealString():
 	assert revealString(testData) == 'ABC'
 
 
+def test_hideRevealStringInverse():
+	"""Testing that anything hidden by hideString is revealed by revealString."""
+	cleanData = bytes(b'\x01' * 500)
+	stringToHide = "Test String that will be hidden."
+	
+	assert revealString(hideString(cleanData, stringToHide)) == stringToHide
+	
+	
 def test_hideData():
 	"""Testing that hideData will hide one bytes inside another."""
 	testData = bytes(b'\x01' * byteLen * 4)
@@ -134,6 +142,14 @@ def test_revealDataPartial():
 	assert revealData(testData[:-byteLen // 2]) == solutionData
 
 
+def test_hideRevealDataInverse():
+	"""Testing that anything hidden by hideData is revealed by revealData."""
+	cleanData = bytes(b'\x01' * 500)
+	dataToHide = bytes("The test data to hide\0", 'utf-8')
+	
+	assert revealData(hideData(cleanData, dataToHide)) == dataToHide
+	
+	
 def test_unpackImage():
 	"""Testing that unpacking returns a bytes full of all the pixels flattened."""
 	pixel = 1, 2, 3, 4
@@ -162,6 +178,18 @@ def test_packImage():
 	assert packed == solutionPixels
 
 
+def test_unpackPackInverse():
+	"""Testing that pixels unpacked by unpackImage are correctly packed by packImage."""
+	pixel = 1, 2, 3, 4
+	solutionPixels = bytes(list(pixel * 4))
+	testPixels = []
+	
+	for _ in range(4):
+		testPixels.append(pixel)
+	
+	assert packImage(unpackImage(testPixels)) == testPixels
+	
+	
 def test_openBinFile():
 	"""Testing that opening the file works."""
 	cleanFile = cleanPNGLocation
@@ -259,14 +287,13 @@ def test_steganographerHide():
 		pytest.fail("Image is corrupt " + steganogrifiedFname)
 
 
-def test_steganographerReveal():
-	"""Testing that a string is found in the dirty image."""
+def test_steganographerHideSteganographerRevealInverse():
+	"""Testing that steganographerReveal reveals what was hidden by steganographerHide."""
 	cleanImage = cleanPNGLocation
 	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerReveal test."
-	steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 	
-	assert steganographerReveal(dirtyImage) == hiddenMessage
+	assert steganographerReveal(steganographerHide(cleanImage, hiddenMessage, dirtyImage)) == hiddenMessage
 	
 
 def test_steganographerNullData():
