@@ -26,7 +26,10 @@ def main(args=None):
 		else:
 			hiddenMessage = steganographerReveal(args.input)
 			print("The hidden message was...")
-			print(hiddenMessage)
+			try:
+				print(hiddenMessage)
+			except codeError:
+				print(hiddenMessage.encode('utf-8'))
 
 if __name__ == "__main__":
 	main()

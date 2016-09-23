@@ -335,11 +335,11 @@ def normalize(arr):
 
 
 def test_main(capfd):
-	"""Testing that arguments passed o the main function work as expected."""
+	"""Testing that arguments passed to the main function work as expected."""
 	lineEnd = '\n'
 	if sys.platform == 'win32':
 		lineEnd = '\r\n'
-	hiddenMessage = 'test_main hidden message'
+	hiddenMessage = 'test_main hidden message 𓁈'
 	dirtyFname = "tests/testImageDirty.png"
 	steganogrifiedFname = "tests/testImageCleanSteganogrified.png"
 	
@@ -399,3 +399,12 @@ def test_bmps():
 	
 	result = os.system("python -m steganographer tests/testImageDirty.bmp")
 	assert result == 0
+
+
+def test_unicode():
+	"""Testing that unicode charaters are correctly hidden and returned."""
+	hiddenMessage = "Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ"
+	
+	assert hiddenMessage == steganographerReveal(steganographerHide("tests/testImageClean.png", hiddenMessage,
+																	"tests/testImageDirty.png"))
+	
