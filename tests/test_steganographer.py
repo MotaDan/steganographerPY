@@ -142,10 +142,11 @@ def test_revealDataPartial():
 	assert revealData(testData[:-byteLen // 2]) == solutionData
 
 
+@pytest.mark.xfail(strict=True, reason="Issue #50 need to change how data is hidden and revealed.", run=True)
 def test_hideRevealDataInverse():
 	"""Testing that anything hidden by hideData is revealed by revealData."""
 	cleanData = bytes(b'\x01' * 500)
-	dataToHide = bytes("The test data to hide\0", 'utf-8')
+	dataToHide = bytes("The test data to hide", 'utf-8')
 	
 	assert revealData(hideData(cleanData, dataToHide)) == dataToHide
 	
