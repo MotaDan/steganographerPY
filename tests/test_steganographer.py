@@ -182,7 +182,6 @@ def test_packImage():
 def test_unpackPackInverse():
 	"""Testing that pixels unpacked by unpackImage are correctly packed by packImage."""
 	pixel = 1, 2, 3, 4
-	solutionPixels = bytes(list(pixel * 4))
 	testPixels = []
 	
 	for _ in range(4):
@@ -362,16 +361,15 @@ def test_steganographerHideString():
 	cleanImage = cleanPNGLocation
 	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerHideString."
-	hiddenFname = ''
 	
 	hiddenFname = steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 	
-	assert open(cleanImage, 'rb').read() != open(dirtyImage, 'rb').read()
-	assert compare_images(cleanImage, dirtyImage) < 500
+	assert open(cleanImage, 'rb').read() != open(hiddenFname, 'rb').read()
+	assert compare_images(cleanImage, hiddenFname) < 500
 	try:
-		Image.open(dirtyImage)
+		Image.open(hiddenFname)
 	except OSError:
-		pytest.fail("Image is corrupt " + dirtyImage)
+		pytest.fail("Image is corrupt " + hiddenFname)
 	
 	
 def test_steganographerHideStringCorrectName():
@@ -379,7 +377,6 @@ def test_steganographerHideStringCorrectName():
 	cleanImage = cleanPNGLocation
 	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerHide."
-	hiddenFname = ''
 	
 	hiddenFname = steganographerHide(cleanImage, hiddenMessage, dirtyImage)
 	
@@ -389,28 +386,25 @@ def test_steganographerHideStringCorrectName():
 def test_steganographerHideStringSteganogrified():
 	"""Testing that a string will correctly be hidden in a new image, that no name was provided for."""
 	cleanImage = cleanPNGLocation
-	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerHideStringSteganogrified."
-	hiddenFname = ''
-	hiddenFname = steganographerHide(cleanImage, hiddenMessage)
-	steganogrifiedFname = "tests/cleanImageSteganogrified.png"
 	
-	assert open(cleanImage, 'rb').read() != open(steganogrifiedFname, 'rb').read()
-	assert compare_images(cleanImage, steganogrifiedFname) < 500
+	hiddenFname = steganographerHide(cleanImage, hiddenMessage)
+	
+	assert open(cleanImage, 'rb').read() != open(hiddenFname, 'rb').read()
+	assert compare_images(cleanImage, hiddenFname) < 500
 	try:
-		Image.open(steganogrifiedFname)
+		Image.open(hiddenFname)
 	except OSError:
-		pytest.fail("Image is corrupt " + steganogrifiedFname)
+		pytest.fail("Image is corrupt " + hiddenFname)
 
 	
 def test_steganographerHideStringSteganogrifiedCorrectName():
 	"""Testing that the image a string is hidden in is the correct one."""
 	cleanImage = cleanPNGLocation
-	dirtyImage = "tests/dirtyImage.png"
 	hiddenMessage = "Hidden text from test_steganographerHideStringSteganogrified."
-	hiddenFname = ''
+	
 	hiddenFname = steganographerHide(cleanImage, hiddenMessage)
-	steganogrifiedFname = "tests/cleanImageSteganogrified.png"
+	steganogrifiedFname = cleanPNGLocation[:-4] + "Steganogrified.png"
 	
 	assert hiddenFname == steganogrifiedFname
 	assert os.path.isfile(steganogrifiedFname)
@@ -523,7 +517,7 @@ def test_mainHideMsgNoOutput(capfd):
 	if sys.platform == 'win32':
 		lineEnd = '\r\n'
 	hiddenMessage = 'test_mainHideMsgNoOutput hidden message'
-	steganogrifiedFname = "tests/cleanImageSteganogrified.png"
+	steganogrifiedFname = cleanPNGLocation[:-4] + "Steganogrified.png"
 	
 	result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + '"')
 	out, _ = capfd.readouterr()
@@ -547,7 +541,7 @@ def test_mainRevealMsgNoOutput(capfd):
 	
 	result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + 
 						'" -o ' + dirtyFname)
-	out, _ = capfd.readouterr()
+	_, _ = capfd.readouterr()
 	
 	result = os.system("python -m steganographer " + dirtyFname)
 	out, _ = capfd.readouterr()
@@ -567,7 +561,7 @@ def test_mainRevealMsgNoOutputUnicode(capfd):
 	
 	result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + 
 						'" -o ' + dirtyFname)
-	out, _ = capfd.readouterr()
+	_, _ = capfd.readouterr()
 	
 	result = os.system("python -m steganographer " + dirtyFname)
 	out, _ = capfd.readouterr()
@@ -593,13 +587,14 @@ def test_mainRevealMsgWithOutput(capfd):
 	
 	result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + 
 						'" -o ' + dirtyFname)
-	out, _ = capfd.readouterr()
+	_, _ = capfd.readouterr()
 	
 	result = os.system("python -m steganographer " + dirtyFname + " -o " + outputFname)
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
 	assert open(outputFname, 'r').read() == hiddenMessage
+	assert out == ("The hidden message was written to " + outputFname + lineEnd)
 
 	
 @pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.", run=False)

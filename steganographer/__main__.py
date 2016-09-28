@@ -28,10 +28,11 @@ def main(args=None):
 			
 			if args.output:
 				open(args.output, 'w', encoding='utf-8').write(hiddenMessage)
+				print("The hidden message was written to " + args.output)
 			else:
 				try:
 					print("The hidden message was...\n" + hiddenMessage)
-				except UnicodeEncodeError:
+				except UnicodeEncodeError: # pragma: no cover
 					ofName = args.input.split('.')[0] + 'Message.txt'
 					
 					print("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
