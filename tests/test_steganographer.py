@@ -573,10 +573,12 @@ def test_mainRevealMsgNoOutputUnicode(capfd):
 	out, _ = capfd.readouterr()
 	
 	assert result == 0
+	assert open(outputFname, 'r', encoding='utf-8').read() == hiddenMessage
+	if sys.platform == 'win32':
+		hiddenMessage = str(hiddenMessage.encode('utf-8'))
 	assert out == ("The hidden message contains unsupported unicode characters and cannot be fully displayed " + 
 					"here. The correct message has been written to " + outputFname + lineEnd + 
-					str(hiddenMessage.encode('utf-8')) + lineEnd)
-	assert open(outputFname, 'r', encoding='utf-8').read() == hiddenMessage
+					hiddenMessage + lineEnd)
 	
 	
 def test_mainRevealMsgWithOutput(capfd):
