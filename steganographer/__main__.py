@@ -35,7 +35,7 @@ def main(args=None):
 					ofName = args.input.split('.')[0] + 'Message.txt'
 					
 					print("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
-							"here. The full message has been written to", ofName)
+							"here. The correct message has been written to", ofName)
 					print(hiddenMessage.encode('utf-8'))
 					open(ofName, 'w', encoding='utf-8').write(hiddenMessage)
 
