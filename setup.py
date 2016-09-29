@@ -24,7 +24,7 @@ setup(
 	# Versions should comply with PEP440.  For a discussion on single-sourcing
 	# the version across setup.py and the project code, see
 	# https://packaging.python.org/en/latest/single_source_version.html
-	version='1.0.3',
+	version='1.0.4',
 
 	description='Hides a message inside an image.',
 	long_description=long_description,
@@ -94,7 +94,7 @@ setup(
 	# for example:
 	# $ pip install -e .[dev,test]
 	extras_require={
-		'test': ['coverage', 'pytest-cov', 'coveralls'],
+		'test': ['pytest', 'coverage', 'pytest-cov', 'coveralls', 'hypothesis'],
 	},
 
 	# To provide executable scripts, use entry points in preference to the

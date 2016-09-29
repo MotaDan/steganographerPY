@@ -2,7 +2,7 @@
 .coverage
 .eggs/
 .pypirc
-!.gitignore
+.hypothesis/
 __pycache__/
 build/
 dist/
