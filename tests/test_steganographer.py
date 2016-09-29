@@ -6,6 +6,8 @@ import os
 import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from steganographer.steganographer import *
+from hypothesis import given
+from hypothesis.strategies import text, binary, characters
 
 
 cleanPNGLocation = "tests/cleanImage.png"
@@ -31,12 +33,14 @@ def test_revealByte():
 	
 	assert revealByte(testData) == solutionData
 
-def test_hideRevealByteAreInverse():
+@given(dataToHide=binary(min_size=1, max_size=1))
+def test_hideRevealByteInverse(dataToHide):
 	"""Testing that anything hidden by hideByte is revealed by revealByte."""
 	cleanData = bytes(b'\x01' * 8)
-	dataToHide = bytes('T', 'utf-8')
 	
-	assert revealByte(hideByte(cleanData, dataToHide[0])) == dataToHide
+	revealedByte = revealByte(hideByte(cleanData, dataToHide[0]))
+	assert revealedByte == dataToHide
+	
 	
 def test_hideString():
 	"""Testing that hideString takes in a string and bytes and hides the string in that bytes."""
@@ -67,12 +71,13 @@ def test_revealString():
 	assert revealString(testData) == 'ABC'
 
 
-def test_hideRevealStringInverse():
+@given(stringToHide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
+def test_hideRevealStringInverse(stringToHide):
 	"""Testing that anything hidden by hideString is revealed by revealString."""
-	cleanData = bytes(b'\x01' * 500)
-	stringToHide = "Test String that will be hidden."
+	cleanData = bytes(b'\x01' * 5000)
 	
-	assert revealString(hideString(cleanData, stringToHide)) == stringToHide
+	revealedString = revealString(hideString(cleanData, stringToHide))
+	assert revealedString == stringToHide
 	
 	
 def test_hideData():
@@ -143,12 +148,14 @@ def test_revealDataPartial():
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #50 need to change how data is hidden and revealed.", run=True)
-def test_hideRevealDataInverse():
+@given(stringToHide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
+def test_hideRevealDataInverse(stringToHide):
 	"""Testing that anything hidden by hideData is revealed by revealData."""
-	cleanData = bytes(b'\x01' * 500)
-	dataToHide = bytes("The test data to hide", 'utf-8')
+	cleanData = bytes(b'\x01' * 5000)
+	dataToHide = bytes(stringToHide, 'utf-8')
 	
-	assert revealData(hideData(cleanData, dataToHide)) == dataToHide
+	revealedData = revealData(hideData(cleanData, dataToHide))
+	assert revealedData == dataToHide
 	
 	
 def test_unpackImage():
@@ -410,13 +417,14 @@ def test_steganographerHideStringSteganogrifiedCorrectName():
 	assert os.path.isfile(steganogrifiedFname)
 	
 
-def test_steganographerHideSteganographerRevealInverse():
+@given(hiddenMessage=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
+def test_steganographerHideSteganographerRevealInverse(hiddenMessage):
 	"""Testing that steganographerReveal reveals what was hidden by steganographerHide."""
 	cleanImage = cleanPNGLocation
 	dirtyImage = "tests/dirtyImage.png"
-	hiddenMessage = "Hidden text from test_steganographerReveal test."
 	
-	assert steganographerReveal(steganographerHide(cleanImage, hiddenMessage, dirtyImage)) == hiddenMessage
+	revealedMessage = steganographerReveal(steganographerHide(cleanImage, hiddenMessage, dirtyImage))
+	assert revealedMessage == hiddenMessage
 	
 
 def test_steganographerNullData():
