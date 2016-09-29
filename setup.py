@@ -94,7 +94,7 @@ setup(
 	# for example:
 	# $ pip install -e .[dev,test]
 	extras_require={
-		'test': ['pytest', 'coverage', 'pytest-cov', 'coveralls', 'hypothesis'],
+		'test': ['pytest', 'coverage', 'pytest-cov', 'coveralls', 'hypothesis', 'pytest-xdist'],
 	},
 
 	# To provide executable scripts, use entry points in preference to the
