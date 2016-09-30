@@ -5,134 +5,134 @@ import sys
 byteLen = 8
 
 
-def hideByte(cleanData, val):
+def hide_byte(clean_data, val):
     """
     Hides a byte val in data. Returns bytes.
 
     Expects a bytes of length 8 and a character value. Will return a bytes with the character's bits hidden
     in the least significant bit.
     """
-    hiddenData = bytearray(len(cleanData))
+    hidden_data = bytearray(len(clean_data))
     mask = 1 << (byteLen - 1)
 
-    for i in range(len(hiddenData)):
-        maskedBit = val & (mask >> i)
+    for i in range(len(hidden_data)):
+        masked_bit = val & (mask >> i)
 
-        if maskedBit > 0:
-            maskedBit = maskedBit >> (byteLen - 1 - i)
-            hiddenData[i] = cleanData[i] | maskedBit
+        if masked_bit > 0:
+            masked_bit >>= byteLen - 1 - i
+            hidden_data[i] = clean_data[i] | masked_bit
         else:
-            maskedBit = ~(mask >> (byteLen - 1))
-            hiddenData[i] = cleanData[i] & maskedBit
+            masked_bit = ~(mask >> (byteLen - 1))
+            hidden_data[i] = clean_data[i] & masked_bit
 
-    return bytes(hiddenData)
+    return bytes(hidden_data)
 
 
-def revealByte(hiddenData):
+def reveal_byte(hidden_data):
     """Expects a bytes of length 8. Will pull out the least significant bit from each byte and return them."""
-    revealedData = bytearray(1)
+    revealed_data = bytearray(1)
 
-    for i in range(len(hiddenData)):
-        leastSigBit = hiddenData[i] & 1
-        revealedData[0] = revealedData[0] | (leastSigBit << (byteLen - 1 - i))
+    for i in range(len(hidden_data)):
+        least_sig_bit = hidden_data[i] & 1
+        revealed_data[0] |= least_sig_bit << (byteLen - 1 - i)
 
-    return bytes(revealedData)
+    return bytes(revealed_data)
 
 
-def hideString(cleanData, val):
+def hide_string(clean_data, val):
     """
-    Hides a string val in cleanData. Returns a bytes.
+    Hides a string val in clean_data. Returns a bytes.
 
     Expects a bytes of any length and a string value. Will return a bytes with the string's bits hidden
     in the least significant bits. Adds null terminator to the end of the string.
     """
     val += '\0'
-    return hideData(cleanData, bytes(val, 'utf-8'))
+    return hide_data(clean_data, bytes(val, 'utf-8'))
 
 
-def revealString(hiddenData):
+def reveal_string(hidden_data):
     """
-    Returns a string hidden in hiddenData.
+    Returns a string hidden in hidden_data.
 
     Expects a bytes of any length. Will pull out the least significant bits from each byte and return them as
     a string.
     """
-    revealedData = revealData(hiddenData)
-    nullPos = 0
+    revealed_data = reveal_data(hidden_data)
+    null_pos = 0
 
-    for i in range(len(revealedData)):
-        if revealedData[i] != 0:
-            nullPos += 1
+    for i in range(len(revealed_data)):
+        if revealed_data[i] != 0:
+            null_pos += 1
         else:
             break
 
-    revealedData = revealedData[:nullPos]
+    revealed_data = revealed_data[:null_pos]
 
-    return revealedData.decode()
+    return revealed_data.decode()
 
 
-def hideData(cleanData, val):
+def hide_data(clean_data, val):
     """
-    Hides val inside cleanData. Returns a bytes.
+    Hides val inside clean_data. Returns a bytes.
 
-    Expects a bytes cleanData of any length and another bytes val. Will return a bytes with the val's
-    bits hidden in the least significant bits of cleanData.
+    Expects a bytes clean_data of any length and another bytes val. Will return a bytes with the val's
+    bits hidden in the least significant bits of clean_data.
     """
-    hiddenData = bytearray()
+    hidden_data = bytearray()
 
-    for dataIndex, strIndex in zip(range(0, len(cleanData), byteLen), range(len(val))):
-        hiddenByte = hideByte(cleanData[dataIndex:dataIndex + byteLen], val[strIndex])
-        hiddenData.extend(hiddenByte)
+    for dataIndex, strIndex in zip(range(0, len(clean_data), byteLen), range(len(val))):
+        hidden_byte = hide_byte(clean_data[dataIndex:dataIndex + byteLen], val[strIndex])
+        hidden_data.extend(hidden_byte)
 
-    hiddenData = hiddenData + cleanData[len(hiddenData):]
+    hidden_data = hidden_data + clean_data[len(hidden_data):]
 
-    return bytes(hiddenData)
+    return bytes(hidden_data)
 
 
-def revealData(hiddenData):
+def reveal_data(hidden_data):
     """
-    Returns the data hidden in hiddenData.
+    Returns the data hidden in hidden_data.
 
-    Expects a bytes hiddenData of any length. Will pull out the least significant bits from each byte and
+    Expects a bytes hidden_data of any length. Will pull out the least significant bits from each byte and
     return them as a bytes.
     """
-    revealedDataLen = len(hiddenData) // byteLen
-    revealedData = bytearray()
+    revealed_data_len = len(hidden_data) // byteLen
+    revealed_data = bytearray()
 
-    for i in range(0, revealedDataLen * byteLen, byteLen):
-        revealedData.extend(revealByte(hiddenData[i:i + byteLen]))
+    for i in range(0, revealed_data_len * byteLen, byteLen):
+        revealed_data.extend(reveal_byte(hidden_data[i:i + byteLen]))
 
-    revealedDataLenRemainder = len(hiddenData) % byteLen
+    revealed_data_len_remainder = len(hidden_data) % byteLen
 
-    if revealedDataLenRemainder > 0:
-        revealedData.extend(revealByte(hiddenData[-1 * revealedDataLenRemainder:]))
+    if revealed_data_len_remainder > 0:
+        revealed_data.extend(reveal_byte(hidden_data[-1 * revealed_data_len_remainder:]))
 
-    return bytes(revealedData)
+    return bytes(revealed_data)
 
 
-def unpackImage(pixels):
+def unpack_image(pixels):
     """Do flatten out 2d pixels and return bytes of list."""
-    unpackedPixels = []
+    unpacked_pixels = []
 
-    for pix in (pixels):
+    for pix in pixels:
         for val in pix:
-            unpackedPixels.append(val)
+            unpacked_pixels.append(val)
 
-    return bytes(unpackedPixels)
+    return bytes(unpacked_pixels)
 
 
-def packImage(pixels):
+def pack_image(pixels):
     """Do create 2d list of pixels and return the list."""
-    packedPixels = []
-    pixelLength = 4
+    packed_pixels = []
+    pixel_length = 4
 
-    for i in range(0, len(pixels), pixelLength):
-        packedPixels.append(tuple(pixels[i:i+pixelLength]))
+    for i in range(0, len(pixels), pixel_length):
+        packed_pixels.append(tuple(pixels[i:i + pixel_length]))
 
-    return packedPixels
+    return packed_pixels
 
 
-def openBinFile(fname):
+def open_bin_file(fname):
     """Reads the file fname and returns bytes for all it's data."""
     try:
         fimage = open(fname, 'rb')
@@ -145,64 +145,64 @@ def openBinFile(fname):
         sys.exit()
 
 
-def writeBinFile(fname, data):
+def write_bin_file(fname, data):
     """Create a file fname and writes the passed in data to it."""
     try:
         fdirty = open(fname, 'wb')
         fdirty.write(data)
 
-    except IOError: # pragma: no cover
+    except IOError:  # pragma: no cover
         print("Could not create file", fname)
         sys.exit()
 
 
-def openImageFile(fname):
+def open_image_file(fname):
     """Reads the file fname and returns bytes for all it's data."""
     try:
         im = Image.open(fname)
         pixels = im.getdata()
-        return unpackImage(pixels)
+        return unpack_image(pixels)
 
     except FileNotFoundError:
         print("Could not read file", fname)
         sys.exit()
 
 
-def writeImageFile(fname, ogFname, data):
-    """Create a image fname and writes the passed in data to it. Gets image properties from ogFname."""
+def write_image_file(fname, og_fname, data):
+    """Create a image fname and writes the passed in data to it. Gets image properties from og_fname."""
     try:
-        ogim = Image.open(ogFname)
+        ogim = Image.open(og_fname)
         im = Image.new(ogim.mode, ogim.size)
-        im.putdata(packImage(data))
+        im.putdata(pack_image(data))
         im.save(fname, ogim.format)
 
     except FileNotFoundError:
-        print("Could not read file", ogFname)
+        print("Could not read file", og_fname)
         sys.exit()
 
 
-def steganographerHide(cleanImageFile, text, dirtyImageFile=''):
+def steganographer_hide(clean_image_file, text, dirty_image_file=''):
     """
-    Hides text inside CleanImageFile and outputs dirtyImageFile.
+    Hides text inside CleanImageFile and outputs dirty_image_file.
 
     Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in
-    cleanImageFile and outputs it to dirtyImageFile.
+    clean_image_file and outputs it to dirty_image_file.
     """
-    cleanData = openImageFile(cleanImageFile)
-    dirtyData = hideString(cleanData, text)
+    clean_data = open_image_file(clean_image_file)
+    dirty_data = hide_string(clean_data, text)
 
-    if dirtyImageFile == '':
-        cleanName = cleanImageFile.split('.')[0]
-        cleanExtension = cleanImageFile.split('.')[1]
-        dirtyImageFile = cleanName + "Steganogrified." + cleanExtension
+    if dirty_image_file == '':
+        clean_name = clean_image_file.split('.')[0]
+        clean_extension = clean_image_file.split('.')[1]
+        dirty_image_file = clean_name + "Steganogrified." + clean_extension
 
-    writeImageFile(dirtyImageFile, cleanImageFile, dirtyData)
+    write_image_file(dirty_image_file, clean_image_file, dirty_data)
 
-    return dirtyImageFile
+    return dirty_image_file
 
 
-def steganographerReveal(fimage):
+def steganographer_reveal(fimage):
     """Reveals whatever string is hidden in the fimage."""
-    dirtyData = openImageFile(fimage)
-    revealedString = revealString(dirtyData)
-    return revealedString
+    dirty_data = open_image_file(fimage)
+    revealed_string = reveal_string(dirty_data)
+    return revealed_string

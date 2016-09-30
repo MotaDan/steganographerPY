@@ -1,7 +1,7 @@
 """The main routine."""
 import sys
 import argparse
-from steganographer.steganographer import steganographerHide, steganographerReveal
+from steganographer.steganographer import steganographer_hide, steganographer_reveal
 
 
 def main(args=None):
@@ -18,28 +18,28 @@ def main(args=None):
 
     if args.input:
         if args.message:
-            hiddenFname = ''
+            hidden_fname = ''
             if args.output:
-                hiddenFname = steganographerHide(args.input, args.message, args.output)
+                hidden_fname = steganographer_hide(args.input, args.message, args.output)
             else:
-                hiddenFname = steganographerHide(args.input, args.message)
-            print("The message has been hidden in " + hiddenFname)
+                hidden_fname = steganographer_hide(args.input, args.message)
+            print("The message has been hidden in " + hidden_fname)
         else:
-            hiddenMessage = steganographerReveal(args.input)
+            hidden_message = steganographer_reveal(args.input)
 
             if args.output:
-                open(args.output, 'w', encoding='utf-8').write(hiddenMessage)
+                open(args.output, 'w', encoding='utf-8').write(hidden_message)
                 print("The hidden message was written to " + args.output)
             else:
                 try:
-                    print("The hidden message was...\n" + hiddenMessage)
+                    print("The hidden message was...\n" + hidden_message)
                 except UnicodeEncodeError:  # pragma: no cover
-                    ofName = args.input.split('.')[0] + 'Message.txt'
+                    output_name = args.input.split('.')[0] + 'Message.txt'
 
                     print("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
-                          "here. The correct message has been written to", ofName)
-                    print(hiddenMessage.encode('utf-8'))
-                    open(ofName, 'w', encoding='utf-8').write(hiddenMessage)
+                          "here. The correct message has been written to", output_name)
+                    print(hidden_message.encode('utf-8'))
+                    open(output_name, 'w', encoding='utf-8').write(hidden_message)
 
 
 if __name__ == "__main__":
