@@ -1,14 +1,10 @@
 """The main routine."""
-import sys
 import argparse
 from steganographer.steganographer import steganographer_hide, steganographer_reveal
 
 
-def main(args=None):
+def main():
     """The main routine."""
-    if args is None:
-        args = sys.argv[1:]
-
     parser = argparse.ArgumentParser(description="hides a message in a file or returns a message hidden in a file")
     parser.add_argument("input", help="file to hide a message in or file to reveal a message from")
     parser.add_argument("-m", "--message", help="message to be hidden in the input file")
@@ -18,7 +14,6 @@ def main(args=None):
 
     if args.input:
         if args.message:
-            hidden_fname = ''
             if args.output:
                 hidden_fname = steganographer_hide(args.input, args.message, args.output)
             else:
@@ -34,7 +29,7 @@ def main(args=None):
                 try:
                     print("The hidden message was...\n" + hidden_message)
                 except UnicodeEncodeError:  # pragma: no cover
-                    output_name = args.input.split('.')[0] + 'Message.txt'
+                    output_name = args.input.split('.')[0] + '_message.txt'
 
                     print("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
                           "here. The correct message has been written to", output_name)

@@ -1,0 +1,1 @@
+test_main_reveal_msg_no_output_unicode hidden message, Unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ

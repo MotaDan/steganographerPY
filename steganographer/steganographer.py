@@ -133,12 +133,12 @@ def pack_image(pixels):
 
 
 def open_bin_file(fname):
-    """Reads the file fname and returns bytes for all it's data."""
+    """Reads the file fname and returns bytes for all of its data."""
     try:
         fimage = open(fname, 'rb')
-        imagebytes = fimage.read()
+        image_bytes = fimage.read()
 
-        return imagebytes
+        return image_bytes
 
     except FileNotFoundError:
         print("Could not read file", fname)

@@ -14,247 +14,250 @@ cleanPNGLocation = "tests/cleanImage.png"
 
 
 def test_hide_byte():
-    """Testing that the hide_byte function does hide a byte and returns the testData with that byte hidden."""
-    testData = bytes(b'\x01' * byteLen)
-    dataToHide = bytes('A', 'utf-8')
-    solutionData = bytearray(byteLen)
-    solutionData[1] = 1
-    solutionData[7] = 1
+    """Testing that the hide_byte function does hide a byte and returns the test_data with that byte hidden."""
+    test_data = bytes(b'\x01' * byteLen)
+    data_to_hide = bytes('A', 'utf-8')
+    solution_data = bytearray(byteLen)
+    solution_data[1] = 1
+    solution_data[7] = 1
 
-    assert hide_byte(testData, dataToHide[0]) == solutionData
+    assert hide_byte(test_data, data_to_hide[0]) == solution_data
 
 
 def test_reveal_byte():
     """Testing that the reveal_byte function returns a bytes of the hidden byte."""
-    testData = bytearray(byteLen)
-    testData[1] = 1
-    testData[7] = 1
-    solutionData = bytes('A', 'utf-8')
+    test_data = bytearray(byteLen)
+    test_data[1] = 1
+    test_data[7] = 1
+    solution_data = bytes('A', 'utf-8')
 
-    assert reveal_byte(testData) == solutionData
+    assert reveal_byte(test_data) == solution_data
 
 
-@given(dataToHide=binary(min_size=1, max_size=1))
-def test_hide_reveal_byte_inverse(dataToHide):
+@given(data_to_hide=binary(min_size=1, max_size=1))
+def test_hide_reveal_byte_inverse(data_to_hide):
     """Testing that anything hidden by hide_byte is revealed by reveal_byte."""
-    cleanData = bytes(b'\x01' * 8)
+    clean_data = bytes(b'\x01' * 8)
 
-    revealedByte = reveal_byte(hide_byte(cleanData, dataToHide[0]))
-    assert revealedByte == dataToHide
+    revealed_byte = reveal_byte(hide_byte(clean_data, data_to_hide[0]))
+    assert revealed_byte == data_to_hide
 
 
 def test_hide_string():
     """Testing that hide_string takes in a string and bytes and hides the string in that bytes."""
-    testData = bytes(b'\x01' * byteLen * 3)
-    solutionData = bytearray(byteLen * 3)
-    solutionData[1] = 1
-    solutionData[7] = 1
-    solutionData[9] = 1
-    solutionData[14] = 1
-    solutionData[17] = 1
-    solutionData[22] = 1
-    solutionData[23] = 1
+    test_data = bytes(b'\x01' * byteLen * 3)
+    solution_data = bytearray(byteLen * 3)
+    solution_data[1] = 1
+    solution_data[7] = 1
+    solution_data[9] = 1
+    solution_data[14] = 1
+    solution_data[17] = 1
+    solution_data[22] = 1
+    solution_data[23] = 1
 
-    assert hide_string(testData, 'ABC') == solutionData
+    assert hide_string(test_data, 'ABC') == solution_data
 
 
 def test_reveal_string():
-    """Testing that reveal_string returns a string of the data that was hidden in testData."""
-    testData = bytearray(byteLen * 4)
-    testData[1] = 1
-    testData[7] = 1
-    testData[9] = 1
-    testData[14] = 1
-    testData[17] = 1
-    testData[22] = 1
-    testData[23] = 1
+    """Testing that reveal_string returns a string of the data that was hidden in test_data."""
+    test_data = bytearray(byteLen * 4)
+    test_data[1] = 1
+    test_data[7] = 1
+    test_data[9] = 1
+    test_data[14] = 1
+    test_data[17] = 1
+    test_data[22] = 1
+    test_data[23] = 1
 
-    assert reveal_string(testData) == 'ABC'
+    assert reveal_string(test_data) == 'ABC'
 
 
-@given(stringToHide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
-def test_hide_reveal_string_inverse(stringToHide):
+@given(string_to_hide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
+def test_hide_reveal_string_inverse(string_to_hide):
     """Testing that anything hidden by hide_string is revealed by reveal_string."""
-    cleanData = bytes(b'\x01' * 5000)
+    clean_data = bytes(b'\x01' * 5000)
 
-    revealedString = reveal_string(hide_string(cleanData, stringToHide))
-    assert revealedString == stringToHide
+    revealed_string = reveal_string(hide_string(clean_data, string_to_hide))
+    assert revealed_string == string_to_hide
 
 
 def test_hide_data():
     """Testing that hide_data will hide one bytes inside another."""
-    testData = bytes(b'\x01' * byteLen * 4)
-    dataToHide = bytes('ABC', 'utf-8')
-    solutionData = bytearray(byteLen * 3) + bytearray(b'\x01' * byteLen)
-    solutionData[1] = 1
-    solutionData[7] = 1
-    solutionData[9] = 1
-    solutionData[14] = 1
-    solutionData[17] = 1
-    solutionData[22] = 1
-    solutionData[23] = 1
+    test_data = bytes(b'\x01' * byteLen * 4)
+    data_to_hide = bytes('ABC', 'utf-8')
+    solution_data = bytearray(byteLen * 3) + bytearray(b'\x01' * byteLen)
+    solution_data[1] = 1
+    solution_data[7] = 1
+    solution_data[9] = 1
+    solution_data[14] = 1
+    solution_data[17] = 1
+    solution_data[22] = 1
+    solution_data[23] = 1
 
-    assert hide_data(testData, dataToHide) == solutionData
+    assert hide_data(test_data, data_to_hide) == solution_data
 
 
 def test_hide_data_partial():
-    """Testing that hide_data will work when given a testData bytes that is too short to hold the data"""
-    testData = bytes(b'\x01' * byteLen * 3)
-    dataToHide = bytes('ABC', 'utf-8')
-    solutionData = bytearray(byteLen * 3)
-    solutionData[1] = 1
-    solutionData[7] = 1
-    solutionData[9] = 1
-    solutionData[14] = 1
-    solutionData[17] = 1
-    solutionData[22] = 1
-    solutionData[23] = 1
+    """Testing that hide_data will work when given a test_data bytes that is too short to hold the data"""
+    test_data = bytes(b'\x01' * byteLen * 3)
+    data_to_hide = bytes('ABC', 'utf-8')
+    solution_data = bytearray(byteLen * 3)
+    solution_data[1] = 1
+    solution_data[7] = 1
+    solution_data[9] = 1
+    solution_data[14] = 1
+    solution_data[17] = 1
+    solution_data[22] = 1
+    solution_data[23] = 1
 
     # Testing when only half a byte is passed in for the data that contains the hidden text.
-    assert hide_data(testData[:4], dataToHide) == solutionData[:4]
+    assert hide_data(test_data[:4], data_to_hide) == solution_data[:4]
 
 
 def test_reveal_data():
-    """Testing that reveal_data will return the correct data that is hidden inside the testData."""
-    testData = bytearray(byteLen * 3)
-    testData[1] = 1
-    testData[7] = 1
-    testData[9] = 1
-    testData[14] = 1
-    testData[17] = 1
-    testData[22] = 1
-    testData[23] = 1
-    solutionData = bytes('ABC', 'utf-8')
+    """Testing that reveal_data will return the correct data that is hidden inside the test_data."""
+    test_data = bytearray(byteLen * 3)
+    test_data[1] = 1
+    test_data[7] = 1
+    test_data[9] = 1
+    test_data[14] = 1
+    test_data[17] = 1
+    test_data[22] = 1
+    test_data[23] = 1
+    solution_data = bytes('ABC', 'utf-8')
 
-    assert reveal_data(testData) == solutionData
+    assert reveal_data(test_data) == solution_data
 
 
 def test_reveal_data_partial():
     """
     Testing that reveal data will return as much data as possible.
 
-    When the testData passed in is too small for the data to be hidden.
+    When the test_data passed in is too small for the data to be hidden.
     """
-    testData = bytearray(byteLen * 3)  # Will contain 'ABC' but will be truncated when passed to reveal_data
-    testData[1] = 1
-    testData[7] = 1
-    testData[9] = 1
-    testData[14] = 1
-    testData[17] = 1
-    testData[22] = 1
-    testData[23] = 1
-    solutionData = bytes('AB@', 'utf-8')
+    test_data = bytearray(byteLen * 3)  # Will contain 'ABC' but will be truncated when passed to reveal_data
+    test_data[1] = 1
+    test_data[7] = 1
+    test_data[9] = 1
+    test_data[14] = 1
+    test_data[17] = 1
+    test_data[22] = 1
+    test_data[23] = 1
+    solution_data = bytes('AB@', 'utf-8')
 
-    assert reveal_data(testData[:-byteLen // 2]) == solutionData
+    assert reveal_data(test_data[:-byteLen // 2]) == solution_data
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #50 need to change how data is hidden and revealed.", run=True)
-@given(stringToHide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
-def test_hide_reveal_data_inverse(stringToHide):
+@given(string_to_hide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
+def test_hide_reveal_data_inverse(string_to_hide):
     """Testing that anything hidden by hide_data is revealed by reveal_data."""
-    cleanData = bytes(b'\x01' * 5000)
-    dataToHide = bytes(stringToHide, 'utf-8')
+    clean_data = bytes(b'\x01' * 5000)
+    data_to_hide = bytes(string_to_hide, 'utf-8')
 
-    revealedData = reveal_data(hide_data(cleanData, dataToHide))
-    assert revealedData == dataToHide
+    revealed_data = reveal_data(hide_data(clean_data, data_to_hide))
+    assert revealed_data == data_to_hide
 
 
 def test_unpack_image():
     """Testing that unpacking returns a bytes full of all the pixels flattened."""
     pixel = 1, 2, 3, 4
-    solutionPixels = bytes(list(pixel * 4))
-    testPixels = []
+    solution_pixels = bytes(list(pixel * 4))
+    test_pixels = []
 
     for _ in range(4):
-        testPixels.append(pixel)
+        test_pixels.append(pixel)
 
-    unpacked = unpack_image(testPixels)
+    unpacked = unpack_image(test_pixels)
 
-    assert unpacked == solutionPixels
+    assert unpacked == solution_pixels
 
 
 def test_pack_image():
     """Testing that packing returns a list with tuples of length 4."""
     pixel = 1, 2, 3, 4
-    testPixels = list(pixel * 4)
-    solutionPixels = []
+    test_pixels = list(pixel * 4)
+    solution_pixels = []
 
     for _ in range(4):
-        solutionPixels.append(pixel)
+        solution_pixels.append(pixel)
 
-    packed = pack_image(testPixels)
+    packed = pack_image(test_pixels)
 
-    assert packed == solutionPixels
+    assert packed == solution_pixels
 
 
 def test_unpack_pack_inverse():
     """Testing that pixels unpacked by unpack_image are correctly packed by pack_image."""
     pixel = 1, 2, 3, 4
-    testPixels = []
+    test_pixels = []
 
     for _ in range(4):
-        testPixels.append(pixel)
+        test_pixels.append(pixel)
 
-    assert pack_image(unpack_image(testPixels)) == testPixels
+    assert pack_image(unpack_image(test_pixels)) == test_pixels
 
 
 def test_open_bin_file():
     """Testing that opening the file works."""
-    cleanFile = cleanPNGLocation
-    fileData = open_bin_file(cleanFile)
+    clean_file = cleanPNGLocation
+    file_data = open_bin_file(clean_file)
 
-    assert fileData == open(cleanFile, 'rb').read()
+    with open(clean_file, 'rb') as f:
+        assert file_data == f.read()
 
     with pytest.raises(SystemExit):
-        fileData = open_bin_file("OpenBinFileThatDoesNotExist.nope")
+        open_bin_file("OpenBinFileThatDoesNotExist.nope")
 
 
 def test_write_bin_file_diff_content():
     """Testing that the file written is different from the one read, after hiding a message."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_bin_file_diff_content.png"
     # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    if os.path.isfile(dirty_file):
+        os.remove(dirty_file)
 
-    data = hide_string(open_bin_file(cleanFile), "Hidden text from test_writeBinFileDiffContent.")
-    write_bin_file(dirtyFile, data)
+    data = hide_string(open_bin_file(clean_file), "Hidden text from test_writeBinFileDiffContent.")
+    write_bin_file(dirty_file, data)
 
-    assert open(cleanFile, 'rb').read() != open(dirtyFile, 'rb').read()
+    with open(clean_file, 'rb') as cf, open(dirty_file, 'rb') as df:
+        assert cf.read() != df.read()
+
+    os.remove(dirty_file)
 
 
 def test_write_bin_file_size_same():
     """Testing that the file written is the same size as the one read, after hiding a message."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
-    # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_bin_file_size_same.png"
 
-    data = hide_string(open_bin_file(cleanFile), "Hidden text from test_writeBinFileSizeSame.")
-    write_bin_file(dirtyFile, data)
+    data = hide_string(open_bin_file(clean_file), "Hidden text from test_writeBinFileSizeSame.")
+    write_bin_file(dirty_file, data)
 
     # Getting the file sizes for the clean and dirty files.
-    cf = open(cleanFile, 'rb')
-    cf.seek(0, 2)
-    cleanFileSize = cf.tell()
+    with open(clean_file, 'rb') as cf:
+        cf.seek(0, 2)
+        clean_file_size = cf.tell()
 
-    df = open(dirtyFile, 'rb')
-    df.seek(0, 2)
-    dirtyFileSize = df.tell()
+    with open(dirty_file, 'rb') as df:
+        df.seek(0, 2)
+        dirty_file_size = df.tell()
 
-    assert cleanFileSize == dirtyFileSize
+    assert clean_file_size == dirty_file_size
+
+    os.remove(dirty_file)
 
 
 def test_open_image_file():
     """Testing that opening an image file returns the data in the file."""
-    cleanFile = cleanPNGLocation
-    imageData = open_image_file(cleanFile)
+    clean_file = cleanPNGLocation
+    image_data = open_image_file(clean_file)
 
-    im = Image.open(cleanFile)
-    pixels = im.getdata()
+    with Image.open(clean_file) as im:
+        pixels = im.getdata()
 
-    assert imageData == unpack_image(pixels)
+    assert image_data == unpack_image(pixels)
 
     with pytest.raises(SystemExit):
         open_image_file("OpenImageFileThatDoesNotExist.nope")
@@ -262,230 +265,242 @@ def test_open_image_file():
 
 def test_write_image_file_valid_image():
     """Testing that the image created is not corrupt."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_image_file_valid_image.png"
     # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    if os.path.isfile(dirty_file):
+        os.remove(dirty_file)
 
-    dirtyData = hide_string(open_image_file(cleanFile), "Hidden text from test_writeImageFileValidImage.")
-    write_image_file(dirtyFile, cleanFile, dirtyData)
+    dirty_data = hide_string(open_image_file(clean_file), "Hidden text from test_writeImageFileValidImage.")
+    write_image_file(dirty_file, clean_file, dirty_data)
 
     try:
-        Image.open(dirtyFile)
+        Image.open(dirty_file)
     except OSError:
-        pytest.fail("Image is corrupt " + dirtyFile)
+        pytest.fail("Image is corrupt " + dirty_file)
+
+    os.remove(dirty_file)
 
 
 def test_write_image_file_diff_content():
     """Testing that writing out an image creates a different image at the bit level."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_image_file_diff_content.png"
     # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    if os.path.isfile(dirty_file):
+        os.remove(dirty_file)
 
-    dirtyData = hide_string(open_image_file(cleanFile), "Hidden text from test_writeImageFileDiffContent.")
-    write_image_file(dirtyFile, cleanFile, dirtyData)
+    dirty_data = hide_string(open_image_file(clean_file), "Hidden text from test_writeImageFileDiffContent.")
+    write_image_file(dirty_file, clean_file, dirty_data)
 
-    assert open(cleanFile, 'rb').read() != open(dirtyFile, 'rb').read()
+    with open(clean_file, 'rb') as cf, open(dirty_file, 'rb') as df:
+        assert cf.read() != df.read()
+
+    os.remove(dirty_file)
 
 
 def test_write_image_file_same_image():
     """Testing that writing out an image creates the same image when viewed generally."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_image_file_same_image.png"
     # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    if os.path.isfile(dirty_file):
+        os.remove(dirty_file)
 
-    dirtyData = hide_string(open_image_file(cleanFile), "Hidden text from test_writeImageFileSameImage.")
-    write_image_file(dirtyFile, cleanFile, dirtyData)
+    dirty_data = hide_string(open_image_file(clean_file), "Hidden text from test_writeImageFileSameImage.")
+    write_image_file(dirty_file, clean_file, dirty_data)
 
-    assert compare_images(cleanFile, dirtyFile) < 500
+    assert compare_images(clean_file, dirty_file) < 500
+
+    os.remove(dirty_file)
 
 
 def test_write_image_file_diff_size():
     """Testing that writing out an image creates a file of a different size, if the file was not generated by PIL."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
-    # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_image_file_diff_size.png"
 
-    dirtyData = hide_string(open_image_file(cleanFile), "Hidden text from test_writeImageFileDiffSize.")
-    write_image_file(dirtyFile, cleanFile, dirtyData)
+    dirty_data = hide_string(open_image_file(clean_file), "Hidden text from test_writeImageFileDiffSize.")
+    write_image_file(dirty_file, clean_file, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
-    cf = open(cleanFile, 'rb')
-    cf.seek(0, 2)
-    cleanFileSize = cf.tell()
+    with open(clean_file, 'rb') as cf:
+        cf.seek(0, 2)
+        clean_file_size = cf.tell()
 
-    df = open(dirtyFile, 'rb')
-    df.seek(0, 2)
-    dirtyFileSize = df.tell()
+    with open(dirty_file, 'rb') as df:
+        df.seek(0, 2)
+        dirty_file_size = df.tell()
 
-    assert cleanFileSize != dirtyFileSize
+    assert clean_file_size != dirty_file_size
+
+    os.remove(dirty_file)
 
 
 def test_write_image_file_diff_size_pil():
     """Testing that writing out an image creates a file of a different size, if the file was generated by PIL."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "tests/dirtyImage.png"
-    PILImage = Image.open(cleanFile)
-    cleanFilePIL = "tests/cleanImagePIL.png"
-    PILImage.save(cleanFilePIL)
-    # Removing dirty file if it is there from another test.
-    if os.path.isfile(dirtyFile):
-        os.remove(dirtyFile)
+    clean_file = cleanPNGLocation
+    dirty_file = "tests/dirtyImage_test_write_image_file_diff_size_pil.png"
+    clean_file_pil = "tests/cleanImagePIL.png"
+    with Image.open(clean_file) as pil_image:
+        pil_image.save(clean_file_pil)
 
-    dirtyData = hide_string(open_image_file(cleanFilePIL), "Hidden text from test_writeImageFileSameImage.")
-    write_image_file(dirtyFile, cleanFilePIL, dirtyData)
+    dirty_data = hide_string(open_image_file(clean_file_pil), "Hidden text from test_writeImageFileSameImage.")
+    write_image_file(dirty_file, clean_file_pil, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
-    cf = open(cleanFilePIL, 'rb')
-    cf.seek(0, 2)
-    cleanFileSize = cf.tell()
+    with open(clean_file_pil, 'rb') as cf:
+        cf.seek(0, 2)
+        clean_file_size = cf.tell()
 
-    df = open(dirtyFile, 'rb')
-    df.seek(0, 2)
-    dirtyFileSize = df.tell()
+    with open(dirty_file, 'rb') as df:
+        df.seek(0, 2)
+        dirty_file_size = df.tell()
 
-    assert cleanFileSize != dirtyFileSize
+    assert clean_file_size != dirty_file_size
+
+    os.remove(dirty_file)
 
 
 def test_write_image_file_exit_on_fail():
     """Testing that when failing to write an image there is a system exit."""
-    cleanFile = cleanPNGLocation
-    dirtyFile = "WriteImageFileThatDoesNotExist.nope"
-    dirtyData = bytes(8)
+    clean_file = cleanPNGLocation
+    dirty_file = "WriteImageFileThatDoesNotExist.nope"
+    dirty_data = bytes(8)
 
     with pytest.raises(SystemExit):
-        write_image_file(cleanFile, dirtyFile, dirtyData)
+        write_image_file(clean_file, dirty_file, dirty_data)
 
 
 def test_steganographer_hide_string():
     """Testing that a string will correctly be hidden in a new image."""
-    cleanImage = cleanPNGLocation
-    dirtyImage = "tests/dirtyImage.png"
-    hiddenMessage = "Hidden text from test_steganographerHideString."
+    clean_image = cleanPNGLocation
+    dirty_image = "tests/dirtyImage_test_steganographer_hide_string.png"
+    hidden_message = "Hidden text from test_steganographer_hide_string."
 
-    hiddenFname = steganographer_hide(cleanImage, hiddenMessage, dirtyImage)
+    hidden_fname = steganographer_hide(clean_image, hidden_message, dirty_image)
 
-    assert open(cleanImage, 'rb').read() != open(hiddenFname, 'rb').read()
-    assert compare_images(cleanImage, hiddenFname) < 500
+    with open(clean_image, 'rb') as ci, open(hidden_fname, 'rb') as di:
+        assert ci.read() != di.read()
+    assert compare_images(clean_image, hidden_fname) < 500
     try:
-        Image.open(hiddenFname)
+        Image.open(hidden_fname)
     except OSError:
-        pytest.fail("Image is corrupt " + hiddenFname)
+        pytest.fail("Image is corrupt " + hidden_fname)
+
+    os.remove(dirty_image)
 
 
 def test_steganographer_hide_string_correct_name():
     """Testing that the image a string is hidden in is the correct one."""
-    cleanImage = cleanPNGLocation
-    dirtyImage = "tests/dirtyImage.png"
-    hiddenMessage = "Hidden text from test_steganographerHide."
+    clean_image = cleanPNGLocation
+    dirty_image = "tests/dirtyImage_test_steganographer_hide_string_correct_name.png"
+    hidden_message = "Hidden text from test_steganographer_hide_string_correct_name."
 
-    hiddenFname = steganographer_hide(cleanImage, hiddenMessage, dirtyImage)
+    hidden_fname = steganographer_hide(clean_image, hidden_message, dirty_image)
 
-    assert hiddenFname == dirtyImage
+    assert hidden_fname == dirty_image
+
+    os.remove(dirty_image)
 
 
 def test_steganographer_hide_string_steganogrified():
     """Testing that a string will correctly be hidden in a new image, that no name was provided for."""
-    cleanImage = cleanPNGLocation
-    hiddenMessage = "Hidden text from test_steganographerHideStringSteganogrified."
+    clean_image = cleanPNGLocation
+    hidden_message = "Hidden text from test_steganographer_hide_string_steganogrified."
 
-    hiddenFname = steganographer_hide(cleanImage, hiddenMessage)
+    hidden_fname = steganographer_hide(clean_image, hidden_message)
 
-    assert open(cleanImage, 'rb').read() != open(hiddenFname, 'rb').read()
-    assert compare_images(cleanImage, hiddenFname) < 500
+    with open(clean_image, 'rb') as ci, open(hidden_fname, 'rb') as di:
+        assert ci.read() != di.read()
+    assert compare_images(clean_image, hidden_fname) < 500
     try:
-        Image.open(hiddenFname)
+        Image.open(hidden_fname)
     except OSError:
-        pytest.fail("Image is corrupt " + hiddenFname)
+        pytest.fail("Image is corrupt " + hidden_fname)
 
 
 def test_steganographer_hide_string_steganogrified_correct_name():
     """Testing that the image a string is hidden in is the correct one."""
-    cleanImage = cleanPNGLocation
-    hiddenMessage = "Hidden text from test_steganographerHideStringSteganogrified."
+    clean_image = cleanPNGLocation
+    hidden_message = "Hidden text from test_steganographer_hide_string_steganogrified_correct_name."
 
-    hiddenFname = steganographer_hide(cleanImage, hiddenMessage)
-    steganogrifiedFname = cleanPNGLocation[:-4] + "Steganogrified.png"
+    hidden_fname = steganographer_hide(clean_image, hidden_message)
+    steganogrified_fname = cleanPNGLocation[:-4] + "Steganogrified.png"
 
-    assert hiddenFname == steganogrifiedFname
-    assert os.path.isfile(steganogrifiedFname)
+    assert hidden_fname == steganogrified_fname
+    assert os.path.isfile(steganogrified_fname)
 
 
-@given(hiddenMessage=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
-def test_steganographer_hide_steganographer_reveal_inverse(hiddenMessage):
+@given(hidden_message=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
+def test_steganographer_hide_steganographer_reveal_inverse(hidden_message):
     """Testing that steganographer_reveal reveals what was hidden by steganographer_hide."""
-    cleanImage = cleanPNGLocation
-    dirtyImage = "tests/dirtyImage.png"
+    clean_image = cleanPNGLocation
+    dirty_image = "tests/dirtyImage_test_steganographer_hide_steganographer_reveal_inverse.png"
 
-    revealedMessage = steganographer_reveal(steganographer_hide(cleanImage, hiddenMessage, dirtyImage))
-    assert revealedMessage == hiddenMessage
+    revealed_message = steganographer_reveal(steganographer_hide(clean_image, hidden_message, dirty_image))
+    assert revealed_message == hidden_message
+
+    os.remove(dirty_image)
 
 
 def test_steganographer_null_data():
     """Testing that the string entered is the string returned. The data is the exact length needed."""
-    testString = "This is a test String"
-    testData = bytes(testString, 'utf-8')
-    blankData = bytes(b'\x01' * len(testString) * byteLen)
+    test_string = "This is a test String"
+    test_data = bytes(test_string, 'utf-8')
+    blank_data = bytes(b'\x01' * len(test_string) * byteLen)
 
-    hiddenString = hide_string(blankData, testString)
-    revealedString = reveal_string(hiddenString)
+    hidden_string = hide_string(blank_data, test_string)
+    revealed_string = reveal_string(hidden_string)
 
-    hiddenData = hide_data(blankData, testData)
-    revealedData = reveal_data(hiddenData)
+    hidden_data = hide_data(blank_data, test_data)
+    revealed_data = reveal_data(hidden_data)
 
-    assert testString == revealedString
-    assert testData == revealedData
+    assert test_string == revealed_string
+    assert test_data == revealed_data
 
 
 def test_steganographer_short_data():
     """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
-    testString = "This is a test String"
-    testData = bytes(testString, 'utf-8')
-    blankData = bytes(b'\x01' * (len(testString) * byteLen - byteLen))
+    test_string = "This is a test String"
+    test_data = bytes(test_string, 'utf-8')
+    blank_data = bytes(b'\x01' * (len(test_string) * byteLen - byteLen))
 
-    hiddenString = hide_string(blankData, testString)
-    revealedString = reveal_string(hiddenString)
+    hidden_string = hide_string(blank_data, test_string)
+    revealed_string = reveal_string(hidden_string)
 
-    hiddenData = hide_data(blankData, testData)
-    revealedData = reveal_data(hiddenData)
+    hidden_data = hide_data(blank_data, test_data)
+    revealed_data = reveal_data(hidden_data)
 
-    assert testString[:-1] == revealedString
-    assert testData[:-1] == revealedData
+    assert test_string[:-1] == revealed_string
+    assert test_data[:-1] == revealed_data
 
 
 def test_steganographer_short_partial_data():
     """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
-    testString = "This is a test String"
-    solutionString = testString[:-1] + chr(ord(testString[-1]) >> byteLen // 2 << byteLen // 2)
-    testData = bytes(testString, 'utf-8')
-    solutionData = bytearray(testData)
-    solutionData[-1] = solutionData[-1] >> byteLen // 2 << byteLen // 2
-    blankData = bytes(b'\x01' * (len(testString) * byteLen - byteLen // 2))
+    test_string = "This is a test String"
+    solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> byteLen // 2 << byteLen // 2)
+    test_data = bytes(test_string, 'utf-8')
+    solution_data = bytearray(test_data)
+    solution_data[-1] = solution_data[-1] >> byteLen // 2 << byteLen // 2
+    blank_data = bytes(b'\x01' * (len(test_string) * byteLen - byteLen // 2))
 
-    hiddenString = hide_string(blankData, testString)
-    revealedString = reveal_string(hiddenString)
+    hidden_string = hide_string(blank_data, test_string)
+    revealed_string = reveal_string(hidden_string)
 
-    hiddenData = hide_data(blankData, testData)
-    revealedData = reveal_data(hiddenData)
+    hidden_data = hide_data(blank_data, test_data)
+    revealed_data = reveal_data(hidden_data)
 
-    assert solutionString == revealedString
-    assert solutionData == revealedData
+    assert solution_string == revealed_string
+    assert solution_data == revealed_data
 
 
 def compare_images(img1, img2):
     """Expects strings of the locations of two images. Will return an integer representing their difference"""
-    img1 = Image.open(img1)
-    img2 = Image.open(img2)
+    with Image.open(img1) as img1, Image.open(img2) as img2:
+        # calculate the difference and its norms
+        diff = ImageChops.difference(img1, img2)
 
-    # calculate the difference and its norms
-    diff = ImageChops.difference(img1, img2)
     m_norm = sum(unpack_image(diff.getdata()))  # Manhattan norm
 
     return m_norm
@@ -501,116 +516,126 @@ def normalize(arr):
 
 def test_main_hide_msg_with_output(capfd):
     """Testing that main works when given input, message, and output."""
-    lineEnd = '\n'
+    line_end = '\n'
     if sys.platform == 'win32':
-        lineEnd = '\r\n'
-    hiddenMessage = 'test_mainHideMsgWithOutput hidden message'
-    dirtyFname = "tests/dirtyImage.png"
+        line_end = '\r\n'
+    hidden_message = 'test_main_hide_msg_with_output hidden message'
+    dirty_fname = "tests/dirtyImage_test_main_hide_msg_with_output.png"
 
-    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage +
-                       '" -o ' + dirtyFname)
+    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hidden_message +
+                       '" -o ' + dirty_fname)
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert out == "The message has been hidden in " + dirtyFname + lineEnd
-    assert compare_images(cleanPNGLocation, dirtyFname) < 500
+    assert out == "The message has been hidden in " + dirty_fname + line_end
+    assert compare_images(cleanPNGLocation, dirty_fname) < 500
     try:
-        Image.open(dirtyFname)
+        Image.open(dirty_fname)
     except OSError:
-        pytest.fail("Image is corrupt " + dirtyFname)
+        pytest.fail("Image is corrupt " + dirty_fname)
+
+    os.remove(dirty_fname)
 
 
 def test_main_hide_msg_no_output(capfd):
     """Testing that main works when given input, message, and no output."""
-    lineEnd = '\n'
+    line_end = '\n'
     if sys.platform == 'win32':
-        lineEnd = '\r\n'
-    hiddenMessage = 'test_mainHideMsgNoOutput hidden message'
-    steganogrifiedFname = cleanPNGLocation[:-4] + "Steganogrified.png"
+        line_end = '\r\n'
+    hidden_message = 'test_main_hide_msg_no_output hidden message'
+    steganogrified_fname = cleanPNGLocation[:-4] + "Steganogrified.png"
 
-    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage + '"')
+    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hidden_message + '"')
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert out == "The message has been hidden in " + steganogrifiedFname + lineEnd
-    assert compare_images(cleanPNGLocation, steganogrifiedFname) < 500
+    assert out == "The message has been hidden in " + steganogrified_fname + line_end
+    assert compare_images(cleanPNGLocation, steganogrified_fname) < 500
     try:
-        Image.open(steganogrifiedFname)
+        Image.open(steganogrified_fname)
     except OSError:
-        pytest.fail("Image is corrupt " + steganogrifiedFname)
+        pytest.fail("Image is corrupt " + steganogrified_fname)
 
 
 def test_main_reveal_msg_no_output(capfd):
     """Testing that main works when given input, message, and no output."""
-    lineEnd = '\n'
+    line_end = '\n'
     if sys.platform == 'win32':
-        lineEnd = '\r\n'
-    hiddenMessage = 'test_mainRevealMsgNoOutput hidden message'
-    dirtyFname = "tests/dirtyImage.png"
+        line_end = '\r\n'
+    hidden_message = 'test_main_reveal_msg_no_output hidden message'
+    dirty_fname = "tests/dirtyImage_test_main_reveal_msg_no_output.png"
 
-    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage +
-                       '" -o ' + dirtyFname)
+    os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hidden_message +
+              '" -o ' + dirty_fname)
     _, _ = capfd.readouterr()
 
-    result = os.system("python -m steganographer " + dirtyFname)
+    result = os.system("python -m steganographer " + dirty_fname)
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
+    assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
+
+    os.remove(dirty_fname)
 
 
 def test_main_reveal_msg_no_output_unicode(capfd):
     """Testing that main works when given input, message, and no output."""
-    lineEnd = '\n'
+    line_end = '\n'
     if sys.platform == 'win32':
-        lineEnd = '\r\n'
-    hiddenMessage = 'test_mainRevealMsgNoOutputUnicode hidden message, Unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ'
-    dirtyFname = "tests/dirtyImage.png"
-    outputFname = "tests/dirtyImageMessage.txt"
+        line_end = '\r\n'
+    hidden_message = 'test_main_reveal_msg_no_output_unicode hidden message, Unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ'
+    dirty_fname = "tests/dirtyImage_test_main_reveal_msg_no_output_unicode.png"
+    output_fname = "tests/dirtyImage_test_main_reveal_msg_no_output_unicode_message.txt"
 
-    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage +
-                       '" -o ' + dirtyFname)
+    os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hidden_message +
+              '" -o ' + dirty_fname)
     _, _ = capfd.readouterr()
 
-    result = os.system("python -m steganographer " + dirtyFname)
+    result = os.system("python -m steganographer " + dirty_fname)
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert open(outputFname, 'r', encoding='utf-8').read() == hiddenMessage
-    if sys.platform == 'win32':
-        assert out == ("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
-                       "here. The correct message has been written to " + outputFname + lineEnd +
-                       str(hiddenMessage.encode('utf-8')) + lineEnd)
-    else:
-        assert out == ("The hidden message was..." + lineEnd + hiddenMessage + lineEnd)
+    with open(output_fname, 'r', encoding='utf-8') as output:
+        assert output.read() == hidden_message
+
+    assert (out == ("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
+                    "here. The correct message has been written to " + output_fname + line_end +
+                    str(hidden_message.encode('utf-8')) + line_end)
+            or out == ("The hidden message was..." + line_end + hidden_message + line_end))
+
+    os.remove(dirty_fname)
 
 
 def test_main_reveal_msg_with_output(capfd):
     """Testing that main works when given input, message, and no output."""
-    lineEnd = '\n'
+    line_end = '\n'
     if sys.platform == 'win32':
-        lineEnd = '\r\n'
-    hiddenMessage = 'test_mainRevealMsgWithOutput hidden message'
-    dirtyFname = "tests/dirtyImage.png"
-    outputFname = "tests/outputMessage.txt"
+        line_end = '\r\n'
+    hidden_message = 'test_main_reveal_msg_with_output hidden message'
+    dirty_fname = "tests/dirtyImage_test_main_reveal_msg_with_output.png"
+    output_fname = "tests/outputMessage.txt"
 
-    result = os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hiddenMessage +
-                       '" -o ' + dirtyFname)
+    os.system('python -m steganographer ' + cleanPNGLocation + ' -m "' + hidden_message +
+              '" -o ' + dirty_fname)
     _, _ = capfd.readouterr()
 
-    result = os.system("python -m steganographer " + dirtyFname + " -o " + outputFname)
+    result = os.system("python -m steganographer " + dirty_fname + " -o " + output_fname)
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert open(outputFname, 'r').read() == hiddenMessage
-    assert out == ("The hidden message was written to " + outputFname + lineEnd)
+    with open(output_fname, 'r') as output:
+        assert output.read() == hidden_message
+
+    assert out == ("The hidden message was written to " + output_fname + line_end)
+
+    os.remove(dirty_fname)
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.", run=False)
 def test_jpegs():
     """Testing that jpegs can have a message hidden and revealed."""
-    hiddenMessage = '"test_jpeg hidden message"'
-    result = os.system('python -m steganographer tests/cleanImage.jpg -m ' + hiddenMessage +
+    hidden_message = '"test_jpeg hidden message"'
+    result = os.system('python -m steganographer tests/cleanImage.jpg -m ' + hidden_message +
                        ' -o tests/dirtyImage.jpg')
 
     assert result == 0
@@ -623,8 +648,8 @@ def test_jpegs():
 @pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.", run=False)
 def test_bmps():
     """Testing that jpegs can have a message hidden and revealed."""
-    hiddenMessage = '"test_bmps hidden message"'
-    result = os.system('python -m steganographer tests/cleanImage.bmp -m ' + hiddenMessage +
+    hidden_message = '"test_bmps hidden message"'
+    result = os.system('python -m steganographer tests/cleanImage.bmp -m ' + hidden_message +
                        ' -o tests/dirtyImage.bmp')
 
     assert result == 0

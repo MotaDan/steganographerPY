@@ -1,1 +1,1 @@
-test_mainRevealMsgWithOutput hidden message
+test_main_reveal_msg_with_output hidden message
