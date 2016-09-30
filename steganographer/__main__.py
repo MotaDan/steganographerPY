@@ -3,6 +3,7 @@ import sys
 import argparse
 from steganographer.steganographer import steganographerHide, steganographerReveal
 
+
 def main(args=None):
     """The main routine."""
     if args is None:
@@ -12,7 +13,7 @@ def main(args=None):
     parser.add_argument("input", help="file to hide a message in or file to reveal a message from")
     parser.add_argument("-m", "--message", help="message to be hidden in the input file")
     parser.add_argument("-o", "--output",
-                    help="name of output file to hide message in or to write revealed message.")
+                        help="name of output file to hide message in or to write revealed message.")
     args = parser.parse_args()
 
     if args.input:
@@ -32,13 +33,14 @@ def main(args=None):
             else:
                 try:
                     print("The hidden message was...\n" + hiddenMessage)
-                except UnicodeEncodeError: # pragma: no cover
+                except UnicodeEncodeError:  # pragma: no cover
                     ofName = args.input.split('.')[0] + 'Message.txt'
 
                     print("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
-                            "here. The correct message has been written to", ofName)
+                          "here. The correct message has been written to", ofName)
                     print(hiddenMessage.encode('utf-8'))
                     open(ofName, 'w', encoding='utf-8').write(hiddenMessage)
+
 
 if __name__ == "__main__":
     main()
