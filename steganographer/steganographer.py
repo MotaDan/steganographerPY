@@ -2,7 +2,7 @@
 from PIL import Image
 import sys
 
-byteLen = 8
+BYTELEN = 8
 
 
 def hide_byte(clean_data, val):
@@ -13,16 +13,16 @@ def hide_byte(clean_data, val):
     in the least significant bit.
     """
     hidden_data = bytearray(len(clean_data))
-    mask = 1 << (byteLen - 1)
+    mask = 1 << (BYTELEN - 1)
 
     for i in range(len(hidden_data)):
         masked_bit = val & (mask >> i)
 
         if masked_bit > 0:
-            masked_bit >>= byteLen - 1 - i
+            masked_bit >>= BYTELEN - 1 - i
             hidden_data[i] = clean_data[i] | masked_bit
         else:
-            masked_bit = ~(mask >> (byteLen - 1))
+            masked_bit = ~(mask >> (BYTELEN - 1))
             hidden_data[i] = clean_data[i] & masked_bit
 
     return bytes(hidden_data)
@@ -34,7 +34,7 @@ def reveal_byte(hidden_data):
 
     for i in range(len(hidden_data)):
         least_sig_bit = hidden_data[i] & 1
-        revealed_data[0] |= least_sig_bit << (byteLen - 1 - i)
+        revealed_data[0] |= least_sig_bit << (BYTELEN - 1 - i)
 
     return bytes(revealed_data)
 
@@ -80,8 +80,8 @@ def hide_data(clean_data, val):
     """
     hidden_data = bytearray()
 
-    for dataIndex, strIndex in zip(range(0, len(clean_data), byteLen), range(len(val))):
-        hidden_byte = hide_byte(clean_data[dataIndex:dataIndex + byteLen], val[strIndex])
+    for data_index, strIndex in zip(range(0, len(clean_data), BYTELEN), range(len(val))):
+        hidden_byte = hide_byte(clean_data[data_index:data_index + BYTELEN], val[strIndex])
         hidden_data.extend(hidden_byte)
 
     hidden_data = hidden_data + clean_data[len(hidden_data):]
@@ -96,13 +96,13 @@ def reveal_data(hidden_data):
     Expects a bytes hidden_data of any length. Will pull out the least significant bits from each byte and
     return them as a bytes.
     """
-    revealed_data_len = len(hidden_data) // byteLen
+    revealed_data_len = len(hidden_data) // BYTELEN
     revealed_data = bytearray()
 
-    for i in range(0, revealed_data_len * byteLen, byteLen):
-        revealed_data.extend(reveal_byte(hidden_data[i:i + byteLen]))
+    for i in range(0, revealed_data_len * BYTELEN, BYTELEN):
+        revealed_data.extend(reveal_byte(hidden_data[i:i + BYTELEN]))
 
-    revealed_data_len_remainder = len(hidden_data) % byteLen
+    revealed_data_len_remainder = len(hidden_data) % BYTELEN
 
     if revealed_data_len_remainder > 0:
         revealed_data.extend(reveal_byte(hidden_data[-1 * revealed_data_len_remainder:]))
@@ -159,8 +159,8 @@ def write_bin_file(fname, data):
 def open_image_file(fname):
     """Reads the file fname and returns bytes for all it's data."""
     try:
-        im = Image.open(fname)
-        pixels = im.getdata()
+        img = Image.open(fname)
+        pixels = img.getdata()
         return unpack_image(pixels)
 
     except FileNotFoundError:
@@ -172,9 +172,9 @@ def write_image_file(fname, og_fname, data):
     """Create a image fname and writes the passed in data to it. Gets image properties from og_fname."""
     try:
         ogim = Image.open(og_fname)
-        im = Image.new(ogim.mode, ogim.size)
-        im.putdata(pack_image(data))
-        im.save(fname, ogim.format)
+        img = Image.new(ogim.mode, ogim.size)
+        img.putdata(pack_image(data))
+        img.save(fname, ogim.format)
 
     except FileNotFoundError:
         print("Could not read file", og_fname)
