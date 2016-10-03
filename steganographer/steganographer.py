@@ -80,8 +80,8 @@ def hide_data(clean_data, val):
     """
     hidden_data = bytearray()
 
-    for data_index, strIndex in zip(range(0, len(clean_data), BYTELEN), range(len(val))):
-        hidden_byte = hide_byte(clean_data[data_index:data_index + BYTELEN], val[strIndex])
+    for data_index, str_index in zip(range(0, len(clean_data), BYTELEN), range(len(val))):
+        hidden_byte = hide_byte(clean_data[data_index:data_index + BYTELEN], val[str_index])
         hidden_data.extend(hidden_byte)
 
     hidden_data = hidden_data + clean_data[len(hidden_data):]
