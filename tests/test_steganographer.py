@@ -617,8 +617,9 @@ def test_main_reveal_no_op_unicode(capfd):
     out, _ = capfd.readouterr()
 
     assert result == 0
-    with open(output_fname, 'r', encoding='utf-8') as output:
-        assert output.read() == hidden_message
+    if os.path.isfile(output_fname):
+        with open(output_fname, 'r', encoding='utf-8') as output:
+            assert output.read() == hidden_message
 
     assert (out == ("The hidden message contains unsupported unicode characters and cannot be fully displayed " +
                     "here. The correct message has been written to " + output_fname + line_end +
