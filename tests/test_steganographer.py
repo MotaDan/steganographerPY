@@ -627,7 +627,8 @@ def test_main_reveal_no_op_unicode(capfd):
             or out == ("The hidden message was..." + line_end + hidden_message + line_end))
 
     os.remove(dirty_fname)
-    os.remove(output_fname)
+    if os.path.isfile(output_fname):
+        os.remove(output_fname)
 
 
 def test_main_reveal_msg_w_output(capfd):
