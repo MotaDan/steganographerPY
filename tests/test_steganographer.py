@@ -455,7 +455,7 @@ def test_null_data_with_string():
 
     assert test_string == revealed_string
 
-	
+
 def test_null_data_with_data():
     """Testing that the data entered is the data returned. The data is the exact length needed."""
     test_string = "This is a test String"
@@ -478,7 +478,7 @@ def test_short_data_with_string():
 
     assert test_string[:-1] == revealed_string
 
-	
+
 def test_short_data_with_data():
     """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
@@ -502,7 +502,7 @@ def test_short_partial_data_string():
 
     assert solution_string == revealed_string
 
-	
+    
 def test_short_partial_data_w_data():
     """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
