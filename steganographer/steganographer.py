@@ -68,7 +68,13 @@ def reveal_string(hidden_data):
 
     revealed_data = revealed_data[:null_pos]
 
-    return revealed_data.decode()
+    try:
+        revealed_string = revealed_data.decode()
+    except UnicodeDecodeError:
+        print("There was a problem reading the hidden message.")
+        sys.exit()
+
+    return revealed_string
 
 
 def hide_data(clean_data, val):

@@ -719,10 +719,10 @@ def test_main_reveal_no_msg(capfd):
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
-    clean_fname = "tests/cleanImage.png"
+    clean_fname = "tests/cleanImage.jpg"
 
     result = os.system("python -m steganographer " + clean_fname)
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert out == ("There is no hidden message in " + clean_fname + line_end)
+    assert out == "There was a problem reading the hidden message." + line_end
