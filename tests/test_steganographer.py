@@ -502,7 +502,7 @@ def test_short_partial_data_string():
 
     assert solution_string == revealed_string
 
-    
+
 def test_short_partial_data_w_data():
     """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
@@ -672,7 +672,7 @@ def test_jpegs(capfd):
     assert result == 0
 
     result = os.system("python -m steganographer " + dirty_fname)
-    out, err = capfd.readouterr()
+    out, _ = capfd.readouterr()
     
     assert result == 0
     assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
@@ -712,3 +712,17 @@ def test_unicode():
 
     assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message, 
                                                   "tests/dirtyImage.png"))
+
+
+def test_main_reveal_no_msg(capfd):
+    """Testing the error returned when there is no message hidden in the file."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    clean_fname = "tests/cleanImage.png"
+
+    result = os.system("python -m steganographer " + clean_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    assert out == ("There is no hidden message in " + clean_fname + line_end)
