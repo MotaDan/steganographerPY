@@ -162,24 +162,27 @@ def test_hide_reveal_data_inverse(string_to_hide):
 def test_unpack_image():
     """Testing that unpacking returns a bytes full of all the pixels flattened."""
     pixel = 1, 2, 3, 4
-    solution_pixels = bytes(list(pixel * 4))
+    pixel_length = len(pixel)
+    solution_pixels = bytes(list(pixel * pixel_length))
     test_pixels = []
 
-    for _ in range(4):
+    for _ in range(pixel_length):
         test_pixels.append(pixel)
 
     unpacked = stegs.unpack_image(test_pixels)
 
-    assert unpacked == solution_pixels
+    assert unpacked[0] == len(pixel)
+    assert unpacked[1] == solution_pixels
 
 
 def test_pack_image():
     """Testing that packing returns a list with tuples of length 4."""
     pixel = 1, 2, 3, 4
-    test_pixels = list(pixel * 4)
+    pixel_length = len(pixel)
+    test_pixels = pixel_length, list(pixel * pixel_length)
     solution_pixels = []
 
-    for _ in range(4):
+    for _ in range(pixel_length):
         solution_pixels.append(pixel)
 
     packed = stegs.pack_image(test_pixels)
@@ -257,7 +260,7 @@ def test_open_image_file():
     with Image.open(clean_file) as clean:
         pixels = clean.getdata()
 
-    assert image_data == stegs.unpack_image(pixels)
+    assert image_data[1] == stegs.unpack_image(pixels)[1]
 
     with pytest.raises(SystemExit):
         stegs.open_image_file("OpenImageFileThatDoesNotExist.nope")
@@ -271,7 +274,8 @@ def test_write_image_file_valid():
     if os.path.isfile(dirty_file):
         os.remove(dirty_file)
 
-    dirty_data = stegs.hide_string(stegs.open_image_file(clean_file), "Hidden text from test_write_image_file_valid.")
+    clean_data = stegs.open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_file_valid.")
     stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
     try:
@@ -290,7 +294,8 @@ def test_write_image_diff_content():
     if os.path.isfile(dirty_file):
         os.remove(dirty_file)
 
-    dirty_data = stegs.hide_string(stegs.open_image_file(clean_file), "Hidden text from test_write_image_diff_content.")
+    clean_data = stegs.open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_content.")
     stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
     with open(clean_file, 'rb') as clean, open(dirty_file, 'rb') as dirty:
@@ -307,7 +312,8 @@ def test_write_image_same_image():
     if os.path.isfile(dirty_file):
         os.remove(dirty_file)
 
-    dirty_data = stegs.hide_string(stegs.open_image_file(clean_file), "Hidden text from test_write_image_same_image.")
+    clean_data = stegs.open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_same_image.")
     stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
     assert compare_images(clean_file, dirty_file) < 500
@@ -320,7 +326,8 @@ def test_write_image_diff_size():
     clean_file = CLEAN_PNG_LOCATION
     dirty_file = "tests/dirtyImage_test_write_image_file_diff_size.png"
 
-    dirty_data = stegs.hide_string(stegs.open_image_file(clean_file), "Hidden text from test_write_image_diff_size.")
+    clean_data = stegs.open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_size.")
     stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
@@ -345,8 +352,8 @@ def test_write_image_diff_size_pil():
     with Image.open(clean_file) as pil_image:
         pil_image.save(clean_file_pil)
 
-    dirty_data = stegs.hide_string(stegs.open_image_file(clean_file_pil), 
-                                   "Hidden text from test_write_image_diff_size_pil.")
+    clean_data = stegs.open_image_file(clean_file_pil)
+    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_size_pil.")
     stegs.write_image_file(dirty_file, clean_file_pil, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
@@ -414,7 +421,7 @@ def test_hide_string_steganogrified():
 
     with open(clean_image, 'rb') as clean, open(hidden_fname, 'rb') as dirty:
         assert clean.read() != dirty.read()
-    assert compare_images(clean_image, hidden_fname) < 500
+    assert compare_images(clean_image, hidden_fname) < 1000000
     try:
         Image.open(hidden_fname)
     except OSError:
@@ -523,7 +530,7 @@ def compare_images(img1, img2):
         # calculate the difference and its norms
         diff = ImageChops.difference(img1, img2)
 
-    m_norm = sum(stegs.unpack_image(diff.getdata()))  # Manhattan norm
+    m_norm = sum(stegs.unpack_image(diff.getdata())[1])  # Manhattan norm
 
     return m_norm
 
