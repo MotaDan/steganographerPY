@@ -87,7 +87,8 @@ def hide_data(clean_data, val):
     hidden_data = bytearray()
 
     for data_index, str_index in zip(range(0, len(clean_data), BYTELEN), range(len(val))):
-        hidden_byte = hide_byte(clean_data[data_index:data_index + BYTELEN], val[str_index])
+        clean_byte = clean_data[data_index:data_index + BYTELEN]
+        hidden_byte = hide_byte(clean_byte, val[str_index])
         hidden_data.extend(hidden_byte)
 
     hidden_data = hidden_data + clean_data[len(hidden_data):]
@@ -117,23 +118,23 @@ def reveal_data(hidden_data):
 
 
 def unpack_image(pixels):
-    """Do flatten out 2d pixels and return bytes of list."""
+    """Flatten out pixels and returns a tuple. The first entry is the size of each pixel."""
     unpacked_pixels = []
 
     for pix in pixels:
         for val in pix:
             unpacked_pixels.append(val)
 
-    return bytes(unpacked_pixels)
+    return len(pixels[0]), bytes(unpacked_pixels)
 
 
 def pack_image(pixels):
     """Do create 2d list of pixels and return the list."""
     packed_pixels = []
-    pixel_length = 4
+    pixel_length = pixels[0]
 
-    for i in range(0, len(pixels), pixel_length):
-        packed_pixels.append(tuple(pixels[i:i + pixel_length]))
+    for i in range(0, len(pixels[1]), pixel_length):
+        packed_pixels.append(tuple(pixels[1][i:i + pixel_length]))
 
     return packed_pixels
 
@@ -195,7 +196,7 @@ def steganographer_hide(clean_image_file, text, dirty_image_file=''):
     clean_image_file and outputs it to dirty_image_file.
     """
     clean_data = open_image_file(clean_image_file)
-    dirty_data = hide_string(clean_data, text)
+    dirty_data = (clean_data[0], hide_string(clean_data[1], text))
 
     if dirty_image_file == '':
         clean_name = clean_image_file.split('.')[0]
@@ -210,5 +211,5 @@ def steganographer_hide(clean_image_file, text, dirty_image_file=''):
 def steganographer_reveal(fimage):
     """Reveals whatever string is hidden in the fimage."""
     dirty_data = open_image_file(fimage)
-    revealed_string = reveal_string(dirty_data)
+    revealed_string = reveal_string(dirty_data[1])
     return revealed_string
