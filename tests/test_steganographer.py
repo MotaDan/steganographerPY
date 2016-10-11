@@ -663,17 +663,16 @@ def test_main_reveal_msg_w_output(capfd):
     os.remove(dirty_fname)
 
 
-@pytest.mark.xfail(strict=True, reason="Issue #28 jpeg support not added.", run=True)
 def test_jpegs(capfd):
     """Testing that jpegs can have a message hidden and revealed."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
-    hidden_message = '"test_jpeg hidden message"'
+    hidden_message = 'test_jpeg hidden message'
     dirty_fname = "tests/dirtyImage_test_jpegs.jpg"
     
-    result = os.system('python -m steganographer tests/cleanImage.jpg -m ' + hidden_message +
-                       ' -o ' + dirty_fname)
+    result = os.system('python -m steganographer tests/cleanImage.jpg -m "' + hidden_message +
+                       '" -o ' + dirty_fname)
     _, _ = capfd.readouterr()
 
     assert result == 0
@@ -685,7 +684,7 @@ def test_jpegs(capfd):
     assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
     assert compare_images("tests/cleanImage.jpg", dirty_fname) < 500
     
-    os.remove(dirty_fname)
+    #os.remove(dirty_fname)
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.", run=True)
@@ -694,11 +693,11 @@ def test_bmps(capfd):
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
-    hidden_message = '"test_bmps hidden message"'
+    hidden_message = 'test_bmps hidden message'
     dirty_fname = "tests/dirtyImage_test_bmps.bmp"
     
-    result = os.system('python -m steganographer tests/cleanImage.bmp -m ' + hidden_message +
-                       ' -o ' + dirty_fname)
+    result = os.system('python -m steganographer tests/cleanImage.bmp -m "' + hidden_message +
+                       '" -o ' + dirty_fname)
     _, _ = capfd.readouterr()
 
     assert result == 0
