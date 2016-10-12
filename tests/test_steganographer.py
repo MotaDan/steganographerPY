@@ -683,8 +683,6 @@ def test_jpegs(capfd):
     assert result == 0
     assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
     assert compare_images("tests/cleanImage.jpg", dirty_fname + '.png') < 500
-    
-    #os.remove(dirty_fname)
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.", run=True)
