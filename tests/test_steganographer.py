@@ -276,14 +276,14 @@ def test_write_image_file_valid():
 
     clean_data = stegs.open_image_file(clean_file)
     dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_file_valid.")
-    stegs.write_image_file(dirty_file, clean_file, dirty_data)
+    output_file = stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
     try:
-        Image.open(dirty_file)
+        Image.open(output_file)
     except OSError:
-        pytest.fail("Image is corrupt " + dirty_file)
+        pytest.fail("Image is corrupt " + output_file)
 
-    os.remove(dirty_file)
+    os.remove(output_file)
 
 
 def test_write_image_diff_content():
@@ -296,12 +296,12 @@ def test_write_image_diff_content():
 
     clean_data = stegs.open_image_file(clean_file)
     dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_content.")
-    stegs.write_image_file(dirty_file, clean_file, dirty_data)
+    output_file = stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
-    with open(clean_file, 'rb') as clean, open(dirty_file, 'rb') as dirty:
+    with open(clean_file, 'rb') as clean, open(output_file, 'rb') as dirty:
         assert clean.read() != dirty.read()
 
-    os.remove(dirty_file)
+    os.remove(output_file)
 
 
 def test_write_image_same_image():
@@ -314,11 +314,11 @@ def test_write_image_same_image():
 
     clean_data = stegs.open_image_file(clean_file)
     dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_same_image.")
-    stegs.write_image_file(dirty_file, clean_file, dirty_data)
+    output_file = stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
-    assert compare_images(clean_file, dirty_file) < 500
+    assert compare_images(clean_file, output_file) < 500
 
-    os.remove(dirty_file)
+    os.remove(output_file)
 
 
 def test_write_image_diff_size():
@@ -328,20 +328,20 @@ def test_write_image_diff_size():
 
     clean_data = stegs.open_image_file(clean_file)
     dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_size.")
-    stegs.write_image_file(dirty_file, clean_file, dirty_data)
+    output_file = stegs.write_image_file(dirty_file, clean_file, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
     with open(clean_file, 'rb') as clean:
         clean.seek(0, 2)
         clean_file_size = clean.tell()
 
-    with open(dirty_file, 'rb') as dirty:
+    with open(output_file, 'rb') as dirty:
         dirty.seek(0, 2)
         dirty_file_size = dirty.tell()
 
     assert clean_file_size != dirty_file_size
 
-    os.remove(dirty_file)
+    os.remove(output_file)
 
 
 def test_write_image_diff_size_pil():
@@ -354,20 +354,20 @@ def test_write_image_diff_size_pil():
 
     clean_data = stegs.open_image_file(clean_file_pil)
     dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_size_pil.")
-    stegs.write_image_file(dirty_file, clean_file_pil, dirty_data)
+    output_file = stegs.write_image_file(dirty_file, clean_file_pil, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
     with open(clean_file_pil, 'rb') as clean:
         clean.seek(0, 2)
         clean_file_size = clean.tell()
 
-    with open(dirty_file, 'rb') as dirty:
+    with open(output_file, 'rb') as dirty:
         dirty.seek(0, 2)
         dirty_file_size = dirty.tell()
 
     assert clean_file_size != dirty_file_size
 
-    os.remove(dirty_file)
+    os.remove(output_file)
 
 
 def test_write_image_exit_on_fail():
@@ -673,9 +673,10 @@ def test_jpegs(capfd):
     
     result = os.system('python -m steganographer tests/cleanImage.jpg -m "' + hidden_message +
                        '" -o ' + dirty_fname + '.jpg')
-    _, _ = capfd.readouterr()
+    out, _ = capfd.readouterr()
 
     assert result == 0
+    assert out == ("The message has been hidden in " + dirty_fname + '.png' + line_end)
 
     result = os.system("python -m steganographer " + dirty_fname + '.png')
     out, _ = capfd.readouterr()
@@ -692,22 +693,21 @@ def test_bmps(capfd):
     if sys.platform == 'win32':
         line_end = '\r\n'
     hidden_message = 'test_bmps hidden message'
-    dirty_fname = "tests/dirtyImage_test_bmps.bmp"
+    dirty_fname = "tests/dirtyImage_test_bmps"
     
     result = os.system('python -m steganographer tests/cleanImage.bmp -m "' + hidden_message +
-                       '" -o ' + dirty_fname)
-    _, _ = capfd.readouterr()
+                       '" -o ' + dirty_fname + '.bmp')
+    out, _ = capfd.readouterr()
 
     assert result == 0
+    assert out == ("The message has been hidden in " + dirty_fname + '.png' + line_end)
 
-    result = os.system("python -m steganographer " + dirty_fname)
+    result = os.system("python -m steganographer " + dirty_fname + '.png')
     out, _ = capfd.readouterr()
     
     assert result == 0
     assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
-    assert compare_images("tests/cleanImage.bmp", dirty_fname) < 500
-    
-    os.remove(dirty_fname)
+    assert compare_images("tests/cleanImage.bmp", dirty_fname + '.png') < 500
 
 
 def test_unicode():

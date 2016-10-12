@@ -177,13 +177,14 @@ def open_image_file(fname):
 
 
 def write_image_file(fname, og_fname, data):
-    """Create a image fname and writes the passed in data to it. Gets image properties from og_fname."""
+    """Create a image fname and writes the passed in data to it. Returns name of image created."""
     try:
         ogim = Image.open(og_fname)
         img = Image.new(ogim.mode, ogim.size)
         img.putdata(pack_image(data))
         fname_no_ext, _ = os.path.splitext(fname)
         img.save(fname_no_ext + '.png', 'png')
+        return fname_no_ext + '.png'
 
     except FileNotFoundError:
         print("Could not read file", og_fname)
@@ -205,9 +206,9 @@ def steganographer_hide(clean_image_file, text, dirty_image_file=''):
         clean_extension = clean_image_file.split('.')[1]
         dirty_image_file = clean_name + "Steganogrified." + clean_extension
 
-    write_image_file(dirty_image_file, clean_image_file, dirty_data)
+    output_file = write_image_file(dirty_image_file, clean_image_file, dirty_data)
 
-    return dirty_image_file
+    return output_file
 
 
 def steganographer_reveal(fimage):
