@@ -122,11 +122,14 @@ def unpack_image(pixels):
     """Flatten out pixels and returns a tuple. The first entry is the size of each pixel."""
     unpacked_pixels = []
 
-    for pix in pixels:
-        for val in pix:
-            unpacked_pixels.append(val)
+    try:
+        for pix in pixels:
+            for val in pix:
+                unpacked_pixels.append(val)
 
-    return len(pixels[0]), bytes(unpacked_pixels)
+        return len(pixels[0]), bytes(unpacked_pixels)
+    except TypeError:
+        return 1, bytes(pixels)
 
 
 def pack_image(pixels):
@@ -168,7 +171,7 @@ def open_image_file(fname):
     """Reads the file fname and returns bytes for all it's data."""
     try:
         img = Image.open(fname)
-        pixels = img.getdata()
+        pixels = list(img.getdata())
         return unpack_image(pixels)
 
     except FileNotFoundError:
