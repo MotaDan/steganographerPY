@@ -1,6 +1,7 @@
 """Given an image and a message steganographer will hide the message in the bits of the image."""
 from PIL import Image
 import sys
+import os.path
 
 BYTELEN = 8
 
@@ -181,7 +182,8 @@ def write_image_file(fname, og_fname, data):
         ogim = Image.open(og_fname)
         img = Image.new(ogim.mode, ogim.size)
         img.putdata(pack_image(data))
-        img.save(fname, 'png')
+        fname_no_ext, _ = os.path.splitext(fname)
+        img.save(fname_no_ext + '.png', 'png')
 
     except FileNotFoundError:
         print("Could not read file", og_fname)

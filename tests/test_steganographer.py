@@ -421,7 +421,7 @@ def test_hide_string_steganogrified():
 
     with open(clean_image, 'rb') as clean, open(hidden_fname, 'rb') as dirty:
         assert clean.read() != dirty.read()
-    assert compare_images(clean_image, hidden_fname) < 1000000
+    assert compare_images(clean_image, hidden_fname) < 500
     try:
         Image.open(hidden_fname)
     except OSError:
@@ -669,20 +669,20 @@ def test_jpegs(capfd):
     if sys.platform == 'win32':
         line_end = '\r\n'
     hidden_message = 'test_jpeg hidden message'
-    dirty_fname = "tests/dirtyImage_test_jpegs.jpg"
+    dirty_fname = "tests/dirtyImage_test_jpegs"
     
     result = os.system('python -m steganographer tests/cleanImage.jpg -m "' + hidden_message +
-                       '" -o ' + dirty_fname)
+                       '" -o ' + dirty_fname + '.jpg')
     _, _ = capfd.readouterr()
 
     assert result == 0
 
-    result = os.system("python -m steganographer " + dirty_fname)
+    result = os.system("python -m steganographer " + dirty_fname + '.png')
     out, _ = capfd.readouterr()
     
     assert result == 0
     assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
-    assert compare_images("tests/cleanImage.jpg", dirty_fname) < 500
+    assert compare_images("tests/cleanImage.jpg", dirty_fname + '.png') < 500
     
     #os.remove(dirty_fname)
 
