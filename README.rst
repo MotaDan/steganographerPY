@@ -17,3 +17,10 @@ Description
 ===========
 
 Given an image and a message steganographer will hide the message in the bits of the image. Currently only works for pngs.
+
+Compatiable with python 3 and up.
+
+To install:
+pip install steganographer
+
+https://pypi.python.org/pypi/steganographer
