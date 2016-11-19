@@ -1,6 +1,6 @@
 """The main routine."""
 import argparse
-from steganographer.steganographer import steganographer_hide, steganographer_reveal
+from steganographer.steganographer import Steganographer
 
 
 def main():
@@ -12,15 +12,17 @@ def main():
                         help="name of output file to hide message in or to write revealed message.")
     args = parser.parse_args()
 
+    stegs = Steganographer()
+
     if args.input:
         if args.message:
             if args.output:
-                hidden_fname = steganographer_hide(args.input, args.message, args.output)
+                hidden_fname = stegs.steganographer_hide(args.input, args.message, args.output)
             else:
-                hidden_fname = steganographer_hide(args.input, args.message)
+                hidden_fname = stegs.steganographer_hide(args.input, args.message)
             print("The message has been hidden in " + hidden_fname)
         else:
-            hidden_message = steganographer_reveal(args.input)
+            hidden_message = stegs.steganographer_reveal(args.input)
 
             if args.output:
                 open(args.output, 'w', encoding='utf-8').write(hidden_message)
