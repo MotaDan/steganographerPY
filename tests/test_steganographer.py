@@ -11,50 +11,50 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # noinspection PyPep8
 from steganographer.steganographer import Steganographer
 # noinspection PyPep8
-from steganographer.steganographer import unpack_image, pack_image, open_bin_file, write_bin_file, open_image_file, \
-    write_image_file
+from steganographer.steganographer import _unpack_image, _pack_image, _open_bin_file, _write_bin_file, _open_image_file, \
+    _write_image_file
 
 CLEAN_PNG_LOCATION = "tests/cleanImage.png"
 
 
 def test_hide_byte():
-    """Testing that the hide_byte function does hide a byte and returns the test_data with that byte hidden."""
+    """Testing that the _hide_byte function does hide a byte and returns the test_data with that byte hidden."""
     stegs = Steganographer()
-    test_data = bytes(b'\x01' * stegs.BYTELEN)
+    test_data = bytes(b'\x01' * stegs._BYTELEN)
     data_to_hide = bytes('A', 'utf-8')
-    solution_data = bytearray(stegs.BYTELEN)
+    solution_data = bytearray(stegs._BYTELEN)
     solution_data[1] = 1
     solution_data[7] = 1
 
-    assert stegs.hide_byte(test_data, data_to_hide[0]) == solution_data
+    assert stegs._hide_byte(test_data, data_to_hide[0]) == solution_data
 
 
 def test_reveal_byte():
-    """Testing that the reveal_byte function returns a bytes of the hidden byte."""
+    """Testing that the _reveal_byte function returns a bytes of the hidden byte."""
     stegs = Steganographer()
-    test_data = bytearray(stegs.BYTELEN)
+    test_data = bytearray(stegs._BYTELEN)
     test_data[1] = 1
     test_data[7] = 1
     solution_data = bytes('A', 'utf-8')
 
-    assert stegs.reveal_byte(test_data) == solution_data
+    assert stegs._reveal_byte(test_data) == solution_data
 
 
 @given(data_to_hide=binary(min_size=1, max_size=1))
 def test_hide_reveal_byte_inverse(data_to_hide):
-    """Testing that anything hidden by hide_byte is revealed by reveal_byte."""
+    """Testing that anything hidden by _hide_byte is revealed by _reveal_byte."""
     clean_data = bytes(b'\x01' * 8)
 
     stegs = Steganographer()
-    revealed_byte = stegs.reveal_byte(stegs.hide_byte(clean_data, data_to_hide[0]))
+    revealed_byte = stegs._reveal_byte(stegs._hide_byte(clean_data, data_to_hide[0]))
     assert revealed_byte == data_to_hide
 
 
 def test_hide_string():
-    """Testing that hide_string takes in a string and bytes and hides the string in that bytes."""
+    """Testing that _hide_string takes in a string and bytes and hides the string in that bytes."""
     stegs = Steganographer()
-    test_data = bytes(b'\x01' * stegs.BYTELEN * 3)
-    solution_data = bytearray(stegs.BYTELEN * 3)
+    test_data = bytes(b'\x01' * stegs._BYTELEN * 3)
+    solution_data = bytearray(stegs._BYTELEN * 3)
     solution_data[1] = 1
     solution_data[7] = 1
     solution_data[9] = 1
@@ -63,13 +63,13 @@ def test_hide_string():
     solution_data[22] = 1
     solution_data[23] = 1
 
-    assert stegs.hide_string(test_data, 'ABC') == solution_data
+    assert stegs._hide_string(test_data, 'ABC') == solution_data
 
 
 def test_reveal_string():
-    """Testing that reveal_string returns a string of the data that was hidden in test_data."""
+    """Testing that _reveal_string returns a string of the data that was hidden in test_data."""
     stegs = Steganographer()
-    test_data = bytearray(stegs.BYTELEN * 4)
+    test_data = bytearray(stegs._BYTELEN * 4)
     test_data[1] = 1
     test_data[7] = 1
     test_data[9] = 1
@@ -78,25 +78,25 @@ def test_reveal_string():
     test_data[22] = 1
     test_data[23] = 1
 
-    assert stegs.reveal_string(test_data) == 'ABC'
+    assert stegs._reveal_string(test_data) == 'ABC'
 
 
 @given(string_to_hide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
 def test_hide_reveal_string_inverse(string_to_hide):
-    """Testing that anything hidden by hide_string is revealed by reveal_string."""
+    """Testing that anything hidden by _hide_string is revealed by _reveal_string."""
     clean_data = bytes(b'\x01' * 5000)
 
     stegs = Steganographer()
-    revealed_string = stegs.reveal_string(stegs.hide_string(clean_data, string_to_hide))
+    revealed_string = stegs._reveal_string(stegs._hide_string(clean_data, string_to_hide))
     assert revealed_string == string_to_hide
 
 
 def test_hide_data():
-    """Testing that hide_data will hide one bytes inside another."""
+    """Testing that _hide_data will hide one bytes inside another."""
     stegs = Steganographer()
-    test_data = bytes(b'\x01' * stegs.BYTELEN * 4)
+    test_data = bytes(b'\x01' * stegs._BYTELEN * 4)
     data_to_hide = bytes('ABC', 'utf-8')
-    solution_data = bytearray(stegs.BYTELEN * 3) + bytearray(b'\x01' * stegs.BYTELEN)
+    solution_data = bytearray(stegs._BYTELEN * 3) + bytearray(b'\x01' * stegs._BYTELEN)
     solution_data[1] = 1
     solution_data[7] = 1
     solution_data[9] = 1
@@ -105,15 +105,15 @@ def test_hide_data():
     solution_data[22] = 1
     solution_data[23] = 1
 
-    assert stegs.hide_data(test_data, data_to_hide) == solution_data
+    assert stegs._hide_data(test_data, data_to_hide) == solution_data
 
 
 def test_hide_data_partial():
-    """Testing that hide_data will work when given a test_data bytes that is too short to hold the data"""
+    """Testing that _hide_data will work when given a test_data bytes that is too short to hold the data"""
     stegs = Steganographer()
-    test_data = bytes(b'\x01' * stegs.BYTELEN * 3)
+    test_data = bytes(b'\x01' * stegs._BYTELEN * 3)
     data_to_hide = bytes('ABC', 'utf-8')
-    solution_data = bytearray(stegs.BYTELEN * 3)
+    solution_data = bytearray(stegs._BYTELEN * 3)
     solution_data[1] = 1
     solution_data[7] = 1
     solution_data[9] = 1
@@ -123,13 +123,13 @@ def test_hide_data_partial():
     solution_data[23] = 1
 
     # Testing when only half a byte is passed in for the data that contains the hidden text.
-    assert stegs.hide_data(test_data[:4], data_to_hide) == solution_data[:4]
+    assert stegs._hide_data(test_data[:4], data_to_hide) == solution_data[:4]
 
 
 def test_reveal_data():
-    """Testing that reveal_data will return the correct data that is hidden inside the test_data."""
+    """Testing that _reveal_data will return the correct data that is hidden inside the test_data."""
     stegs = Steganographer()
-    test_data = bytearray(stegs.BYTELEN * 3)
+    test_data = bytearray(stegs._BYTELEN * 3)
     test_data[1] = 1
     test_data[7] = 1
     test_data[9] = 1
@@ -139,7 +139,7 @@ def test_reveal_data():
     test_data[23] = 1
     solution_data = bytes('ABC', 'utf-8')
 
-    assert stegs.reveal_data(test_data) == solution_data
+    assert stegs._reveal_data(test_data) == solution_data
 
 
 def test_reveal_data_partial():
@@ -149,7 +149,7 @@ def test_reveal_data_partial():
     When the test_data passed in is too small for the data to be hidden.
     """
     stegs = Steganographer()
-    test_data = bytearray(stegs.BYTELEN * 3)  # Will contain 'ABC' but will be truncated when passed to reveal_data
+    test_data = bytearray(stegs._BYTELEN * 3)  # Will contain 'ABC' but will be truncated when passed to _reveal_data
     test_data[1] = 1
     test_data[7] = 1
     test_data[9] = 1
@@ -159,18 +159,18 @@ def test_reveal_data_partial():
     test_data[23] = 1
     solution_data = bytes('AB@', 'utf-8')
 
-    assert stegs.reveal_data(test_data[:-stegs.BYTELEN // 2]) == solution_data
+    assert stegs._reveal_data(test_data[:-stegs._BYTELEN // 2]) == solution_data
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #50 need to change how data is hidden and revealed.", run=True)
 @given(string_to_hide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
 def test_hide_reveal_data_inverse(string_to_hide):
-    """Testing that anything hidden by hide_data is revealed by reveal_data."""
+    """Testing that anything hidden by _hide_data is revealed by _reveal_data."""
     clean_data = bytes(b'\x01' * 5000)
     data_to_hide = bytes(string_to_hide, 'utf-8')
 
     stegs = Steganographer()
-    revealed_data = stegs.reveal_data(stegs.hide_data(clean_data, data_to_hide))
+    revealed_data = stegs._reveal_data(stegs._hide_data(clean_data, data_to_hide))
     assert revealed_data == data_to_hide
 
 
@@ -184,7 +184,7 @@ def test_unpack_image():
     for _ in range(pixel_length):
         test_pixels.append(pixel)
 
-    unpacked = unpack_image(test_pixels)
+    unpacked = _unpack_image(test_pixels)
 
     assert unpacked[0] == len(pixel)
     assert unpacked[1] == solution_pixels
@@ -200,32 +200,32 @@ def test_pack_image():
     for _ in range(pixel_length):
         solution_pixels.append(pixel)
 
-    packed = pack_image(test_pixels)
+    packed = _pack_image(test_pixels)
 
     assert packed == solution_pixels
 
 
 def test_unpack_pack_inverse():
-    """Testing that pixels unpacked by unpack_image are correctly packed by pack_image."""
+    """Testing that pixels unpacked by _unpack_image are correctly packed by _pack_image."""
     pixel = 1, 2, 3, 4
     test_pixels = []
 
     for _ in range(4):
         test_pixels.append(pixel)
 
-    assert pack_image(unpack_image(test_pixels)) == test_pixels
+    assert _pack_image(_unpack_image(test_pixels)) == test_pixels
 
 
 def test_open_bin_file():
     """Testing that opening the file works."""
     clean_file = CLEAN_PNG_LOCATION
-    file_data = open_bin_file(clean_file)
+    file_data = _open_bin_file(clean_file)
 
     with open(clean_file, 'rb') as file:
         assert file_data == file.read()
 
     with pytest.raises(SystemExit):
-        open_bin_file("OpenBinFileThatDoesNotExist.nope")
+        _open_bin_file("OpenBinFileThatDoesNotExist.nope")
 
 
 def test_write_bin_diff_content():
@@ -237,8 +237,8 @@ def test_write_bin_diff_content():
         os.remove(dirty_file)
 
     stegs = Steganographer()
-    data = stegs.hide_string(open_bin_file(clean_file), "Hidden text from test_write_bin_diff_content.")
-    write_bin_file(dirty_file, data)
+    data = stegs._hide_string(_open_bin_file(clean_file), "Hidden text from test_write_bin_diff_content.")
+    _write_bin_file(dirty_file, data)
 
     with open(clean_file, 'rb') as clean, open(dirty_file, 'rb') as dirty:
         assert clean.read() != dirty.read()
@@ -252,8 +252,8 @@ def test_write_bin_file_size_same():
     dirty_file = "tests/dirtyImage_test_write_bin_file_size_same.png"
 
     stegs = Steganographer()
-    data = stegs.hide_string(open_bin_file(clean_file), "Hidden text from test_write_bin_file_size_same.")
-    write_bin_file(dirty_file, data)
+    data = stegs._hide_string(_open_bin_file(clean_file), "Hidden text from test_write_bin_file_size_same.")
+    _write_bin_file(dirty_file, data)
 
     # Getting the file sizes for the clean and dirty files.
     with open(clean_file, 'rb') as clean:
@@ -272,15 +272,15 @@ def test_write_bin_file_size_same():
 def test_open_image_file():
     """Testing that opening an image file returns the data in the file."""
     clean_file = CLEAN_PNG_LOCATION
-    image_data = open_image_file(clean_file)
+    image_data = _open_image_file(clean_file)
 
     with Image.open(clean_file) as clean:
         pixels = clean.getdata()
 
-    assert image_data[1] == unpack_image(pixels)[1]
+    assert image_data[1] == _unpack_image(pixels)[1]
 
     with pytest.raises(SystemExit):
-        open_image_file("OpenImageFileThatDoesNotExist.nope")
+        _open_image_file("OpenImageFileThatDoesNotExist.nope")
 
 
 def test_write_image_file_valid():
@@ -292,9 +292,9 @@ def test_write_image_file_valid():
         os.remove(dirty_file)
 
     stegs = Steganographer()
-    clean_data = open_image_file(clean_file)
-    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_file_valid.")
-    output_file = write_image_file(dirty_file, clean_file, dirty_data)
+    clean_data = _open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs._hide_string(clean_data[1], "Hidden text from test_write_image_file_valid.")
+    output_file = _write_image_file(dirty_file, clean_file, dirty_data)
 
     try:
         Image.open(output_file)
@@ -313,9 +313,9 @@ def test_write_image_diff_content():
         os.remove(dirty_file)
 
     stegs = Steganographer()
-    clean_data = open_image_file(clean_file)
-    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_content.")
-    output_file = write_image_file(dirty_file, clean_file, dirty_data)
+    clean_data = _open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs._hide_string(clean_data[1], "Hidden text from test_write_image_diff_content.")
+    output_file = _write_image_file(dirty_file, clean_file, dirty_data)
 
     with open(clean_file, 'rb') as clean, open(output_file, 'rb') as dirty:
         assert clean.read() != dirty.read()
@@ -332,9 +332,9 @@ def test_write_image_same_image():
         os.remove(dirty_file)
 
     stegs = Steganographer()
-    clean_data = open_image_file(clean_file)
-    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_same_image.")
-    output_file = write_image_file(dirty_file, clean_file, dirty_data)
+    clean_data = _open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs._hide_string(clean_data[1], "Hidden text from test_write_image_same_image.")
+    output_file = _write_image_file(dirty_file, clean_file, dirty_data)
 
     assert compare_images(clean_file, output_file) < 500
 
@@ -347,9 +347,9 @@ def test_write_image_diff_size():
     dirty_file = "tests/dirtyImage_test_write_image_file_diff_size.png"
 
     stegs = Steganographer()
-    clean_data = open_image_file(clean_file)
-    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_size.")
-    output_file = write_image_file(dirty_file, clean_file, dirty_data)
+    clean_data = _open_image_file(clean_file)
+    dirty_data = clean_data[0], stegs._hide_string(clean_data[1], "Hidden text from test_write_image_diff_size.")
+    output_file = _write_image_file(dirty_file, clean_file, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
     with open(clean_file, 'rb') as clean:
@@ -374,9 +374,9 @@ def test_write_image_diff_size_pil():
         pil_image.save(clean_file_pil)
 
     stegs = Steganographer()
-    clean_data = open_image_file(clean_file_pil)
-    dirty_data = clean_data[0], stegs.hide_string(clean_data[1], "Hidden text from test_write_image_diff_size_pil.")
-    output_file = write_image_file(dirty_file, clean_file_pil, dirty_data)
+    clean_data = _open_image_file(clean_file_pil)
+    dirty_data = clean_data[0], stegs._hide_string(clean_data[1], "Hidden text from test_write_image_diff_size_pil.")
+    output_file = _write_image_file(dirty_file, clean_file_pil, dirty_data)
 
     # Getting the file sizes for the clean and dirty files.
     with open(clean_file_pil, 'rb') as clean:
@@ -399,7 +399,7 @@ def test_write_image_exit_on_fail():
     dirty_data = bytes(8)
 
     with pytest.raises(SystemExit):
-        write_image_file(clean_file, dirty_file, dirty_data)
+        _write_image_file(clean_file, dirty_file, dirty_data)
 
 
 def test_steganographer_hide_string():
@@ -483,10 +483,10 @@ def test_null_data_with_string():
     """Testing that the string entered is the string returned. The data is the exact length needed."""
     test_string = "This is a test String"
     stegs = Steganographer()
-    blank_data = bytes(b'\x01' * len(test_string) * stegs.BYTELEN)
+    blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
 
-    hidden_string = stegs.hide_string(blank_data, test_string)
-    revealed_string = stegs.reveal_string(hidden_string)
+    hidden_string = stegs._hide_string(blank_data, test_string)
+    revealed_string = stegs._reveal_string(hidden_string)
 
     assert test_string == revealed_string
 
@@ -496,10 +496,10 @@ def test_null_data_with_data():
     test_string = "This is a test String"
     test_data = bytes(test_string, 'utf-8')
     stegs = Steganographer()
-    blank_data = bytes(b'\x01' * len(test_string) * stegs.BYTELEN)
+    blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
 
-    hidden_data = stegs.hide_data(blank_data, test_data)
-    revealed_data = stegs.reveal_data(hidden_data)
+    hidden_data = stegs._hide_data(blank_data, test_data)
+    revealed_data = stegs._reveal_data(hidden_data)
 
     assert test_data == revealed_data
 
@@ -508,10 +508,10 @@ def test_short_data_with_string():
     """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
     stegs = Steganographer()
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs.BYTELEN - stegs.BYTELEN))
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
 
-    hidden_string = stegs.hide_string(blank_data, test_string)
-    revealed_string = stegs.reveal_string(hidden_string)
+    hidden_string = stegs._hide_string(blank_data, test_string)
+    revealed_string = stegs._reveal_string(hidden_string)
 
     assert test_string[:-1] == revealed_string
 
@@ -521,10 +521,10 @@ def test_short_data_with_data():
     test_string = "This is a test String"
     test_data = bytes(test_string, 'utf-8')
     stegs = Steganographer()
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs.BYTELEN - stegs.BYTELEN))
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
 
-    hidden_data = stegs.hide_data(blank_data, test_data)
-    revealed_data = stegs.reveal_data(hidden_data)
+    hidden_data = stegs._hide_data(blank_data, test_data)
+    revealed_data = stegs._reveal_data(hidden_data)
 
     assert test_data[:-1] == revealed_data
 
@@ -533,11 +533,11 @@ def test_short_partial_data_string():
     """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
     stegs = Steganographer()
-    solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> stegs.BYTELEN // 2 << stegs.BYTELEN // 2)
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs.BYTELEN - stegs.BYTELEN // 2))
+    solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2)
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
-    hidden_string = stegs.hide_string(blank_data, test_string)
-    revealed_string = stegs.reveal_string(hidden_string)
+    hidden_string = stegs._hide_string(blank_data, test_string)
+    revealed_string = stegs._reveal_string(hidden_string)
 
     assert solution_string == revealed_string
 
@@ -548,11 +548,11 @@ def test_short_partial_data_w_data():
     test_data = bytes(test_string, 'utf-8')
     solution_data = bytearray(test_data)
     stegs = Steganographer()
-    solution_data[-1] = solution_data[-1] >> stegs.BYTELEN // 2 << stegs.BYTELEN // 2
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs.BYTELEN - stegs.BYTELEN // 2))
+    solution_data[-1] = solution_data[-1] >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
-    hidden_data = stegs.hide_data(blank_data, test_data)
-    revealed_data = stegs.reveal_data(hidden_data)
+    hidden_data = stegs._hide_data(blank_data, test_data)
+    revealed_data = stegs._reveal_data(hidden_data)
 
     assert solution_data == revealed_data
 
@@ -563,7 +563,7 @@ def compare_images(img1, img2):
         # calculate the difference and its norms
         diff = ImageChops.difference(img1, img2)
 
-    m_norm = sum(unpack_image(diff.getdata())[1])  # Manhattan norm
+    m_norm = sum(_unpack_image(diff.getdata())[1])  # Manhattan norm
 
     return m_norm
 
