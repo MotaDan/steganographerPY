@@ -11,8 +11,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # noinspection PyPep8
 from steganographer.steganographer import Steganographer
 # noinspection PyPep8
-from steganographer.steganographer import _unpack_image, _pack_image, _open_bin_file, _write_bin_file, _open_image_file, \
-    _write_image_file
+from steganographer.steganographer import _unpack_image, _pack_image, _open_bin_file, _write_bin_file, \
+    _open_image_file, _write_image_file
 
 CLEAN_PNG_LOCATION = "tests/cleanImage.png"
 

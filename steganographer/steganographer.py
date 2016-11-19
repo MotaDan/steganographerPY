@@ -81,6 +81,7 @@ def _write_image_file(fname, og_fname, data):
 
 
 class Steganographer:
+
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
