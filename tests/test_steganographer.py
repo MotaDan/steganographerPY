@@ -514,7 +514,7 @@ def test_null_data_with_data():
 
 def test_short_data_with_string():
     """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
-    test_string = "This is a test String"
+    test_string = "a"
     stegs = Steganographer()
     stegs._DATA_LEN = len(test_string)
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))

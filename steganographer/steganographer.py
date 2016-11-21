@@ -128,6 +128,9 @@ class Steganographer:
 
     def _reveal_byte(self, hidden_data):
         """Expects a bytes of length 8. Will pull out the least significant bit from each byte and return them."""
+        if len(hidden_data) == 0:
+            return bytes()
+
         revealed_data = bytearray(1)
 
         for i in range(len(hidden_data)):
@@ -198,7 +201,6 @@ class Steganographer:
         return them as a bytes.
         """
         revealed_data_len = self._DATA_LEN
-        #revealed_data_len = len(hidden_data) // self._BYTELEN
         revealed_data = bytearray()
 
         for i in range(0, revealed_data_len * self._BYTELEN, self._BYTELEN):
