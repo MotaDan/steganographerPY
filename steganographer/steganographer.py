@@ -81,7 +81,6 @@ def _write_image_file(fname, og_fname, data):
 
 
 class Steganographer:
-
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
@@ -91,7 +90,8 @@ class Steganographer:
     _DATA_LEN = _HEADER_SIZE
 
     def _generate_header(self, data_size):
-        self._HEADER = bytes(self._HEADER_TITLE, 'utf-8') + bytes(data_size.to_bytes(self._HEADER_DATA_SIZE, sys.byteorder))
+        self._HEADER = bytes(self._HEADER_TITLE, 'utf-8') + bytes(
+            data_size.to_bytes(self._HEADER_DATA_SIZE, sys.byteorder))
         self._HEADER_SIZE = len(self._HEADER)
 
         return self._HEADER
@@ -100,7 +100,8 @@ class Steganographer:
         bytes_to_hide_header = self._HEADER_SIZE * self._BYTELEN
         header = self._reveal_data(data[:bytes_to_hide_header])
         header_title = header[:len(self._HEADER_TITLE)]
-        self._DATA_LEN = int.from_bytes(header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], sys.byteorder)
+        self._DATA_LEN = int.from_bytes(
+            header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], sys.byteorder)
 
         return header_title == self._HEADER_TITLE.encode('utf-8')
 
@@ -146,7 +147,6 @@ class Steganographer:
         Expects a bytes of any length and a string value. Will return a bytes with the string's bits hidden
         in the least significant bits. Adds null terminator to the end of the string.
         """
-        #val += '\0'
         return self._hide_data(clean_data, bytes(val, 'utf-8'))
 
     def _reveal_string(self, hidden_data):
@@ -205,11 +205,6 @@ class Steganographer:
 
         for i in range(0, revealed_data_len * self._BYTELEN, self._BYTELEN):
             revealed_data.extend(self._reveal_byte(hidden_data[i:i + self._BYTELEN]))
-
-        #revealed_data_len_remainder = len(hidden_data) % self._BYTELEN
-
-        #if revealed_data_len_remainder > 0:
-        #    revealed_data.extend(self._reveal_byte(hidden_data[-1 * revealed_data_len_remainder:]))
 
         return bytes(revealed_data)
 
