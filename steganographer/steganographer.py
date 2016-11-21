@@ -88,6 +88,7 @@ class Steganographer:
     _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
     _HEADER_SIZE = len(_HEADER_TITLE) + _HEADER_DATA_SIZE
+    _DATA_LEN = _HEADER_SIZE
 
     def _generate_header(self, data_size):
         self._HEADER = bytes(self._HEADER_TITLE, 'utf-8') + bytes(data_size.to_bytes(self._HEADER_DATA_SIZE, sys.byteorder))
@@ -98,8 +99,8 @@ class Steganographer:
     def _retrieve_header(self, data):
         bytes_to_hide_header = self._HEADER_SIZE * self._BYTELEN
         header = self._reveal_data(data[:bytes_to_hide_header])
-        header_title = header[:len(self._HEADER_TITLE)]
-        self._DATA_LEN = header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE]
+        header_title = header[:len(self._HEADER_TITLE)].decode('utf-8')
+        self._DATA_LEN = int.from_bytes(header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], sys.byteorder)
 
         return header_title == self._HEADER_TITLE
 
@@ -203,10 +204,10 @@ class Steganographer:
         for i in range(0, revealed_data_len * self._BYTELEN, self._BYTELEN):
             revealed_data.extend(self._reveal_byte(hidden_data[i:i + self._BYTELEN]))
 
-        revealed_data_len_remainder = len(hidden_data) % self._BYTELEN
+        #revealed_data_len_remainder = len(hidden_data) % self._BYTELEN
 
-        if revealed_data_len_remainder > 0:
-            revealed_data.extend(self._reveal_byte(hidden_data[-1 * revealed_data_len_remainder:]))
+        #if revealed_data_len_remainder > 0:
+        #    revealed_data.extend(self._reveal_byte(hidden_data[-1 * revealed_data_len_remainder:]))
 
         return bytes(revealed_data)
 
@@ -218,7 +219,7 @@ class Steganographer:
         clean_image_file and outputs it to dirty_image_file.
         """
         header = self._generate_header(len(text.encode('utf-8')))
-        clean_data = _open_image_file(clean_image_file)  # Is a tuple with he size of pixels and the pixels.
+        clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
         dirty_data = (clean_data[0], self._hide_string(clean_data[1], header.decode('utf-8') + text))
 
         if dirty_image_file == '':
@@ -235,7 +236,7 @@ class Steganographer:
         dirty_data = _open_image_file(fimage)
 
         if self._retrieve_header(dirty_data[1]) is False:
-            return "This file %s has no hidden message.", fimage
+            return "This file %s has no hidden message." % fimage
 
         revealed_string = self._reveal_string(dirty_data[1][self._HEADER_SIZE * self._BYTELEN:])
         return revealed_string

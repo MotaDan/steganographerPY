@@ -503,6 +503,7 @@ def test_null_data_with_data():
     test_string = "This is a test String"
     test_data = bytes(test_string, 'utf-8')
     stegs = Steganographer()
+    stegs._DATA_LEN = len(test_string)
     blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
 
     hidden_data = stegs._hide_data(blank_data, test_data)
@@ -515,6 +516,7 @@ def test_short_data_with_string():
     """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
     stegs = Steganographer()
+    stegs._DATA_LEN = len(test_string)
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
 
     hidden_string = stegs._hide_string(blank_data, test_string)
@@ -528,6 +530,7 @@ def test_short_data_with_data():
     test_string = "This is a test String"
     test_data = bytes(test_string, 'utf-8')
     stegs = Steganographer()
+    stegs._DATA_LEN = len(test_string)
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
 
     hidden_data = stegs._hide_data(blank_data, test_data)
@@ -540,6 +543,7 @@ def test_short_partial_data_string():
     """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
     test_string = "This is a test String"
     stegs = Steganographer()
+    stegs._DATA_LEN = len(test_string)
     solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2)
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
@@ -555,6 +559,7 @@ def test_short_partial_data_w_data():
     test_data = bytes(test_string, 'utf-8')
     solution_data = bytearray(test_data)
     stegs = Steganographer()
+    stegs._DATA_LEN = len(test_string)
     solution_data[-1] = solution_data[-1] >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
