@@ -99,10 +99,10 @@ class Steganographer:
     def _retrieve_header(self, data):
         bytes_to_hide_header = self._HEADER_SIZE * self._BYTELEN
         header = self._reveal_data(data[:bytes_to_hide_header])
-        header_title = header[:len(self._HEADER_TITLE)].decode('utf-8')
+        header_title = header[:len(self._HEADER_TITLE)]
         self._DATA_LEN = int.from_bytes(header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], sys.byteorder)
 
-        return header_title == self._HEADER_TITLE
+        return header_title == self._HEADER_TITLE.encode('utf-8')
 
     def _hide_byte(self, clean_data, val):
         """
@@ -238,7 +238,8 @@ class Steganographer:
         dirty_data = _open_image_file(fimage)
 
         if self._retrieve_header(dirty_data[1]) is False:
-            return "This file %s has no hidden message." % fimage
+            print("This file %s has no hidden message." % fimage)
+            sys.exit()
 
         revealed_string = self._reveal_string(dirty_data[1][self._HEADER_SIZE * self._BYTELEN:])
         return revealed_string
