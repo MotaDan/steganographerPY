@@ -85,6 +85,23 @@ class Steganographer:
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
+    _HEADER_TITLE = "STEGS"
+    _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
+    _HEADER_SIZE = len(_HEADER_TITLE) + _HEADER_DATA_SIZE
+
+    def _generate_header(self, data_size):
+        self._HEADER = bytes(self._HEADER_TITLE, 'utf-8') + bytes(data_size.to_bytes(self._HEADER_DATA_SIZE, sys.byteorder))
+        self._HEADER_SIZE = len(self._HEADER)
+
+        return self._HEADER
+
+    def _retrieve_header(self, data):
+        bytes_to_hide_header = self._HEADER_SIZE * self._BYTELEN
+        header = self._reveal_data(data[:bytes_to_hide_header])
+        header_title = header[:len(self._HEADER_TITLE)]
+        self._DATA_LEN = header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE]
+
+        return header_title == self._HEADER_TITLE
 
     def _hide_byte(self, clean_data, val):
         """
@@ -125,7 +142,7 @@ class Steganographer:
         Expects a bytes of any length and a string value. Will return a bytes with the string's bits hidden
         in the least significant bits. Adds null terminator to the end of the string.
         """
-        val += '\0'
+        #val += '\0'
         return self._hide_data(clean_data, bytes(val, 'utf-8'))
 
     def _reveal_string(self, hidden_data):
@@ -136,15 +153,15 @@ class Steganographer:
         a string.
         """
         revealed_data = self._reveal_data(hidden_data)
-        null_pos = 0
-
-        for i in range(len(revealed_data)):
-            if revealed_data[i] != 0:
-                null_pos += 1
-            else:
-                break
-
-        revealed_data = revealed_data[:null_pos]
+        # null_pos = 0
+        #
+        # for i in range(len(revealed_data)):
+        #     if revealed_data[i] != 0:
+        #         null_pos += 1
+        #     else:
+        #         break
+        #
+        # revealed_data = revealed_data[:null_pos]
 
         try:
             revealed_string = revealed_data.decode()
@@ -179,7 +196,8 @@ class Steganographer:
         Expects a bytes hidden_data of any length. Will pull out the least significant bits from each byte and
         return them as a bytes.
         """
-        revealed_data_len = len(hidden_data) // self._BYTELEN
+        revealed_data_len = self._DATA_LEN
+        #revealed_data_len = len(hidden_data) // self._BYTELEN
         revealed_data = bytearray()
 
         for i in range(0, revealed_data_len * self._BYTELEN, self._BYTELEN):
@@ -199,8 +217,9 @@ class Steganographer:
         Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in
         clean_image_file and outputs it to dirty_image_file.
         """
-        clean_data = _open_image_file(clean_image_file)
-        dirty_data = (clean_data[0], self._hide_string(clean_data[1], text))
+        header = self._generate_header(len(text.encode('utf-8')))
+        clean_data = _open_image_file(clean_image_file)  # Is a tuple with he size of pixels and the pixels.
+        dirty_data = (clean_data[0], self._hide_string(clean_data[1], header.decode('utf-8') + text))
 
         if dirty_image_file == '':
             clean_name = clean_image_file.split('.')[0]
@@ -214,5 +233,9 @@ class Steganographer:
     def steganographer_reveal(self, fimage):
         """Reveals whatever string is hidden in the fimage."""
         dirty_data = _open_image_file(fimage)
-        revealed_string = self._reveal_string(dirty_data[1])
+
+        if self._retrieve_header(dirty_data[1]) is False:
+            return "This file %s has no hidden message.", fimage
+
+        revealed_string = self._reveal_string(dirty_data[1][self._HEADER_SIZE * self._BYTELEN:])
         return revealed_string

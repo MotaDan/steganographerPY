@@ -68,7 +68,9 @@ def test_hide_string():
 
 def test_reveal_string():
     """Testing that _reveal_string returns a string of the data that was hidden in test_data."""
+    solution = 'ABC'
     stegs = Steganographer()
+    stegs._DATA_LEN = len(solution)
     test_data = bytearray(stegs._BYTELEN * 4)
     test_data[1] = 1
     test_data[7] = 1
@@ -78,15 +80,15 @@ def test_reveal_string():
     test_data[22] = 1
     test_data[23] = 1
 
-    assert stegs._reveal_string(test_data) == 'ABC'
+    assert stegs._reveal_string(test_data) == solution
 
 
 @given(string_to_hide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
 def test_hide_reveal_string_inverse(string_to_hide):
     """Testing that anything hidden by _hide_string is revealed by _reveal_string."""
     clean_data = bytes(b'\x01' * 5000)
-
     stegs = Steganographer()
+    stegs._DATA_LEN = len(string_to_hide.encode('utf-8'))
     revealed_string = stegs._reveal_string(stegs._hide_string(clean_data, string_to_hide))
     assert revealed_string == string_to_hide
 
@@ -96,6 +98,7 @@ def test_hide_data():
     stegs = Steganographer()
     test_data = bytes(b'\x01' * stegs._BYTELEN * 4)
     data_to_hide = bytes('ABC', 'utf-8')
+    stegs._DATA_LEN = len(data_to_hide)
     solution_data = bytearray(stegs._BYTELEN * 3) + bytearray(b'\x01' * stegs._BYTELEN)
     solution_data[1] = 1
     solution_data[7] = 1
@@ -113,6 +116,7 @@ def test_hide_data_partial():
     stegs = Steganographer()
     test_data = bytes(b'\x01' * stegs._BYTELEN * 3)
     data_to_hide = bytes('ABC', 'utf-8')
+    stegs._DATA_LEN = len(data_to_hide)
     solution_data = bytearray(stegs._BYTELEN * 3)
     solution_data[1] = 1
     solution_data[7] = 1
@@ -128,7 +132,9 @@ def test_hide_data_partial():
 
 def test_reveal_data():
     """Testing that _reveal_data will return the correct data that is hidden inside the test_data."""
+    solution_data = bytes('ABC', 'utf-8')
     stegs = Steganographer()
+    stegs._DATA_LEN = len(solution_data)
     test_data = bytearray(stegs._BYTELEN * 3)
     test_data[1] = 1
     test_data[7] = 1
@@ -137,7 +143,6 @@ def test_reveal_data():
     test_data[17] = 1
     test_data[22] = 1
     test_data[23] = 1
-    solution_data = bytes('ABC', 'utf-8')
 
     assert stegs._reveal_data(test_data) == solution_data
 
@@ -149,6 +154,7 @@ def test_reveal_data_partial():
     When the test_data passed in is too small for the data to be hidden.
     """
     stegs = Steganographer()
+    solution_data = bytes('AB@', 'utf-8')
     test_data = bytearray(stegs._BYTELEN * 3)  # Will contain 'ABC' but will be truncated when passed to _reveal_data
     test_data[1] = 1
     test_data[7] = 1
@@ -157,7 +163,7 @@ def test_reveal_data_partial():
     test_data[17] = 1
     test_data[22] = 1
     test_data[23] = 1
-    solution_data = bytes('AB@', 'utf-8')
+    stegs._DATA_LEN = len('ABC')
 
     assert stegs._reveal_data(test_data[:-stegs._BYTELEN // 2]) == solution_data
 
@@ -483,6 +489,7 @@ def test_null_data_with_string():
     """Testing that the string entered is the string returned. The data is the exact length needed."""
     test_string = "This is a test String"
     stegs = Steganographer()
+    stegs._DATA_LEN = len(test_string)
     blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
 
     hidden_string = stegs._hide_string(blank_data, test_string)
