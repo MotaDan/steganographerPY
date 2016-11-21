@@ -168,7 +168,6 @@ def test_reveal_data_partial():
     assert stegs._reveal_data(test_data[:-stegs._BYTELEN // 2]) == solution_data
 
 
-@pytest.mark.xfail(strict=True, reason="Issue #50 need to change how data is hidden and revealed.", run=True)
 @given(string_to_hide=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
 def test_hide_reveal_data_inverse(string_to_hide):
     """Testing that anything hidden by _hide_data is revealed by _reveal_data."""
@@ -176,6 +175,7 @@ def test_hide_reveal_data_inverse(string_to_hide):
     data_to_hide = bytes(string_to_hide, 'utf-8')
 
     stegs = Steganographer()
+    stegs._DATA_LEN = len(string_to_hide.encode('utf-8'))
     revealed_data = stegs._reveal_data(stegs._hide_data(clean_data, data_to_hide))
     assert revealed_data == data_to_hide
 
@@ -775,4 +775,4 @@ def test_main_reveal_no_msg(capfd):
     out, _ = capfd.readouterr()
 
     assert result == 0
-    assert out == "There was a problem reading the hidden message." + line_end
+    assert out == "This file %s has no hidden message." % clean_fname + line_end
