@@ -86,21 +86,30 @@ class Steganographer:
     _BYTELEN = 8
     _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
-    _HEADER_SIZE = len(_HEADER_TITLE) + _HEADER_DATA_SIZE
-    _DATA_LEN = _HEADER_SIZE
+
+    def __init__(self):
+        """Setting _data_len so retrieving the header knows what to grab."""
+        self._header_size = len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE
+        self._data_len = self._header_size
 
     def _generate_header(self, data_size):
-        self._HEADER = bytes(self._HEADER_TITLE, 'utf-8') + bytes(
+        """Generates the header that will be placed at the beginning of the image."""
+        self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(
             data_size.to_bytes(self._HEADER_DATA_SIZE, sys.byteorder))
-        self._HEADER_SIZE = len(self._HEADER)
+        self._header_size = len(self._header)
 
-        return self._HEADER
+        return self._header
 
     def _retrieve_header(self, data):
-        bytes_to_hide_header = self._HEADER_SIZE * self._BYTELEN
+        """
+        Retrieves the header from the data passed in and sets the appropriate attributes.
+
+        Returns if there is a valid header or not.
+        """
+        bytes_to_hide_header = self._header_size * self._BYTELEN
         header = self._reveal_data(data[:bytes_to_hide_header])
         header_title = header[:len(self._HEADER_TITLE)]
-        self._DATA_LEN = int.from_bytes(
+        self._data_len = int.from_bytes(
             header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], sys.byteorder)
 
         return header_title == self._HEADER_TITLE.encode('utf-8')
@@ -200,7 +209,7 @@ class Steganographer:
         Expects a bytes hidden_data of any length. Will pull out the least significant bits from each byte and
         return them as a bytes.
         """
-        revealed_data_len = self._DATA_LEN
+        revealed_data_len = self._data_len
         revealed_data = bytearray()
 
         for i in range(0, revealed_data_len * self._BYTELEN, self._BYTELEN):
@@ -236,5 +245,5 @@ class Steganographer:
             print("This file %s has no hidden message." % fimage)
             sys.exit()
 
-        revealed_string = self._reveal_string(dirty_data[1][self._HEADER_SIZE * self._BYTELEN:])
+        revealed_string = self._reveal_string(dirty_data[1][self._header_size * self._BYTELEN:])
         return revealed_string
