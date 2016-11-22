@@ -166,20 +166,11 @@ class Steganographer:
         a string.
         """
         revealed_data = self._reveal_data(hidden_data)
-        # null_pos = 0
-        #
-        # for i in range(len(revealed_data)):
-        #     if revealed_data[i] != 0:
-        #         null_pos += 1
-        #     else:
-        #         break
-        #
-        # revealed_data = revealed_data[:null_pos]
 
         try:
-            revealed_string = revealed_data.decode()
-        except UnicodeDecodeError:
-            print("There was a problem reading the hidden message.")
+            revealed_string = revealed_data.decode('utf-8')
+        except UnicodeDecodeError:  # pragma: no cover
+            print("The hidden message could not be decoded.")
             sys.exit()
 
         return revealed_string
