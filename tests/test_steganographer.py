@@ -732,7 +732,7 @@ def test_jpegs(capfd):
     assert compare_images("tests/cleanImage.jpg", dirty_fname + '.png') < 500
 
 
-@pytest.mark.xfail(strict=True, reason="Issue #30 bmp support not added.", run=True)
+@pytest.mark.xfail(strict=True, reason="Issue #59 bmp support is broken.", run=True)
 def test_bmps(capfd):
     """Testing that jpegs can have a message hidden and revealed."""
     line_end = '\n'
