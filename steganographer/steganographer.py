@@ -81,6 +81,7 @@ def _write_image_file(fname, og_fname, data):
 
 
 class Steganographer:
+
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
@@ -91,6 +92,7 @@ class Steganographer:
         """Setting _data_len so retrieving the header knows what to grab."""
         self._header_size = len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE
         self._data_len = self._header_size
+        self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * self._HEADER_DATA_SIZE)
 
     def _generate_header(self, data_size):
         """Generates the header that will be placed at the beginning of the image."""
