@@ -38,7 +38,7 @@ def _open_bin_file(fname):
         return image_bytes
 
     except FileNotFoundError:
-        print("Could not read file", fname)
+        print("Could not find file", fname)
         sys.exit()
 
 
@@ -95,9 +95,13 @@ class Steganographer:
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * self._HEADER_DATA_SIZE)
 
     def _generate_header(self, data_size):
-        """Generates the header that will be placed at the beginning of the image."""
+        """
+        Generates the header that will be placed at the beginning of the image.
+
+        Returns header as bytes.
+        """
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(
-            data_size.to_bytes(self._HEADER_DATA_SIZE, sys.byteorder))
+            data_size.to_bytes(self._HEADER_DATA_SIZE, "little"))
         self._header_size = len(self._header)
 
         return self._header
@@ -112,7 +116,7 @@ class Steganographer:
         header = self._reveal_data(data[:bytes_to_hide_header])
         header_title = header[:len(self._HEADER_TITLE)]
         self._data_len = int.from_bytes(
-            header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], sys.byteorder)
+            header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little")
 
         return header_title == self._HEADER_TITLE.encode('utf-8')
 
@@ -219,14 +223,16 @@ class Steganographer:
         """
         header = self._generate_header(len(text.encode('utf-8')))
         clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
-        dirty_data = (clean_data[0], self._hide_string(clean_data[1], header.decode('utf-8') + text))
+        dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
+        dirty_data += self._hide_string(clean_data[1][len(header) * self._BYTELEN:], text)
+        dirty_image_data = (clean_data[0], dirty_data)
 
         if dirty_image_file == '':
             clean_name = clean_image_file.split('.')[0]
             clean_extension = clean_image_file.split('.')[1]
             dirty_image_file = clean_name + "Steganogrified." + clean_extension
 
-        output_file = _write_image_file(dirty_image_file, clean_image_file, dirty_data)
+        output_file = _write_image_file(dirty_image_file, clean_image_file, dirty_image_data)
 
         return output_file
 
