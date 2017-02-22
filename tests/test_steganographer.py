@@ -432,7 +432,7 @@ def test_steganographer_hide_string():
 def test_steganographer_hide_string_nonsense():
     """Testing that a random string, that can cause a decode error, will correctly be hidden in a new image."""
     clean_image = CLEAN_PNG_LOCATION
-    dirty_image = "tests/dirtyImage_test_steganographer_hide_string.png"
+    dirty_image = "tests/dirtyImage_test_steganographer_hide_string_nonsense.png"
     hidden_message = "Ĝ𐡑ĜĜĜĜĜĜĜĜĜԬĜ\U000fc423ĜĜĜĜԬĜĜĜԬԬĜԬ\U000fc423ĜԬ\U000fc423ԬԬĜ\U000fc423ԬĜԬ𐡕𐡕𐡑𐡕𐡕𐡕𐡑𐡕𐡑𐡕𐡑"
 
     stegs = Steganographer()
