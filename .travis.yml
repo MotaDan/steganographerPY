@@ -21,4 +21,4 @@ deploy:
     repo: MotaDan/steganographerPY
 matrix:
     allow_failures:
-    - python: nightly
+    - python:
