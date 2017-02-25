@@ -440,7 +440,7 @@ def test_steganographer_hide_string_nonsense():
 
     with open(clean_image, 'rb') as clean, open(hidden_fname, 'rb') as dirty:
         assert clean.read() != dirty.read()
-    assert compare_images(clean_image, hidden_fname) < 500
+    assert compare_images(clean_image, hidden_fname) < 650
     try:
         Image.open(hidden_fname)
     except OSError:
