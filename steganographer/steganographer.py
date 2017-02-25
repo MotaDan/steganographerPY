@@ -81,13 +81,12 @@ def _write_image_file(fname, og_fname, data):
 
 
 class Steganographer:
-
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
     _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
-    _HEADER_BITS_SIZE = 1   # The size of the header segment for storing the number of bits from a byte used.
+    _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
     def __init__(self):
         """Setting _data_len so retrieving the header knows what to grab."""
@@ -103,8 +102,8 @@ class Steganographer:
         Returns header as bytes.
         """
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + \
-                       bytes(data_size.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
-                       bytes(bits_to_use.to_bytes(self._HEADER_BITS_SIZE, "little"))
+            bytes(data_size.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
+            bytes(bits_to_use.to_bytes(self._HEADER_BITS_SIZE, "little"))
         self._header_size = len(self._header)
 
         return self._header
@@ -122,7 +121,7 @@ class Steganographer:
             header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little")
         self._bits_used = int.from_bytes(
             header[len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE:
-            len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
+                   len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
 
         return header_title == self._HEADER_TITLE.encode('utf-8')
 
