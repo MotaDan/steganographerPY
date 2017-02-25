@@ -87,21 +87,24 @@ class Steganographer:
     _BYTELEN = 8
     _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
+    _HEADER_BITS_SIZE = 1   # The size of the header segment for storing the number of bits from a byte used.
 
     def __init__(self):
         """Setting _data_len so retrieving the header knows what to grab."""
-        self._header_size = len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE
-        self._data_len = self._header_size
-        self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * self._HEADER_DATA_SIZE)
+        self._header_size = len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE
+        self._data_len = self._header_size  # The only data that should be present is the header.
+        self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * (self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE))
+        self._bits_used = 1
 
-    def _generate_header(self, data_size):
+    def _generate_header(self, data_size, bits_to_use):
         """
         Generates the header that will be placed at the beginning of the image.
 
         Returns header as bytes.
         """
-        self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(
-            data_size.to_bytes(self._HEADER_DATA_SIZE, "little"))
+        self._header = bytes(self._HEADER_TITLE, 'utf-8') + \
+                       bytes(data_size.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
+                       bytes(bits_to_use.to_bytes(self._HEADER_BITS_SIZE, "little"))
         self._header_size = len(self._header)
 
         return self._header
@@ -117,6 +120,9 @@ class Steganographer:
         header_title = header[:len(self._HEADER_TITLE)]
         self._data_len = int.from_bytes(
             header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little")
+        self._bits_used = int.from_bytes(
+            header[len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE:
+            len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
 
         return header_title == self._HEADER_TITLE.encode('utf-8')
 
@@ -221,7 +227,7 @@ class Steganographer:
         Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in
         clean_image_file and outputs it to dirty_image_file.
         """
-        header = self._generate_header(len(text.encode('utf-8')))
+        header = self._generate_header(len(text.encode('utf-8')), 1)
         clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
         dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
         dirty_data += self._hide_string(clean_data[1][len(header) * self._BYTELEN:], text)
