@@ -4,4 +4,5 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-Pillow==3.4.2
+olefile==0.44             # via pillow
+Pillow==4.0.0
