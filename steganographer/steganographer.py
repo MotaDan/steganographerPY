@@ -221,7 +221,7 @@ class Steganographer:
 
     def steganographer_hide(self, clean_image_file, text, dirty_image_file=''):
         """
-        Hides text inside CleanImageFile and outputs dirty_image_file.
+        Hides text inside clean_image_file and outputs dirty_image_file.
 
         Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in
         clean_image_file and outputs it to dirty_image_file.
@@ -230,6 +230,23 @@ class Steganographer:
         clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
         dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
         dirty_data += self._hide_string(clean_data[1][len(header) * self._BYTELEN:], text)
+        dirty_image_data = (clean_data[0], dirty_data)
+
+        if dirty_image_file == '':
+            clean_name = clean_image_file.split('.')[0]
+            clean_extension = clean_image_file.split('.')[1]
+            dirty_image_file = clean_name + "Steganogrified." + clean_extension
+
+        output_file = _write_image_file(dirty_image_file, clean_image_file, dirty_image_data)
+
+        return output_file
+
+    def steganographer_hide_file(self, clean_image_file, file_to_hide, dirty_image_file=''):
+        """Hides file_to_hide inside clean_image_file and outputs to dirty_image_file."""
+        header = self._generate_header(len(open(file_to_hide, 'rb').read()), 1)
+        clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
+        dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
+        dirty_data += self._hide_data(clean_data[1][len(header) * self._BYTELEN:], open(file_to_hide, 'rb').read())
         dirty_image_data = (clean_data[0], dirty_data)
 
         if dirty_image_file == '':
