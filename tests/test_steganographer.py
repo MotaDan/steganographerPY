@@ -499,6 +499,8 @@ def test_hide_string_steganogrified():
     except OSError:
         pytest.fail("Image is corrupt " + hidden_fname)
 
+    os.remove(hidden_fname)
+
 
 def test_steganogrified_name():
     """Testing that the image a string is hidden in is the correct one."""
@@ -511,6 +513,8 @@ def test_steganogrified_name():
 
     assert hidden_fname == steganogrified_fname
     assert os.path.isfile(steganogrified_fname)
+
+    os.remove(hidden_fname)
 
 
 @given(hidden_message=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
@@ -662,6 +666,8 @@ def test_main_hide_msg_no_output(capfd):
         Image.open(steganogrified_fname)
     except OSError:
         pytest.fail("Image is corrupt " + steganogrified_fname)
+
+    os.remove(steganogrified_fname)
 
 
 def test_main_reveal_msg_no_output(capfd):
