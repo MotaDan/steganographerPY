@@ -460,13 +460,13 @@ def test_steganographer_hide_file():
 
     with open(clean_image, 'rb') as clean, open(hidden_fname, 'rb') as dirty:
         assert clean.read() != dirty.read()
-    #assert compare_images(clean_image, hidden_fname) < 650
+    assert compare_images(clean_image, hidden_fname) < 38000
     try:
         Image.open(hidden_fname)
     except OSError:
         pytest.fail("Image is corrupt " + hidden_fname)
 
-    #os.remove(dirty_image)
+    os.remove(hidden_fname)
 
 
 def test_steganographer_hide_name():
@@ -619,14 +619,6 @@ def compare_images(img1, img2):
     m_norm = sum(_unpack_image(diff.getdata())[1])  # Manhattan norm
 
     return m_norm
-
-
-def normalize(arr):
-    """Normalizes a list of pixels."""
-    rng = arr.max() - arr.min()
-    amin = arr.min()
-
-    return (arr - amin) * 255 / rng
 
 
 def test_main_hide_msg_with_output(capfd):
