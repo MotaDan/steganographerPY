@@ -7,6 +7,7 @@ import os
 import os.path
 from hypothesis import given
 from hypothesis.strategies import text, binary, characters
+from shutil import copy2
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # noinspection PyPep8
@@ -485,7 +486,7 @@ def test_steganographer_hide_name():
 
 def test_hide_string_steganogrified():
     """Testing that a string will correctly be hidden in a new image, that no name was provided for."""
-    clean_image = CLEAN_PNG_LOCATION
+    clean_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "_test_hide_string_steganogrified.png")
     hidden_message = "Hidden text from test_hide_string_steganogrified."
 
     stegs = Steganographer()
@@ -499,21 +500,23 @@ def test_hide_string_steganogrified():
     except OSError:
         pytest.fail("Image is corrupt " + hidden_fname)
 
+    os.remove(clean_image)
     os.remove(hidden_fname)
 
 
 def test_steganogrified_name():
     """Testing that the image a string is hidden in is the correct one."""
-    clean_image = CLEAN_PNG_LOCATION
+    clean_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "_test_steganogrified_name.png")
     hidden_message = "Hidden text from test_steganogrified_name."
 
     stegs = Steganographer()
     hidden_fname = stegs.steganographer_hide(clean_image, hidden_message)
-    steganogrified_fname = CLEAN_PNG_LOCATION[:-4] + "Steganogrified.png"
+    steganogrified_fname = clean_image[:-4] + "Steganogrified.png"
 
     assert hidden_fname == steganogrified_fname
     assert os.path.isfile(steganogrified_fname)
 
+    os.remove(clean_image)
     os.remove(hidden_fname)
 
 
