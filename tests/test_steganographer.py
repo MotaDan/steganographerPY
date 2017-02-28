@@ -765,6 +765,20 @@ def test_main_reveal_msg_w_output(capfd):
     os.remove(dirty_fname)
 
 
+def test_main_reveal_no_msg(capfd):
+    """Testing the error returned when there is no message hidden in the file."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    clean_fname = "tests/cleanImage.jpg"
+
+    result = os.system("python -m steganographer " + clean_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    assert out == "This file %s has no hidden message." % clean_fname + line_end
+
+
 def test_jpegs(capfd):
     """Testing that jpegs can have a message hidden and revealed."""
     line_end = '\n'
@@ -820,16 +834,3 @@ def test_unicode():
     assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
                                                                             "tests/dirtyImage.png"))
 
-
-def test_main_reveal_no_msg(capfd):
-    """Testing the error returned when there is no message hidden in the file."""
-    line_end = '\n'
-    if sys.platform == 'win32':
-        line_end = '\r\n'
-    clean_fname = "tests/cleanImage.jpg"
-
-    result = os.system("python -m steganographer " + clean_fname)
-    out, _ = capfd.readouterr()
-
-    assert result == 0
-    assert out == "This file %s has no hidden message." % clean_fname + line_end
