@@ -451,7 +451,7 @@ def test_steganographer_hide_string_nonsense():
 
 
 def test_steganographer_hide_file():
-    """Testing that a random string, that can cause a decode error, will correctly be hidden in a new image."""
+    """Testing that a file can be hidden inside of an image and the image created is not corrupt"""
     clean_image = CLEAN_PNG_LOCATION
     dirty_image = "tests/dirtyImage_test_steganographer_hide_file.png"
     file_to_hide = "tests/test_steganographer.py"
@@ -468,6 +468,21 @@ def test_steganographer_hide_file():
         pytest.fail("Image is corrupt " + hidden_fname)
 
     os.remove(hidden_fname)
+
+
+def test_steganographer_reveal_file():
+    """Testing that a file that has been hidden can be revealed."""
+    original_file = "tests/test_steganographer.py"
+    dirty_image = "tests/dirtyImageWFile.png"
+    revealed_file = "tests/test_steganographer_reveal_file.py"
+
+    stegs = Steganographer()
+    hidden_fname = stegs.steganographer_reveal_file(dirty_image, revealed_file)
+
+    with open(original_file, 'rb') as original, open(revealed_file, 'rb') as revealed:
+        assert original.read() == revealed.read()
+
+    #os.remove(revealed_file)
 
 
 def test_steganographer_hide_name():
