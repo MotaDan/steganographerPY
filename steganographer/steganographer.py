@@ -81,6 +81,7 @@ def _write_image_file(fname, og_fname, data):
 
 
 class Steganographer:
+
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
@@ -279,7 +280,7 @@ class Steganographer:
 
         revealed_data = self._reveal_data(dirty_data[1][self._header_size * self._BYTELEN:])
 
-        with open(revealed_file, 'wb') as f:
-            f.write(revealed_data)
+        with open(revealed_file, 'wb') as rFile:
+            rFile.write(revealed_data)
 
         return revealed_file

@@ -430,7 +430,7 @@ def test_steganographer_hide_string():
     os.remove(dirty_image)
 
 
-def test_steganographer_hide_string_nonsense():
+def test_stegs_hide_string_nonsense():
     """Testing that a random string, that can cause a decode error, will correctly be hidden in a new image."""
     clean_image = CLEAN_PNG_LOCATION
     dirty_image = "tests/dirtyImage_test_steganographer_hide_string_nonsense.png"
