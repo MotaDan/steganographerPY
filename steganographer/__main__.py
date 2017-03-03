@@ -10,6 +10,7 @@ def main():
     parser.add_argument("-m", "--message", help="message to be hidden in the input file")
     parser.add_argument("-o", "--output",
                         help="name of output file to hide message in or to write revealed message.")
+    parser.add_argument("-f", "--file", help="file to be hidden in the input file")
     args = parser.parse_args()
 
     stegs = Steganographer()
@@ -21,6 +22,12 @@ def main():
             else:
                 hidden_fname = stegs.steganographer_hide(args.input, args.message)
             print("The message has been hidden in " + hidden_fname)
+        elif args.file:
+            if args.output:
+                hidden_fname = stegs.steganographer_hide_file(args.input, args.file, args.output)
+            else:
+                hidden_fname = stegs.steganographer_hide_file(args.input, args.file)
+            print("The file " + args.file + " has been hidden in " + hidden_fname)
         else:
             hidden_message = stegs.steganographer_reveal(args.input)
 
