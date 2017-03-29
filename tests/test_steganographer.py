@@ -474,10 +474,13 @@ def test_steganographer_reveal_file():
     """Testing that a file that has been hidden can be revealed."""
     original_file = "tests/FileToHide.zip"
     dirty_image = "tests/dirtyImageWFile.png"
-    revealed_file = "tests/test_steganographer_reveal_file.zip"
+    revealed_file_name = "tests/test_steganographer_reveal_file.zip"
 
     stegs = Steganographer()
-    revealed_file_name = stegs.steganographer_reveal_file(dirty_image, revealed_file)
+    revealed_file_data = stegs.steganographer_reveal_file(dirty_image)
+
+    with open(revealed_file_name, 'wb') as rFile:
+        rFile.write(revealed_file_data)
 
     with open(original_file, 'rb') as original, open(revealed_file_name, 'rb') as revealed:
         assert original.read() == revealed.read()
