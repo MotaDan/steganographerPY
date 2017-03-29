@@ -48,7 +48,7 @@ def main():
                 print("The hidden file was revealed in " + fileName)
         # Revealing a message.
         else:
-            hidden_message = stegs.steganographer_reveal(args.input)
+            hidden_message = stegs.steganographer_reveal(args.input).decode('utf-8')
 
             if args.output:
                 open(args.output, 'w', encoding='utf-8').write(hidden_message)

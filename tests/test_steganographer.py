@@ -477,7 +477,7 @@ def test_steganographer_reveal_file():
     revealed_file_name = "tests/test_steganographer_reveal_file.zip"
 
     stegs = Steganographer()
-    revealed_file_data = stegs.steganographer_reveal_file(dirty_image)
+    revealed_file_data = stegs.steganographer_reveal(dirty_image)
 
     with open(revealed_file_name, 'wb') as rFile:
         rFile.write(revealed_file_data)
@@ -545,7 +545,7 @@ def test_steganographer_inverse(hidden_message):
     dirty_image = "tests/dirtyImage_test_steganographer_inverse.png"
 
     stegs = Steganographer()
-    revealed_message = stegs.steganographer_reveal(stegs.steganographer_hide(clean_image, hidden_message, dirty_image))
+    revealed_message = stegs.steganographer_reveal(stegs.steganographer_hide(clean_image, hidden_message, dirty_image)).decode('utf-8')
     assert revealed_message == hidden_message
 
     os.remove(dirty_image)
@@ -835,5 +835,5 @@ def test_unicode():
 
     stegs = Steganographer()
     assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
-                                                                            "tests/dirtyImage.png"))
+                                                                            "tests/dirtyImage.png")).decode('utf-8')
 

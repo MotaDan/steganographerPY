@@ -267,8 +267,8 @@ class Steganographer:
             print("This file %s has no hidden message." % fimage)
             sys.exit()
 
-        revealed_string = self._reveal_string(dirty_data[1][self._header_size * self._BYTELEN:])
-        return revealed_string
+        revealed_data = self._reveal_data(dirty_data[1][self._header_size * self._BYTELEN:])
+        return revealed_data
 
     def steganographer_reveal_file(self, fimage):
         """Reveals whatever string is hidden in the fimage."""
@@ -279,5 +279,4 @@ class Steganographer:
             sys.exit()
 
         revealed_data = self._reveal_data(dirty_data[1][self._header_size * self._BYTELEN:])
-
         return revealed_data
