@@ -11,7 +11,7 @@ def main():
     parser.add_argument("-o", "--output",
                         help="name of output file to hide message in or to write revealed message")
     parser.add_argument("-f", "--file", help="file to be hidden in the input file")
-    parser.add_argument("-r", "--reveal", help="a file will be revealed")
+    parser.add_argument("-r", "--reveal", action='store_true', help="a file will be revealed")
     args = parser.parse_args()
 
     stegs = Steganographer()
