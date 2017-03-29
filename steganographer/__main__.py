@@ -34,14 +34,14 @@ def main():
         # Revealing a file.
         elif args.reveal:
             if args.output:
-                revealed_data = stegs.steganographer_reveal_file(args.input)
+                revealed_data = stegs.steganographer_reveal(args.input)
 
                 with open(args.output, 'wb') as rFile:
                     rFile.write(revealed_data)
                 print("The hidden file was revealed in " + args.output)
             else:
                 fileName = "steganographer_revealed_file.txt"
-                revealed_data = stegs.steganographer_reveal_file(args.input)
+                revealed_data = stegs.steganographer_reveal(args.input)
 
                 with open(fileName, 'wb') as rFile:
                     rFile.write(revealed_data)
