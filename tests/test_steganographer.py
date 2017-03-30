@@ -545,7 +545,8 @@ def test_steganographer_inverse(hidden_message):
     dirty_image = "tests/dirtyImage_test_steganographer_inverse.png"
 
     stegs = Steganographer()
-    revealed_message = stegs.steganographer_reveal(stegs.steganographer_hide(clean_image, hidden_message, dirty_image)).decode('utf-8')
+    revealed_message = stegs.steganographer_reveal(stegs.steganographer_hide(
+        clean_image, hidden_message, dirty_image)).decode('utf-8')
     assert revealed_message == hidden_message
 
     os.remove(dirty_image)

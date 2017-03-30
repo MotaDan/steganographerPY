@@ -36,16 +36,16 @@ def main():
             if args.output:
                 revealed_data = stegs.steganographer_reveal(args.input)
 
-                with open(args.output, 'wb') as rFile:
-                    rFile.write(revealed_data)
+                with open(args.output, 'wb') as rev_file:
+                    rev_file.write(revealed_data)
                 print("The hidden file was revealed in " + args.output)
             else:
-                fileName = "steganographer_revealed_file.txt"
+                file_name = "steganographer_revealed_file.txt"
                 revealed_data = stegs.steganographer_reveal(args.input)
 
-                with open(fileName, 'wb') as rFile:
-                    rFile.write(revealed_data)
-                print("The hidden file was revealed in " + fileName)
+                with open(file_name, 'wb') as rev_file:
+                    rev_file.write(revealed_data)
+                print("The hidden file was revealed in " + file_name)
         # Revealing a message.
         else:
             hidden_message = stegs.steganographer_reveal(args.input).decode('utf-8')
