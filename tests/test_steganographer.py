@@ -101,7 +101,7 @@ def test_hide_data():
     test_data = bytes(b'\x01' * stegs._BYTELEN * 4)
     data_to_hide = bytes('ABC', 'utf-8')
     stegs._data_len = len(data_to_hide)
-    solution_data = bytearray(stegs._BYTELEN * 3) + bytearray(b'\x01' * stegs._BYTELEN)
+    solution_data = bytearray(stegs._BYTELEN * 4)
     solution_data[1] = 1
     solution_data[7] = 1
     solution_data[9] = 1
@@ -109,6 +109,7 @@ def test_hide_data():
     solution_data[17] = 1
     solution_data[22] = 1
     solution_data[23] = 1
+    solution_data[24:] = b'\x01' * stegs._BYTELEN
 
     assert stegs._hide_data(test_data, data_to_hide) == solution_data
 
