@@ -766,6 +766,91 @@ def test_main_reveal_msg_no_output(capfd):
     os.remove(dirty_fname)
 
 
+def test_main_reveal_file_no_output(capfd):
+    """Testing that main works when given input, message, and no output."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    file_to_hide = "tests/FileToHide.zip"
+    dirty_fname = "tests/dirtyImage_test_main_reveal_file_no_output.png"
+
+    os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -f "' + file_to_hide +
+              '" -o ' + dirty_fname)
+    _, _ = capfd.readouterr()
+
+    result = os.system("python -m steganographer -r " + dirty_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    assert out == ("The hidden file was revealed in steganographer_revealed_file.txt" + line_end)
+
+    os.remove(dirty_fname)
+
+
+def test_main_reveal_msg_w_output(capfd):
+    """Testing that main works when given input, message, and no output."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    hidden_message = 'test_main_reveal_msg_w_output hidden message'
+    dirty_fname = "tests/dirtyImage_test_main_reveal_msg_w_output.png"
+    output_fname = "tests/outputMessage.txt"
+
+    os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -m "' + hidden_message +
+              '" -o ' + dirty_fname)
+    _, _ = capfd.readouterr()
+
+    result = os.system("python -m steganographer " + dirty_fname + " -o " + output_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    with open(output_fname, 'r') as output:
+        assert output.read() == hidden_message
+
+    assert out == ("The hidden message was written to " + output_fname + line_end)
+
+    os.remove(dirty_fname)
+
+
+def test_main_reveal_file_w_output(capfd):
+    """Testing that main works when given input, message, and no output."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    file_to_hide = "tests/FileToHide.zip"
+    dirty_fname = "tests/dirtyImage_test_main_reveal_file_w_output.png"
+    output_fname = "tests/outputFile.zip"
+
+    os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -f "' + file_to_hide +
+              '" -o ' + dirty_fname)
+    _, _ = capfd.readouterr()
+
+    result = os.system("python -m steganographer " + dirty_fname + " -r -o " + output_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    with open(output_fname, 'rb') as output, open(file_to_hide, 'rb') as original_file:
+        assert output.read() == original_file.read()
+
+    assert out == ("The hidden file was revealed in " + output_fname + line_end)
+
+    os.remove(dirty_fname)
+
+
+def test_main_reveal_no_msg(capfd):
+    """Testing the error returned when there is no message hidden in the file."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    clean_fname = "tests/cleanImage.jpg"
+
+    result = os.system("python -m steganographer " + clean_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    assert out == "This file %s has no hidden message." % clean_fname + line_end
+
+
 def test_main_reveal_no_op_unicode(capfd):
     """Testing that main works when given input, message, and no output."""
     line_end = '\n'
@@ -795,45 +880,6 @@ def test_main_reveal_no_op_unicode(capfd):
     os.remove(dirty_fname)
     if os.path.isfile(output_fname):
         os.remove(output_fname)
-
-
-def test_main_reveal_msg_w_output(capfd):
-    """Testing that main works when given input, message, and no output."""
-    line_end = '\n'
-    if sys.platform == 'win32':
-        line_end = '\r\n'
-    hidden_message = 'test_main_reveal_msg_w_output hidden message'
-    dirty_fname = "tests/dirtyImage_test_main_reveal_msg_w_output.png"
-    output_fname = "tests/outputMessage.txt"
-
-    os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -m "' + hidden_message +
-              '" -o ' + dirty_fname)
-    _, _ = capfd.readouterr()
-
-    result = os.system("python -m steganographer " + dirty_fname + " -o " + output_fname)
-    out, _ = capfd.readouterr()
-
-    assert result == 0
-    with open(output_fname, 'r') as output:
-        assert output.read() == hidden_message
-
-    assert out == ("The hidden message was written to " + output_fname + line_end)
-
-    os.remove(dirty_fname)
-
-
-def test_main_reveal_no_msg(capfd):
-    """Testing the error returned when there is no message hidden in the file."""
-    line_end = '\n'
-    if sys.platform == 'win32':
-        line_end = '\r\n'
-    clean_fname = "tests/cleanImage.jpg"
-
-    result = os.system("python -m steganographer " + clean_fname)
-    out, _ = capfd.readouterr()
-
-    assert result == 0
-    assert out == "This file %s has no hidden message." % clean_fname + line_end
 
 
 def test_jpegs(capfd):
