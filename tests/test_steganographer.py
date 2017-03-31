@@ -525,18 +525,26 @@ def test_hide_string_steganogrified():
 
 def test_steganogrified_name():
     """Testing that the image a string is hidden in is the correct one."""
-    clean_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "_test_steganogrified_name.png")
+    clean_message_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "_test_message_steganogrified_name.png")
+    clean_file_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "_test_file_steganogrified_name.png")
     hidden_message = "Hidden text from test_steganogrified_name."
+    file_to_hide = "tests/FileToHide.zip"
 
     stegs = Steganographer()
-    hidden_fname = stegs.steganographer_hide(clean_image, hidden_message)
-    steganogrified_fname = clean_image[:-4] + "Steganogrified.png"
+    hidden_message_fname = stegs.steganographer_hide(clean_message_image, hidden_message)
+    steganogrified_message_fname = clean_message_image[:-4] + "Steganogrified.png"
+    hidden_file_fname = stegs.steganographer_hide_file(clean_file_image, file_to_hide)
+    steganogrified_file_fname = clean_file_image[:-4] + "Steganogrified.png"
 
-    assert hidden_fname == steganogrified_fname
-    assert os.path.isfile(steganogrified_fname)
+    assert hidden_message_fname == steganogrified_message_fname
+    assert os.path.isfile(steganogrified_message_fname)
+    assert hidden_file_fname == steganogrified_file_fname
+    assert os.path.isfile(steganogrified_file_fname)
 
-    os.remove(clean_image)
-    os.remove(hidden_fname)
+    os.remove(clean_message_image)
+    os.remove(hidden_message_fname)
+    os.remove(clean_file_image)
+    os.remove(hidden_file_fname)
 
 
 @given(hidden_message=text(characters(min_codepoint=1, blacklist_categories=('Cc', 'Cs'))))
