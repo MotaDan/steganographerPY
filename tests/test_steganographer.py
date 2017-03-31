@@ -678,6 +678,7 @@ def test_main_hide_msg_with_output(capfd):
 
     os.remove(dirty_fname)
 
+
 def test_main_hide_file_with_output(capfd):
     """Testing that main works when given input, file, and output."""
     line_end = '\n'
