@@ -462,7 +462,7 @@ def test_steganographer_hide_file():
 
     with open(clean_image, 'rb') as clean, open(hidden_fname, 'rb') as dirty:
         assert clean.read() != dirty.read()
-    assert compare_images(clean_image, hidden_fname) < 38000
+    assert compare_images(clean_image, hidden_fname) < 19000
     try:
         Image.open(hidden_fname)
     except OSError:
@@ -678,6 +678,28 @@ def test_main_hide_msg_with_output(capfd):
 
     os.remove(dirty_fname)
 
+def test_main_hide_file_with_output(capfd):
+    """Testing that main works when given input, file, and output."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    file_to_hide = "tests/FileToHide.zip"
+    dirty_fname = "tests/dirtyImage_test_main_hide_file_with_output.png"
+
+    result = os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -f "' + file_to_hide +
+                       '" -o ' + dirty_fname)
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    assert out == "The file " + file_to_hide + " has been hidden in " + dirty_fname + line_end
+    assert compare_images(CLEAN_PNG_LOCATION, dirty_fname) < 19000
+    try:
+        Image.open(dirty_fname)
+    except OSError:
+        pytest.fail("Image is corrupt " + dirty_fname)
+
+    os.remove(dirty_fname)
+
 
 def test_main_hide_msg_no_output(capfd):
     """Testing that main works when given input, message, and no output."""
@@ -693,6 +715,28 @@ def test_main_hide_msg_no_output(capfd):
     assert result == 0
     assert out == "The message has been hidden in " + steganogrified_fname + line_end
     assert compare_images(CLEAN_PNG_LOCATION, steganogrified_fname) < 500
+    try:
+        Image.open(steganogrified_fname)
+    except OSError:
+        pytest.fail("Image is corrupt " + steganogrified_fname)
+
+    os.remove(steganogrified_fname)
+
+
+def test_main_hide_file_no_output(capfd):
+    """Testing that main works when given input, file, and no output."""
+    line_end = '\n'
+    if sys.platform == 'win32':
+        line_end = '\r\n'
+    file_to_hide = "tests/FileToHide.zip"
+    steganogrified_fname = CLEAN_PNG_LOCATION[:-4] + "Steganogrified.png"
+
+    result = os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -f "' + file_to_hide + '"')
+    out, _ = capfd.readouterr()
+
+    assert result == 0
+    assert out == "The file " + file_to_hide + " has been hidden in " + steganogrified_fname + line_end
+    assert compare_images(CLEAN_PNG_LOCATION, steganogrified_fname) < 19000
     try:
         Image.open(steganogrified_fname)
     except OSError:
