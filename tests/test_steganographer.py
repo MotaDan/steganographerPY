@@ -480,8 +480,8 @@ def test_steganographer_reveal_file():
     stegs = Steganographer()
     revealed_file_data = stegs.steganographer_reveal(dirty_image)
 
-    with open(revealed_file_name, 'wb') as rFile:
-        rFile.write(revealed_file_data)
+    with open(revealed_file_name, 'wb') as rev_file:
+        rev_file.write(revealed_file_data)
 
     with open(original_file, 'rb') as original, open(revealed_file_name, 'rb') as revealed:
         assert original.read() == revealed.read()
