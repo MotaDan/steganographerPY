@@ -708,19 +708,21 @@ def test_main_hide_msg_no_output(capfd):
     if sys.platform == 'win32':
         line_end = '\r\n'
     hidden_message = 'test_main_hide_msg_no_output hidden message'
-    steganogrified_fname = CLEAN_PNG_LOCATION[:-4] + "Steganogrified.png"
+    clean_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "test_main_hide_msg_no_output.png")
+    steganogrified_fname = clean_image[:-4] + "Steganogrified.png"
 
-    result = os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -m "' + hidden_message + '"')
+    result = os.system('python -m steganographer ' + clean_image + ' -m "' + hidden_message + '"')
     out, _ = capfd.readouterr()
 
     assert result == 0
     assert out == "The message has been hidden in " + steganogrified_fname + line_end
-    assert compare_images(CLEAN_PNG_LOCATION, steganogrified_fname) < 500
+    assert compare_images(clean_image, steganogrified_fname) < 500
     try:
         Image.open(steganogrified_fname)
     except OSError:
         pytest.fail("Image is corrupt " + steganogrified_fname)
 
+    os.remove(clean_image)
     os.remove(steganogrified_fname)
 
 
@@ -730,19 +732,21 @@ def test_main_hide_file_no_output(capfd):
     if sys.platform == 'win32':
         line_end = '\r\n'
     file_to_hide = "tests/FileToHide.zip"
-    steganogrified_fname = CLEAN_PNG_LOCATION[:-4] + "Steganogrified.png"
+    clean_image = copy2(CLEAN_PNG_LOCATION, CLEAN_PNG_LOCATION[:-4] + "test_main_hide_file_no_output.png")
+    steganogrified_fname = clean_image[:-4] + "Steganogrified.png"
 
-    result = os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -f "' + file_to_hide + '"')
+    result = os.system('python -m steganographer ' + clean_image + ' -f "' + file_to_hide + '"')
     out, _ = capfd.readouterr()
 
     assert result == 0
     assert out == "The file " + file_to_hide + " has been hidden in " + steganogrified_fname + line_end
-    assert compare_images(CLEAN_PNG_LOCATION, steganogrified_fname) < 19000
+    assert compare_images(clean_image, steganogrified_fname) < 19000
     try:
         Image.open(steganogrified_fname)
     except OSError:
         pytest.fail("Image is corrupt " + steganogrified_fname)
 
+    os.remove(clean_image)
     os.remove(steganogrified_fname)
 
 
