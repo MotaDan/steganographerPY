@@ -32,8 +32,8 @@ def _pack_image(pixels):
 def _open_bin_file(fname):
     """Reads the file fname and returns bytes for all of its data."""
     try:
-        fimage = open(fname, 'rb')
-        image_bytes = fimage.read()
+        with open(fname, 'rb') as fimage:
+            image_bytes = fimage.read()
 
         return image_bytes
 
@@ -45,8 +45,8 @@ def _open_bin_file(fname):
 def _write_bin_file(fname, data):
     """Create a file fname and writes the passed in data to it."""
     try:
-        fdirty = open(fname, 'wb')
-        fdirty.write(data)
+        with open(fname, 'wb') as fdirty:
+            fdirty.write(data)
 
     except IOError:  # pragma: no cover
         print("Could not create file", fname)
@@ -56,9 +56,9 @@ def _write_bin_file(fname, data):
 def _open_image_file(fname):
     """Reads the file fname and returns bytes for all it's data."""
     try:
-        img = Image.open(fname)
-        pixels = list(img.getdata())
-        return _unpack_image(pixels)
+        with Image.open(fname) as img:
+            pixels = list(img.getdata())
+            return _unpack_image(pixels)
 
     except FileNotFoundError:
         print("Could not read file", fname)
@@ -68,12 +68,12 @@ def _open_image_file(fname):
 def _write_image_file(fname, og_fname, data):
     """Create a image fname and writes the passed in data to it. Returns name of image created."""
     try:
-        ogim = Image.open(og_fname)
-        img = Image.new(ogim.mode, ogim.size)
-        img.putdata(_pack_image(data))
-        fname_no_ext, _ = os.path.splitext(fname)
-        img.save(fname_no_ext + '.png', 'png')
-        return fname_no_ext + '.png'
+        with Image.open(og_fname) as ogim:
+            img = Image.new(ogim.mode, ogim.size)
+            img.putdata(_pack_image(data))
+            fname_no_ext, _ = os.path.splitext(fname)
+            img.save(fname_no_ext + '.png', 'png')
+            return fname_no_ext + '.png'
 
     except FileNotFoundError:
         print("Could not read file", og_fname)
@@ -244,11 +244,13 @@ class Steganographer:
 
     def steganographer_hide_file(self, clean_image_file, file_to_hide, dirty_image_file=''):
         """Hides file_to_hide inside clean_image_file and outputs to dirty_image_file."""
-        header = self._generate_header(len(open(file_to_hide, 'rb').read()), 1)
-        clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
-        dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
-        dirty_data += self._hide_data(clean_data[1][len(header) * self._BYTELEN:], open(file_to_hide, 'rb').read())
-        dirty_image_data = (clean_data[0], dirty_data)
+        with open(file_to_hide, 'rb') as input_file:
+            header = self._generate_header(len(input_file.read()), 1)
+            input_file.seek(0)
+            clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
+            dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
+            dirty_data += self._hide_data(clean_data[1][len(header) * self._BYTELEN:], input_file.read())
+            dirty_image_data = (clean_data[0], dirty_data)
 
         if dirty_image_file == '':
             clean_name = clean_image_file.split('.')[0]
