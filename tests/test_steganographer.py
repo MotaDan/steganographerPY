@@ -402,6 +402,15 @@ def test_write_image_diff_content():
     os.remove(output_file)
 
 
+def compare_images(img1, img2):
+    """Expects strings of the locations of two images. Will return an integer representing their difference"""
+    with Image.open(img1) as img1, Image.open(img2) as img2:
+        # Calculate a difference image that is the difference between the two images.
+        diff = ImageChops.difference(img1, img2)
+
+    return sum(_unpack_image(diff.getdata())[1])
+
+
 def test_write_image_same_image():
     """Writing out an image creates the same image when viewed generally."""
     clean_file = CLEAN_PNG_LOCATION
@@ -606,17 +615,6 @@ def test_steganographer_inverse(hidden_message):
     assert revealed_message == hidden_message
 
     os.remove(dirty_image)
-
-
-def compare_images(img1, img2):
-    """Expects strings of the locations of two images. Will return an integer representing their difference"""
-    with Image.open(img1) as img1, Image.open(img2) as img2:
-        # calculate the difference and its norms
-        diff = ImageChops.difference(img1, img2)
-
-    m_norm = sum(_unpack_image(diff.getdata())[1])  # Manhattan norm
-
-    return m_norm
 
 
 def test_main_hide_msg_with_output(capfd):
@@ -906,4 +904,3 @@ def test_unicode():
     stegs = Steganographer()
     assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
                                                                             "tests/dirtyImage.png")).decode('utf-8')
-
