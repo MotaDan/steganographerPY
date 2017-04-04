@@ -180,7 +180,86 @@ def test_hide_reveal_data_inverse(string_to_hide):
     stegs = Steganographer()
     stegs._data_len = len(string_to_hide.encode('utf-8'))
     revealed_data = stegs._reveal_data(stegs._hide_data(clean_data, data_to_hide))
+
     assert revealed_data == data_to_hide
+
+
+def test_exact_data_with_string_inverse():
+    """The string entered is the string returned. The storing data is the exact length needed."""
+    test_string = "This is a test String"
+    stegs = Steganographer()
+    stegs._data_len = len(test_string)
+    blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
+
+    revealed_string = stegs._reveal_string(stegs._hide_string(blank_data, test_string))
+
+    assert test_string == revealed_string
+
+
+def test_exact_data_with_data_inverse():
+    """The data entered is the data returned. The storing data is the exact length needed."""
+    test_string = "This is a test String"
+    test_data = bytes(test_string, 'utf-8')
+    stegs = Steganographer()
+    stegs._data_len = len(test_string)
+    blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
+
+    revealed_data = stegs._reveal_data(stegs._hide_data(blank_data, test_data))
+
+    assert test_data == revealed_data
+
+
+def test_short_data_with_string_inverse():
+    """When the data is too small, by a full byte, everything that can be returned is returned."""
+    test_string = "This is a test String"
+    stegs = Steganographer()
+    stegs._data_len = len(test_string)
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
+
+    revealed_string = stegs._reveal_string(stegs._hide_string(blank_data, test_string))
+
+    assert test_string[:-1] == revealed_string
+
+
+def test_short_data_with_data_inverse():
+    """When the data is too small, by a full byte, everything that can be returned is returned."""
+    test_string = "This is a test String"
+    test_data = bytes(test_string, 'utf-8')
+    stegs = Steganographer()
+    stegs._data_len = len(test_string)
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
+
+    revealed_data = stegs._reveal_data(stegs._hide_data(blank_data, test_data))
+
+    assert test_data[:-1] == revealed_data
+
+
+def test_short_partial_data_string_inverse():
+    """When the data is too small, by a half byte, everything that can be returned is returned."""
+    test_string = "This is a test String"
+    stegs = Steganographer()
+    stegs._data_len = len(test_string)
+    solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2)
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
+
+    revealed_string = stegs._reveal_string(stegs._hide_string(blank_data, test_string))
+
+    assert solution_string == revealed_string
+
+
+def test_short_partial_data_w_data_inverse():
+    """When the data is too small, by a half byte, everything that can be returned is returned."""
+    test_string = "This is a test String"
+    test_data = bytes(test_string, 'utf-8')
+    solution_data = bytearray(test_data)
+    stegs = Steganographer()
+    stegs._data_len = len(test_string)
+    solution_data[-1] = solution_data[-1] >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2
+    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
+
+    revealed_data = stegs._reveal_data(stegs._hide_data(blank_data, test_data))
+
+    assert solution_data == revealed_data
 
 
 def test_unpack_image():
@@ -527,90 +606,6 @@ def test_steganographer_inverse(hidden_message):
     assert revealed_message == hidden_message
 
     os.remove(dirty_image)
-
-
-def test_null_data_with_string():
-    """Testing that the string entered is the string returned. The data is the exact length needed."""
-    test_string = "This is a test String"
-    stegs = Steganographer()
-    stegs._data_len = len(test_string)
-    blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
-
-    hidden_string = stegs._hide_string(blank_data, test_string)
-    revealed_string = stegs._reveal_string(hidden_string)
-
-    assert test_string == revealed_string
-
-
-def test_null_data_with_data():
-    """Testing that the data entered is the data returned. The data is the exact length needed."""
-    test_string = "This is a test String"
-    test_data = bytes(test_string, 'utf-8')
-    stegs = Steganographer()
-    stegs._data_len = len(test_string)
-    blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
-
-    hidden_data = stegs._hide_data(blank_data, test_data)
-    revealed_data = stegs._reveal_data(hidden_data)
-
-    assert test_data == revealed_data
-
-
-def test_short_data_with_string():
-    """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
-    test_string = "a"
-    stegs = Steganographer()
-    stegs._data_len = len(test_string)
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
-
-    hidden_string = stegs._hide_string(blank_data, test_string)
-    revealed_string = stegs._reveal_string(hidden_string)
-
-    assert test_string[:-1] == revealed_string
-
-
-def test_short_data_with_data():
-    """Testing that when the data is too small, by a full byte, that everything that can be returned is returned."""
-    test_string = "This is a test String"
-    test_data = bytes(test_string, 'utf-8')
-    stegs = Steganographer()
-    stegs._data_len = len(test_string)
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
-
-    hidden_data = stegs._hide_data(blank_data, test_data)
-    revealed_data = stegs._reveal_data(hidden_data)
-
-    assert test_data[:-1] == revealed_data
-
-
-def test_short_partial_data_string():
-    """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
-    test_string = "This is a test String"
-    stegs = Steganographer()
-    stegs._data_len = len(test_string)
-    solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2)
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
-
-    hidden_string = stegs._hide_string(blank_data, test_string)
-    revealed_string = stegs._reveal_string(hidden_string)
-
-    assert solution_string == revealed_string
-
-
-def test_short_partial_data_w_data():
-    """Testing that when the data is too small, by a half byte, that everything that can be returned is returned."""
-    test_string = "This is a test String"
-    test_data = bytes(test_string, 'utf-8')
-    solution_data = bytearray(test_data)
-    stegs = Steganographer()
-    stegs._data_len = len(test_string)
-    solution_data[-1] = solution_data[-1] >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2
-    blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
-
-    hidden_data = stegs._hide_data(blank_data, test_data)
-    revealed_data = stegs._reveal_data(hidden_data)
-
-    assert solution_data == revealed_data
 
 
 def compare_images(img1, img2):
