@@ -112,10 +112,10 @@ class Steganographer:
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
     def __init__(self):
-        """Setting _data_len so retrieving the header knows what to grab."""
-        self._data_len = len(self._HEADER.header_bytes)  # The only data that should be present is the header.
+        """Setting header data_len, so retrieving the header knows how much data to grab."""
+        self._HEADER = self._HEADER._replace(data_len=len(self._HEADER.header_bytes))  # The only data is the header.
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * (self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE))
-        self._HEADER._replace(bits_used = 1)
+        self._HEADER._replace(bits_used=1)
 
     def _generate_header(self, data_size, bits_to_use):
         """
@@ -138,9 +138,9 @@ class Steganographer:
         bytes_to_hide_header = len(self._HEADER.header_bytes) * self._BYTELEN
         header = self._reveal_data(data[:bytes_to_hide_header])
         header_title = header[:len(self._HEADER_TITLE)]
-        self._data_len = int.from_bytes(
-            header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little")
-        self._HEADER._replace(bits_used = int.from_bytes(
+        self._HEADER = self._HEADER._replace(data_len=int.from_bytes(
+            header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little"))
+        self._HEADER._replace(bits_used=int.from_bytes(
             header[len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE:
                    len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little"))
 
@@ -232,7 +232,7 @@ class Steganographer:
         Expects a bytes hidden_data of any length. Will pull out the least significant bits from each byte and
         return them as a bytes.
         """
-        revealed_data_len = self._data_len
+        revealed_data_len = self._HEADER.data_len
         revealed_data = bytearray()
 
         for i in range(0, revealed_data_len * self._BYTELEN, self._BYTELEN):
