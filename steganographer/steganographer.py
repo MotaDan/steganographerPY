@@ -2,6 +2,7 @@
 from PIL import Image
 import sys
 import os.path
+from collections import namedtuple
 
 
 def _unpack_image(pixels):
@@ -80,18 +81,39 @@ def _write_image_file(fname, og_fname, data):
         sys.exit()
 
 
+class Header(namedtuple('Header', ['title', 'data_len', 'bits_used'])):
+
+    """The header that is stored at the beginning of steganogrified images."""
+
+    _HEADER_TITLE = "STEGS"
+    _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
+    _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
+
+    __slots__ = ()
+
+    @property
+    def header_bytes(self):
+        """Coverts the header into a bytes object."""
+        header = bytes(self._HEADER_TITLE, 'utf-8') + \
+            bytes(self.data_len.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
+            bytes(self.bits_used.to_bytes(self._HEADER_BITS_SIZE, "little"))
+
+        return header
+
+
 class Steganographer:
 
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
+    _HEADER = Header(title='STEGS', data_len=0, bits_used=1)
     _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
     def __init__(self):
         """Setting _data_len so retrieving the header knows what to grab."""
-        self._header_size = len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE
+        self._header_size = len(self._HEADER.header_bytes)
         self._data_len = self._header_size  # The only data that should be present is the header.
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * (self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE))
         self._bits_used = 1
