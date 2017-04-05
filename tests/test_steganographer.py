@@ -19,6 +19,16 @@ from steganographer.steganographer import _unpack_image, _pack_image, _open_bin_
 CLEAN_PNG_LOCATION = "tests/cleanImage.png"
 
 
+def test_generate_header():
+    """The header is generated as expected"""
+    stegs = Steganographer()
+    header = bytes(stegs._HEADER_TITLE, 'utf-8') + \
+        bytes(stegs._HEADER.data_len.to_bytes(stegs._HEADER_DATA_SIZE, "little")) + \
+        bytes(stegs._HEADER.bits_used.to_bytes(stegs._HEADER_BITS_SIZE, "little"))
+
+    assert header == stegs._generate_header(stegs._HEADER.data_len, stegs._HEADER.bits_used)
+
+
 def test_hide_byte():
     """The _hide_byte function does hide a byte and returns the test_data with that byte hidden."""
     stegs = Steganographer()
