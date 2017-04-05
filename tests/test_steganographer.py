@@ -617,8 +617,16 @@ def test_steganographer_inverse(hidden_message):
     os.remove(dirty_image)
 
 
+def test_unicode_inverse():
+    """Unicode characters are hidden and revealed."""
+    message = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ"
+
+    stegs = Steganographer()
+    assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
+                                                                            "tests/dirtyImage.png")).decode('utf-8')
+
 def test_main_hide_msg_with_output(capfd):
-    """Testing that main works when given input, message, and output."""
+    """Command line calls to hide work when given an input image, a message, and an output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -641,7 +649,7 @@ def test_main_hide_msg_with_output(capfd):
 
 
 def test_main_hide_file_with_output(capfd):
-    """Testing that main works when given input, file, and output."""
+    """Command line calls to hide work when given an input image, a file to hide, and an output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -664,7 +672,7 @@ def test_main_hide_file_with_output(capfd):
 
 
 def test_main_hide_msg_no_output(capfd):
-    """Testing that main works when given input, message, and no output."""
+    """Command line calls to hide work when given an input image, a message, and no output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -688,7 +696,7 @@ def test_main_hide_msg_no_output(capfd):
 
 
 def test_main_hide_file_no_output(capfd):
-    """Testing that main works when given input, file, and no output."""
+    """Command line calls to hide work when given an input image, a file to hide, and no output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -712,7 +720,7 @@ def test_main_hide_file_no_output(capfd):
 
 
 def test_main_reveal_msg_no_output(capfd):
-    """Testing that main works when given input, message, and no output."""
+    """Command line calls to reveal work when given an input image, and no output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -733,7 +741,7 @@ def test_main_reveal_msg_no_output(capfd):
 
 
 def test_main_reveal_file_no_output(capfd):
-    """Testing that main works when given input, message, and no output."""
+    """Command line calls to reveal work when given an input image, the reveal file flag, and no output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -756,7 +764,7 @@ def test_main_reveal_file_no_output(capfd):
 
 
 def test_main_reveal_msg_w_output(capfd):
-    """Testing that main works when given input, message, and no output."""
+    """Command line calls to reveal work when given an input image, and an output file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -781,7 +789,7 @@ def test_main_reveal_msg_w_output(capfd):
 
 
 def test_main_reveal_file_w_output(capfd):
-    """Testing that main works when given input, message, and no output."""
+    """Command line calls to reveal work when given an input image, a reveal file flag, and an output image."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -806,7 +814,7 @@ def test_main_reveal_file_w_output(capfd):
 
 
 def test_main_reveal_no_msg(capfd):
-    """Testing the error returned when there is no message hidden in the file."""
+    """There should be an error returned when there is no message hidden in the image file."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -820,7 +828,7 @@ def test_main_reveal_no_msg(capfd):
 
 
 def test_main_reveal_no_op_unicode(capfd):
-    """Testing that main works when given input, message, and no output."""
+    """Command line calls to reveal work when the hidden message contains high value unicode."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -851,7 +859,7 @@ def test_main_reveal_no_op_unicode(capfd):
 
 
 def test_jpegs(capfd):
-    """Testing that jpegs can have a message hidden and revealed."""
+    """Jpegs can have a message hidden and revealed. Note they are converted to pngs."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -875,7 +883,7 @@ def test_jpegs(capfd):
 
 @pytest.mark.xfail(strict=True, reason="Issue #59 bmp support is broken.", run=True)
 def test_bmps(capfd):
-    """Testing that jpegs can have a message hidden and revealed."""
+    """Bmps can have a message hidden and revealed."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'
@@ -895,12 +903,3 @@ def test_bmps(capfd):
     assert result == 0
     assert out == ("The hidden message was..." + line_end + hidden_message + line_end)
     assert compare_images("tests/cleanImage.bmp", dirty_fname + '.png') < 500
-
-
-def test_unicode():
-    """Testing that unicode characters are hidden and revealed."""
-    message = "test_unicode hidden message. Some random unicode characters: 𓁈 ᾨ ԅ Թ ػ ޗ ߚ ङ ლ ጩ Ꮬ"
-
-    stegs = Steganographer()
-    assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
-                                                                            "tests/dirtyImage.png")).decode('utf-8')
