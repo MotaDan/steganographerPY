@@ -115,7 +115,7 @@ class Steganographer:
         """Setting header data_len, so retrieving the header knows how much data to grab."""
         self._HEADER = self._HEADER._replace(data_len=len(self._HEADER.header_bytes))  # The only data is the header.
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * (self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE))
-        self._HEADER._replace(bits_used=1)
+        self._HEADER = self._HEADER._replace(bits_used=1)
 
     def _generate_header(self, data_size, bits_to_use):
         """
@@ -140,7 +140,7 @@ class Steganographer:
         header_title = header[:len(self._HEADER_TITLE)]
         self._HEADER = self._HEADER._replace(data_len=int.from_bytes(
             header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little"))
-        self._HEADER._replace(bits_used=int.from_bytes(
+        self._HEADER = self._HEADER._replace(bits_used=int.from_bytes(
             header[len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE:
                    len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little"))
 
