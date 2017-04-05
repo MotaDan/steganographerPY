@@ -116,7 +116,7 @@ class Steganographer:
         self._header_size = len(self._HEADER.header_bytes)
         self._data_len = self._header_size  # The only data that should be present is the header.
         self._header = bytes(self._HEADER_TITLE, 'utf-8') + bytes(0 * (self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE))
-        self._bits_used = 1
+        self._HEADER._replace(bits_used = 1)
 
     def _generate_header(self, data_size, bits_to_use):
         """
@@ -142,9 +142,9 @@ class Steganographer:
         header_title = header[:len(self._HEADER_TITLE)]
         self._data_len = int.from_bytes(
             header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little")
-        self._bits_used = int.from_bytes(
+        self._HEADER._replace(bits_used = int.from_bytes(
             header[len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE:
-                   len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
+                   len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little"))
 
         return header_title == self._HEADER_TITLE.encode('utf-8')
 
