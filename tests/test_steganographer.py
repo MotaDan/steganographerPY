@@ -29,6 +29,15 @@ def test_generate_header():
     assert header == stegs._generate_header(stegs._HEADER.data_len, stegs._HEADER.bits_used)
 
 
+@pytest.mark.xfail(strict=True, reason="Issue #78 Test not written.", run=False)
+def test_retrieve_header():
+    """The header is retrieved as expected"""
+    stegs = Steganographer()
+
+
+    assert ''!=''
+
+
 def test_hide_byte():
     """The _hide_byte function does hide a byte and returns the test_data with that byte hidden."""
     stegs = Steganographer()
