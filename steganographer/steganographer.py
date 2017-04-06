@@ -92,7 +92,7 @@ class Header(namedtuple('Header', ['title', 'data_len', 'bits_used'])):
     __slots__ = ()
 
     @property
-    def header_bytes(self):
+    def header_as_bytes(self):
         """Coverts the header into a bytes object."""
         header = bytes(self._HEADER_TITLE, 'utf-8') + \
             bytes(self.data_len.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
@@ -110,7 +110,7 @@ class Steganographer:
 
     def __init__(self):
         """Setting header data_len, so retrieving the header knows how much data to grab."""
-        self._header = self._header._replace(data_len=len(self._header.header_bytes))  # The only data is the header.
+        self._header = self._header._replace(data_len=len(self._header.header_as_bytes))  # The only data is the header.
         self._header = self._header._replace(bits_used=1)
 
     def _generate_header(self, data_size, bits_to_use):
@@ -122,7 +122,7 @@ class Steganographer:
         self._header = self._header._replace(data_len=data_size)
         self._header = self._header._replace(bits_used=bits_to_use)
 
-        return self._header.header_bytes
+        return self._header.header_as_bytes
 
     def _retrieve_header(self, data):
         """
@@ -130,7 +130,7 @@ class Steganographer:
 
         Returns if there is a valid header or not.
         """
-        bytes_to_hide_header = len(self._header.header_bytes) * self._BYTELEN
+        bytes_to_hide_header = len(self._header.header_as_bytes) * self._BYTELEN
         self._header = self._header._replace(data_len=bytes_to_hide_header)  # The only data is the header.
         header = self._reveal_data(data[:bytes_to_hide_header])
         header_title = header[:len(self._header.title)]
@@ -285,5 +285,5 @@ class Steganographer:
             print("This file %s has no hidden message." % fimage)
             sys.exit()
 
-        revealed_data = self._reveal_data(dirty_data[1][len(self._header.header_bytes) * self._BYTELEN:])
+        revealed_data = self._reveal_data(dirty_data[1][len(self._header.header_as_bytes) * self._BYTELEN:])
         return revealed_data
