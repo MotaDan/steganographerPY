@@ -23,10 +23,10 @@ def test_generate_header():
     """The header is generated as expected"""
     stegs = Steganographer()
     header = bytes(stegs._HEADER_TITLE, 'utf-8') + \
-        bytes(stegs._HEADER.data_len.to_bytes(stegs._HEADER_DATA_SIZE, "little")) + \
-        bytes(stegs._HEADER.bits_used.to_bytes(stegs._HEADER_BITS_SIZE, "little"))
+        bytes(stegs._header.data_len.to_bytes(stegs._HEADER_DATA_SIZE, "little")) + \
+             bytes(stegs._header.bits_used.to_bytes(stegs._HEADER_BITS_SIZE, "little"))
 
-    assert header == stegs._generate_header(stegs._HEADER.data_len, stegs._HEADER.bits_used)
+    assert header == stegs._generate_header(stegs._header.data_len, stegs._header.bits_used)
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #78 Test not written.", run=False)
@@ -91,7 +91,7 @@ def test_reveal_string():
     """Returns a string representation of the data that was hidden in the test_data."""
     solution = 'ABC'
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(solution))
+    stegs._header = stegs._header._replace(data_len=len(solution))
     test_data = bytearray(stegs._BYTELEN * 4)
     test_data[1] = 1
     test_data[7] = 1
@@ -109,7 +109,7 @@ def test_hide_reveal_string_inverse(string_to_hide):
     """Anything hidden by _hide_string is revealed by _reveal_string."""
     clean_data = bytes(b'\x01' * 5000)
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(string_to_hide.encode('utf-8')))
+    stegs._header = stegs._header._replace(data_len=len(string_to_hide.encode('utf-8')))
     revealed_string = stegs._reveal_string(stegs._hide_string(clean_data, string_to_hide))
     assert revealed_string == string_to_hide
 
@@ -119,7 +119,7 @@ def test_hide_data():
     stegs = Steganographer()
     test_data = bytes(b'\x01' * stegs._BYTELEN * 4)
     data_to_hide = bytes('ABC', 'utf-8')
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(data_to_hide))
+    stegs._header = stegs._header._replace(data_len=len(data_to_hide))
     solution_data = bytearray(stegs._BYTELEN * 4)
     solution_data[1] = 1
     solution_data[7] = 1
@@ -138,7 +138,7 @@ def test_hide_data_partial():
     stegs = Steganographer()
     test_data = bytes(b'\x01' * stegs._BYTELEN * 3)
     data_to_hide = bytes('ABC', 'utf-8')
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(data_to_hide))
+    stegs._header = stegs._header._replace(data_len=len(data_to_hide))
     solution_data = bytearray(stegs._BYTELEN * 3)
     solution_data[1] = 1
     solution_data[7] = 1
@@ -156,7 +156,7 @@ def test_reveal_data():
     """Will return the correct data that is hidden inside the test_data."""
     solution_data = bytes('ABC', 'utf-8')
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(solution_data))
+    stegs._header = stegs._header._replace(data_len=len(solution_data))
     test_data = bytearray(stegs._BYTELEN * 3)
     test_data[1] = 1
     test_data[7] = 1
@@ -197,7 +197,7 @@ def test_hide_reveal_data_inverse(string_to_hide):
     data_to_hide = bytes(string_to_hide, 'utf-8')
 
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(string_to_hide.encode('utf-8')))
+    stegs._header = stegs._header._replace(data_len=len(string_to_hide.encode('utf-8')))
     revealed_data = stegs._reveal_data(stegs._hide_data(clean_data, data_to_hide))
 
     assert revealed_data == data_to_hide
@@ -207,7 +207,7 @@ def test_exact_data_with_string_inverse():
     """The string entered is the string returned. The storing data is the exact length needed."""
     test_string = "This is a test String"
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(test_string))
+    stegs._header = stegs._header._replace(data_len=len(test_string))
     blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
 
     revealed_string = stegs._reveal_string(stegs._hide_string(blank_data, test_string))
@@ -220,7 +220,7 @@ def test_exact_data_with_data_inverse():
     test_string = "This is a test String"
     test_data = bytes(test_string, 'utf-8')
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(test_string))
+    stegs._header = stegs._header._replace(data_len=len(test_string))
     blank_data = bytes(b'\x01' * len(test_string) * stegs._BYTELEN)
 
     revealed_data = stegs._reveal_data(stegs._hide_data(blank_data, test_data))
@@ -232,7 +232,7 @@ def test_short_data_with_string_inverse():
     """When the data is too small, by a full byte, everything that can be returned is returned."""
     test_string = "This is a test String"
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(test_string))
+    stegs._header = stegs._header._replace(data_len=len(test_string))
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
 
     revealed_string = stegs._reveal_string(stegs._hide_string(blank_data, test_string))
@@ -245,7 +245,7 @@ def test_short_data_with_data_inverse():
     test_string = "This is a test String"
     test_data = bytes(test_string, 'utf-8')
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(test_string))
+    stegs._header = stegs._header._replace(data_len=len(test_string))
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN))
 
     revealed_data = stegs._reveal_data(stegs._hide_data(blank_data, test_data))
@@ -257,7 +257,7 @@ def test_short_partial_data_string_inverse():
     """When the data is too small, by a half byte, everything that can be returned is returned."""
     test_string = "This is a test String"
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(test_string))
+    stegs._header = stegs._header._replace(data_len=len(test_string))
     solution_string = test_string[:-1] + chr(ord(test_string[-1]) >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2)
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
@@ -272,7 +272,7 @@ def test_short_partial_data_w_data_inverse():
     test_data = bytes(test_string, 'utf-8')
     solution_data = bytearray(test_data)
     stegs = Steganographer()
-    stegs._HEADER = stegs._HEADER._replace(data_len=len(test_string))
+    stegs._header = stegs._header._replace(data_len=len(test_string))
     solution_data[-1] = solution_data[-1] >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
@@ -643,6 +643,7 @@ def test_unicode_inverse():
     stegs = Steganographer()
     assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
                                                                             "tests/dirtyImage.png")).decode('utf-8')
+
 
 def test_main_hide_msg_with_output(capfd):
     """Command line calls to hide work when given an input image, a message, and an output file."""
