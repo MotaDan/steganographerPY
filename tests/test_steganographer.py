@@ -24,7 +24,7 @@ def test_generate_header():
     stegs = Steganographer()
     header = bytes(stegs._header._HEADER_TITLE, 'utf-8') + \
         bytes(stegs._header.data_len.to_bytes(stegs._header._HEADER_DATA_SIZE, "little")) + \
-             bytes(stegs._header.bits_used.to_bytes(stegs._HEADER_BITS_SIZE, "little"))
+             bytes(stegs._header.bits_used.to_bytes(stegs._header._HEADER_BITS_SIZE, "little"))
 
     assert header == stegs._generate_header(stegs._header.data_len, stegs._header.bits_used)
 

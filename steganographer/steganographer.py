@@ -107,7 +107,6 @@ class Steganographer:
 
     _BYTELEN = 8
     _header = Header(title="STEGS", data_len=0, bits_used=1)
-    _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
     def __init__(self):
         """Setting header data_len, so retrieving the header knows how much data to grab."""
@@ -139,7 +138,7 @@ class Steganographer:
             header[len(self._header.title):len(self._header.title) + self._header._HEADER_DATA_SIZE], "little"))
         self._header = self._header._replace(bits_used=int.from_bytes(
             header[len(self._header.title) + self._header._HEADER_DATA_SIZE:
-                   len(self._header.title) + self._header._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little"))
+                   len(self._header.title) + self._header._HEADER_DATA_SIZE + self._header._HEADER_BITS_SIZE], "little"))
 
         return header_title == self._header.title.encode('utf-8')
 
