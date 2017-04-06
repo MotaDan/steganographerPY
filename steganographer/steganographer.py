@@ -107,7 +107,6 @@ class Steganographer:
 
     _BYTELEN = 8
     _header = Header(title="STEGS", data_len=0, bits_used=1)
-    _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
@@ -136,14 +135,14 @@ class Steganographer:
         bytes_to_hide_header = len(self._header.header_bytes) * self._BYTELEN
         self._header = self._header._replace(data_len=bytes_to_hide_header)  # The only data is the header.
         header = self._reveal_data(data[:bytes_to_hide_header])
-        header_title = header[:len(self._HEADER_TITLE)]
+        header_title = header[:len(self._header.title)]
         self._header = self._header._replace(data_len=int.from_bytes(
-            header[len(self._HEADER_TITLE):len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE], "little"))
+            header[len(self._header.title):len(self._header.title) + self._HEADER_DATA_SIZE], "little"))
         self._header = self._header._replace(bits_used=int.from_bytes(
-            header[len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE:
-                   len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little"))
+            header[len(self._header.title) + self._HEADER_DATA_SIZE:
+                   len(self._header.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little"))
 
-        return header_title == self._HEADER_TITLE.encode('utf-8')
+        return header_title == self._header.title.encode('utf-8')
 
     def _hide_byte(self, clean_data, val):
         """

@@ -22,7 +22,7 @@ CLEAN_PNG_LOCATION = "tests/cleanImage.png"
 def test_generate_header():
     """The header is generated as expected"""
     stegs = Steganographer()
-    header = bytes(stegs._HEADER_TITLE, 'utf-8') + \
+    header = bytes(stegs._header._HEADER_TITLE, 'utf-8') + \
         bytes(stegs._header.data_len.to_bytes(stegs._HEADER_DATA_SIZE, "little")) + \
              bytes(stegs._header.bits_used.to_bytes(stegs._HEADER_BITS_SIZE, "little"))
 
