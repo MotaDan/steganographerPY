@@ -90,7 +90,7 @@ class Header:
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
     def __init__(self):
-        self.title = "STEGS"
+        self.title = self._HEADER_TITLE
         self.data_len = 0
         self.bits_used = 1
 

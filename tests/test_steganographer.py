@@ -33,9 +33,14 @@ def test_generate_header():
 def test_retrieve_header():
     """The header is retrieved as expected"""
     stegs = Steganographer()
+    test_data_len = 20
+    test_bits_used = 1
 
+    test_header = stegs._generate_header(test_data_len, test_bits_used)
+    solution_header = stegs._retrieve_header(test_header)
 
-    assert ''!=''
+    assert solution_header.data_len == test_data_len
+    assert solution_header.bits_used == test_bits_used
 
 
 def test_hide_byte():
