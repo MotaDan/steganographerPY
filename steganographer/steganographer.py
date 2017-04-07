@@ -149,9 +149,9 @@ class Steganographer:
         Returns if there is a valid header or not.
         """
         bytes_to_hide_header = len(self._header.header_as_bytes) * self._BYTELEN
+        header_as_bytes = self._reveal_data(data[:bytes_to_hide_header])
         self._header.data_len = bytes_to_hide_header  # The only data is the header.
-        header = self._reveal_data(data[:bytes_to_hide_header])
-        return self._header.retrieve_header(header)
+        return self._header.retrieve_header(header_as_bytes)
 
     def _hide_byte(self, clean_data, val):
         """
