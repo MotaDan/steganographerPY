@@ -88,18 +88,21 @@ class Header:
     _HEADER_TITLE = "STEGS"
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
+    _HEADER_FILE_LENGTH_SIZE = 2  # The size of the header segment for storing the file length.
 
     def __init__(self):
         self.title = self._HEADER_TITLE
         self.data_len = 0
         self.bits_used = 1
+        self.file_name = ""
 
     @property
     def header_as_bytes(self):
         """Coverts the header into a bytes object."""
         header = bytes(self._HEADER_TITLE, 'utf-8') + \
             bytes(self.data_len.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
-            bytes(self.bits_used.to_bytes(self._HEADER_BITS_SIZE, "little"))
+            bytes(self.bits_used.to_bytes(self._HEADER_BITS_SIZE, "little")) + \
+            bytes(self.file_name, 'utf-8')
 
         return header
 
@@ -114,7 +117,10 @@ class Header:
             potential_header[len(self.title):len(self.title) + self._HEADER_DATA_SIZE], "little")
         self.bits_used = int.from_bytes(
             potential_header[len(self.title) + self._HEADER_DATA_SIZE:
-            len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
+                             len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
+        self.file_name = potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE:
+                                          len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
+                                          self._HEADER_FILE_LENGTH_SIZE].decode('utf-8')
 
         return header_title == self.title.encode('utf-8')
 
