@@ -81,7 +81,7 @@ def _write_image_file(fname, og_fname, data):
         sys.exit()
 
 
-class Header(namedtuple('Header', ['title', 'data_len', 'bits_used'])):
+class Header:
 
     """The header that is stored at the beginning of steganogrified images."""
 
@@ -89,7 +89,10 @@ class Header(namedtuple('Header', ['title', 'data_len', 'bits_used'])):
     _HEADER_DATA_SIZE = 10  # The size of the data segment in the header.
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
 
-    __slots__ = ()
+    def __init__(self):
+        self.title = "STEGS"
+        self.data_len = 0
+        self.bits_used = 1
 
     @property
     def header_as_bytes(self):
@@ -100,18 +103,33 @@ class Header(namedtuple('Header', ['title', 'data_len', 'bits_used'])):
 
         return header
 
+    def retrieve_header(self, potential_header):
+        """
+        Retrieves the header from the data passed in and sets the appropriate attributes.
+
+        Returns if there is a valid header or not.
+        """
+        header_title = potential_header[:len(self.title)]
+        self.data_len = int.from_bytes(
+            potential_header[len(self.title):len(self.title) + self._HEADER_DATA_SIZE], "little")
+        self.bits_used = int.from_bytes(
+            potential_header[len(self.title) + self._HEADER_DATA_SIZE:
+            len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
+
+        return header_title == self.title.encode('utf-8')
+
 
 class Steganographer:
 
     """Takes care of hiding a revealing messages in images."""
 
     _BYTELEN = 8
-    _header = Header(title="STEGS", data_len=0, bits_used=1)
+    _header = Header()
 
     def __init__(self):
         """Setting header data_len, so retrieving the header knows how much data to grab."""
-        self._header = self._header._replace(data_len=len(self._header.header_as_bytes))  # The only data is the header.
-        self._header = self._header._replace(bits_used=1)
+        self._header.data_len = len(self._header.header_as_bytes)  # The only data is the header.
+        self._header.bits_used = 1
 
     def _generate_header(self, data_size, bits_to_use):
         """
@@ -119,8 +137,8 @@ class Steganographer:
 
         Returns header as bytes.
         """
-        self._header = self._header._replace(data_len=data_size)
-        self._header = self._header._replace(bits_used=bits_to_use)
+        self._header.data_len = data_size
+        self._header.bits_used = bits_to_use
 
         return self._header.header_as_bytes
 
@@ -131,16 +149,9 @@ class Steganographer:
         Returns if there is a valid header or not.
         """
         bytes_to_hide_header = len(self._header.header_as_bytes) * self._BYTELEN
-        self._header = self._header._replace(data_len=bytes_to_hide_header)  # The only data is the header.
+        self._header.data_len = bytes_to_hide_header  # The only data is the header.
         header = self._reveal_data(data[:bytes_to_hide_header])
-        header_title = header[:len(self._header.title)]
-        self._header = self._header._replace(data_len=int.from_bytes(
-            header[len(self._header.title):len(self._header.title) + self._header._HEADER_DATA_SIZE], "little"))
-        self._header = self._header._replace(bits_used=int.from_bytes(
-            header[len(self._header.title) + self._header._HEADER_DATA_SIZE:
-                   len(self._header.title) + self._header._HEADER_DATA_SIZE + self._header._HEADER_BITS_SIZE], "little"))
-
-        return header_title == self._header.title.encode('utf-8')
+        return self._header.retrieve_header(header)
 
     def _hide_byte(self, clean_data, val):
         """
