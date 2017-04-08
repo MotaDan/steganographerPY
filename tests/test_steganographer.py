@@ -30,18 +30,23 @@ def test_generate_header():
     assert header == stegs._generate_header(stegs._header.data_len, stegs._header.bits_used, "")
 
 
-@pytest.mark.xfail(strict=True, reason="Issue #78 Test not written.", run=False)
 def test_retrieve_header():
     """The header is retrieved as expected"""
     stegs = Steganographer()
     test_data_len = 20
     test_bits_used = 1
+    test_file_name = "test_retrieve_header.txt"
+    test_file_name_len = 24
+    test_data = bytes(b'\x01' * len(stegs._header.header_as_bytes) * stegs._BYTELEN)
 
-    test_header = stegs._generate_header(test_data_len, test_bits_used, "")
-    solution_header = stegs._retrieve_header(test_header)
+    test_header = stegs._generate_header(test_data_len, test_bits_used, test_file_name)
+    test_data = stegs._hide_data(test_data, test_header)
+    header_retrieved = stegs._retrieve_header(test_data)
 
-    assert solution_header.data_len == test_data_len
-    assert solution_header.bits_used == test_bits_used
+    assert header_retrieved == True
+    assert stegs._header.data_len == test_data_len
+    assert stegs._header.bits_used == test_bits_used
+    assert stegs._header.file_name_len == test_file_name_len
 
 
 def test_hide_byte():
