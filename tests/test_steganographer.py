@@ -24,9 +24,10 @@ def test_generate_header():
     stegs = Steganographer()
     header = bytes(stegs._header._HEADER_TITLE, 'utf-8') + \
         bytes(stegs._header.data_len.to_bytes(stegs._header._HEADER_DATA_SIZE, "little")) + \
-        bytes(stegs._header.bits_used.to_bytes(stegs._header._HEADER_BITS_SIZE, "little"))
+        bytes(stegs._header.bits_used.to_bytes(stegs._header._HEADER_BITS_SIZE, "little")) + \
+        bytes(stegs._header.file_name_len.to_bytes(stegs._header._HEADER_FILE_LENGTH_SIZE, "little"))
 
-    assert header == stegs._generate_header(stegs._header.data_len, stegs._header.bits_used)
+    assert header == stegs._generate_header(stegs._header.data_len, stegs._header.bits_used, "")
 
 
 @pytest.mark.xfail(strict=True, reason="Issue #78 Test not written.", run=False)
@@ -36,7 +37,7 @@ def test_retrieve_header():
     test_data_len = 20
     test_bits_used = 1
 
-    test_header = stegs._generate_header(test_data_len, test_bits_used)
+    test_header = stegs._generate_header(test_data_len, test_bits_used, "")
     solution_header = stegs._retrieve_header(test_header)
 
     assert solution_header.data_len == test_data_len
@@ -277,7 +278,7 @@ def test_short_partial_data_w_data_inverse():
     test_data = bytes(test_string, 'utf-8')
     solution_data = bytearray(test_data)
     stegs = Steganographer()
-    stegs._header.data_len=len(test_string)
+    stegs._header.data_len = len(test_string)
     solution_data[-1] = solution_data[-1] >> stegs._BYTELEN // 2 << stegs._BYTELEN // 2
     blank_data = bytes(b'\x01' * (len(test_string) * stegs._BYTELEN - stegs._BYTELEN // 2))
 
@@ -884,7 +885,7 @@ def test_main_reveal_no_op_unicode(capfd):
 
 
 def test_jpegs(capfd):
-    """Jpegs can have a message hidden and revealed. Note they are converted to pngs."""
+    """Jpegs can have a message hidden and revealed. Note they are converted to png."""
     line_end = '\n'
     if sys.platform == 'win32':
         line_end = '\r\n'

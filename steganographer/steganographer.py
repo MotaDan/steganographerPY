@@ -2,7 +2,6 @@
 from PIL import Image
 import sys
 import os.path
-from collections import namedtuple
 
 
 def _unpack_image(pixels):
@@ -94,7 +93,7 @@ class Header:
         self.title = self._HEADER_TITLE
         self.data_len = 0
         self.bits_used = 1
-        self.file_name = ""
+        self.file_name_len = 0
 
     @property
     def header_as_bytes(self):
@@ -102,7 +101,7 @@ class Header:
         header = bytes(self._HEADER_TITLE, 'utf-8') + \
             bytes(self.data_len.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
             bytes(self.bits_used.to_bytes(self._HEADER_BITS_SIZE, "little")) + \
-            bytes(self.file_name, 'utf-8')
+            bytes(self.file_name_len.to_bytes(self._HEADER_FILE_LENGTH_SIZE, "little"))
 
         return header
 
@@ -118,9 +117,10 @@ class Header:
         self.bits_used = int.from_bytes(
             potential_header[len(self.title) + self._HEADER_DATA_SIZE:
                              len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE], "little")
-        self.file_name = potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE:
-                                          len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
-                                          self._HEADER_FILE_LENGTH_SIZE].decode('utf-8')
+        self.file_name_len = int.from_bytes(
+            potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE:
+                             len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
+                             self._HEADER_FILE_LENGTH_SIZE], "little")
 
         return header_title == self.title.encode('utf-8')
 
@@ -137,7 +137,7 @@ class Steganographer:
         self._header.data_len = len(self._header.header_as_bytes)  # The only data is the header.
         self._header.bits_used = 1
 
-    def _generate_header(self, data_size, bits_to_use):
+    def _generate_header(self, data_size, bits_to_use, file_name):
         """
         Generates the header that will be placed at the beginning of the image.
 
@@ -145,6 +145,7 @@ class Steganographer:
         """
         self._header.data_len = data_size
         self._header.bits_used = bits_to_use
+        self._header.file_name_len = len(file_name)
 
         return self._header.header_as_bytes
 
@@ -157,6 +158,7 @@ class Steganographer:
         bytes_to_hide_header = len(self._header.header_as_bytes) * self._BYTELEN
         self._header.data_len = bytes_to_hide_header  # The only data is the header.
         header_as_bytes = self._reveal_data(data[:bytes_to_hide_header])
+
         return self._header.retrieve_header(header_as_bytes)
 
     def _hide_byte(self, clean_data, val):
@@ -260,7 +262,7 @@ class Steganographer:
         Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in
         clean_image_file and outputs it to dirty_image_file.
         """
-        header = self._generate_header(len(text.encode('utf-8')), 1)
+        header = self._generate_header(len(text.encode('utf-8')), 1, "")
         clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
         dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
         dirty_data += self._hide_string(clean_data[1][len(header) * self._BYTELEN:], text)
@@ -278,11 +280,15 @@ class Steganographer:
     def steganographer_hide_file(self, clean_image_file, file_to_hide, dirty_image_file=''):
         """Hides file_to_hide inside clean_image_file and outputs to dirty_image_file."""
         with open(file_to_hide, 'rb') as input_file:
-            header = self._generate_header(len(input_file.read()), 1)
+            header = self._generate_header(len(input_file.read()), 1, file_to_hide)
             input_file.seek(0)
             clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
             dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
-            dirty_data += self._hide_data(clean_data[1][len(header) * self._BYTELEN:], input_file.read())
+            dirty_data += self._hide_data(
+                clean_data[1][len(header) * self._BYTELEN:(len(header) + len(file_to_hide)) * self._BYTELEN],
+                file_to_hide.encode('utf-8'))
+            dirty_data += self._hide_data(clean_data[1][(len(header) + len(file_to_hide)) * self._BYTELEN:],
+                                          input_file.read())
             dirty_image_data = (clean_data[0], dirty_data)
 
         if dirty_image_file == '':
@@ -302,5 +308,6 @@ class Steganographer:
             print("This file %s has no hidden message." % fimage)
             sys.exit()
 
-        revealed_data = self._reveal_data(dirty_data[1][len(self._header.header_as_bytes) * self._BYTELEN:])
+        revealed_data = self._reveal_data(dirty_data[1][(len(self._header.header_as_bytes) +
+                                                         self._header.file_name_len) * self._BYTELEN:])
         return revealed_data
