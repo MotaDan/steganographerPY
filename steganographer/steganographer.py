@@ -89,11 +89,20 @@ class Header:
     _HEADER_BITS_SIZE = 1  # The size of the header segment for storing the number of bits from a byte used.
     _HEADER_FILE_LENGTH_SIZE = 2  # The size of the header segment for storing the file length.
 
-    def __init__(self):
+    def __init__(self, data_len=0, bits_used=1, file_name=""):
         self.title = self._HEADER_TITLE
-        self.data_len = 0
-        self.bits_used = 1
-        self.file_name_len = 0
+        self.data_len = data_len
+        self.bits_used = bits_used
+        self.file_name_len = len(file_name)
+        self.file_name = file_name
+
+    @property
+    def header_length(self):
+        """Returns the length of the header data."""
+        length = len(self._HEADER_TITLE) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE + \
+            self._HEADER_FILE_LENGTH_SIZE + self.file_name_len
+
+        return length
 
     @property
     def header_as_bytes(self):
@@ -101,7 +110,8 @@ class Header:
         header = bytes(self._HEADER_TITLE, 'utf-8') + \
             bytes(self.data_len.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
             bytes(self.bits_used.to_bytes(self._HEADER_BITS_SIZE, "little")) + \
-            bytes(self.file_name_len.to_bytes(self._HEADER_FILE_LENGTH_SIZE, "little"))
+            bytes(self.file_name_len.to_bytes(self._HEADER_FILE_LENGTH_SIZE, "little")) + \
+            bytes(self.file_name, 'utf-8')
 
         return header
 
@@ -121,6 +131,9 @@ class Header:
             potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE:
                              len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
                              self._HEADER_FILE_LENGTH_SIZE], "little")
+        self.file_name = potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE + self._HEADER_FILE_LENGTH_SIZE:
+                                          len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
+                                          self._HEADER_FILE_LENGTH_SIZE + self.file_name_len]
 
         return header_title == self.title.encode('utf-8')
 
@@ -134,7 +147,7 @@ class Steganographer:
 
     def __init__(self):
         """Setting header data_len, so retrieving the header knows how much data to grab."""
-        self._header.data_len = len(self._header.header_as_bytes)  # The only data is the header.
+        self._header.data_len = self._header.header_length  # The only data is the header.
         self._header.bits_used = 1
 
     def _generate_header(self, data_size, bits_to_use, file_name):
@@ -143,9 +156,7 @@ class Steganographer:
 
         Returns header as bytes.
         """
-        self._header.data_len = data_size
-        self._header.bits_used = bits_to_use
-        self._header.file_name_len = len(file_name)
+        self._header = Header(data_size, bits_to_use, file_name)
 
         return self._header.header_as_bytes
 
@@ -155,11 +166,19 @@ class Steganographer:
 
         Returns if there is a valid header or not.
         """
-        bytes_to_hide_header = len(self._header.header_as_bytes) * self._BYTELEN
+        bytes_to_hide_header = self._header.header_length * self._BYTELEN
         self._header.data_len = bytes_to_hide_header  # The only data is the header.
         header_as_bytes = self._reveal_data(data[:bytes_to_hide_header])
+        is_header_valid = self._header.retrieve_header(header_as_bytes)
 
-        return self._header.retrieve_header(header_as_bytes)
+        # Getting the file name if one exist and updating the header.
+        if self._header.file_name_len > 0:
+            bytes_to_hide_header = self._header.header_length * self._BYTELEN
+            self._header.data_len = bytes_to_hide_header  # The only data is the header.
+            header_as_bytes = self._reveal_data(data[:bytes_to_hide_header])
+            is_header_valid = self._header.retrieve_header(header_as_bytes)
+
+        return is_header_valid
 
     def _hide_byte(self, clean_data, val):
         """
@@ -283,12 +302,8 @@ class Steganographer:
             header = self._generate_header(len(input_file.read()), 1, file_to_hide)
             input_file.seek(0)
             clean_data = _open_image_file(clean_image_file)  # Is a tuple with the size of a pixel and the pixels.
-            dirty_data = self._hide_data(clean_data[1][:len(header) * self._BYTELEN], header)
-            dirty_data += self._hide_data(
-                clean_data[1][len(header) * self._BYTELEN:(len(header) + len(file_to_hide)) * self._BYTELEN],
-                file_to_hide.encode('utf-8'))
-            dirty_data += self._hide_data(clean_data[1][(len(header) + len(file_to_hide)) * self._BYTELEN:],
-                                          input_file.read())
+            dirty_data = self._hide_data(clean_data[1][:self._header.header_length * self._BYTELEN], header)
+            dirty_data += self._hide_data(clean_data[1][self._header.header_length * self._BYTELEN:], input_file.read())
             dirty_image_data = (clean_data[0], dirty_data)
 
         if dirty_image_file == '':
@@ -308,6 +323,5 @@ class Steganographer:
             print("This file %s has no hidden message." % fimage)
             sys.exit()
 
-        revealed_data = self._reveal_data(dirty_data[1][(len(self._header.header_as_bytes) +
-                                                         self._header.file_name_len) * self._BYTELEN:])
+        revealed_data = self._reveal_data(dirty_data[1][self._header.header_length * self._BYTELEN:])
         return revealed_data

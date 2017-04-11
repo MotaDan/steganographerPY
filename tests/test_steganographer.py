@@ -33,20 +33,23 @@ def test_generate_header():
 def test_retrieve_header():
     """The header is retrieved as expected"""
     stegs = Steganographer()
-    test_data_len = 20
+    test_message = "12345".encode('utf-8')
+    test_data_len = len(test_message)
     test_bits_used = 1
     test_file_name = "test_retrieve_header.txt"
-    test_file_name_len = 24
-    test_data = bytes(b'\x01' * len(stegs._header.header_as_bytes) * stegs._BYTELEN)
+    test_file_name_len = len(test_file_name)
+    test_data = bytes(b'\x01' * 1000)
 
     test_header = stegs._generate_header(test_data_len, test_bits_used, test_file_name)
-    test_data = stegs._hide_data(test_data, test_header)
-    header_retrieved = stegs._retrieve_header(test_data)
+    hidden_data = stegs._hide_data(test_data[:stegs._header.header_length * stegs._BYTELEN], test_header)
+    hidden_data += stegs._hide_data(test_data[stegs._header.header_length * stegs._BYTELEN:], test_message)
+    header_retrieved = stegs._retrieve_header(hidden_data)
 
     assert header_retrieved == True
     assert stegs._header.data_len == test_data_len
     assert stegs._header.bits_used == test_bits_used
     assert stegs._header.file_name_len == test_file_name_len
+    assert stegs._header.file_name.decode('utf-8') == test_file_name
 
 
 def test_hide_byte():
