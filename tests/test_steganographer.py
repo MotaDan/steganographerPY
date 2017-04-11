@@ -45,7 +45,7 @@ def test_retrieve_header():
     hidden_data += stegs._hide_data(test_data[stegs._header.header_length * stegs._BYTELEN:], test_message)
     header_retrieved = stegs._retrieve_header(hidden_data)
 
-    assert header_retrieved == True
+    assert header_retrieved is True
     assert stegs._header.data_len == test_data_len
     assert stegs._header.bits_used == test_bits_used
     assert stegs._header.file_name_len == test_file_name_len

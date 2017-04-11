@@ -131,7 +131,8 @@ class Header:
             potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE:
                              len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
                              self._HEADER_FILE_LENGTH_SIZE], "little")
-        self.file_name = potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE + self._HEADER_FILE_LENGTH_SIZE:
+        self.file_name = potential_header[len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
+                                          self._HEADER_FILE_LENGTH_SIZE:
                                           len(self.title) + self._HEADER_DATA_SIZE + self._HEADER_BITS_SIZE +
                                           self._HEADER_FILE_LENGTH_SIZE + self.file_name_len]
 
