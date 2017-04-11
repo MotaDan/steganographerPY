@@ -781,7 +781,7 @@ def test_main_reveal_file_no_output(capfd):
         line_end = '\r\n'
     file_to_hide = "tests/FileToHide.zip"
     dirty_fname = "tests/dirtyImage_test_main_reveal_file_no_output.png"
-    generated_output_file = "steganographer_revealed_file.txt"
+    generated_output_file = file_to_hide
 
     os.system('python -m steganographer ' + CLEAN_PNG_LOCATION + ' -f "' + file_to_hide +
               '" -o ' + dirty_fname)
@@ -794,7 +794,6 @@ def test_main_reveal_file_no_output(capfd):
     assert out == ("The hidden file was revealed in " + generated_output_file + line_end)
 
     os.remove(dirty_fname)
-    os.remove(generated_output_file)
 
 
 def test_main_reveal_msg_w_output(capfd):

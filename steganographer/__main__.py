@@ -33,15 +33,14 @@ def main():
             print("The file " + args.file + " has been hidden in " + hidden_fname)
         # Revealing a file.
         elif args.reveal:
-            if args.output:
-                revealed_data = stegs.steganographer_reveal(args.input)
+            revealed_data = stegs.steganographer_reveal(args.input)
 
+            if args.output:
                 with open(args.output, 'wb') as rev_file:
                     rev_file.write(revealed_data)
                 print("The hidden file was revealed in " + args.output)
             else:
-                file_name = "steganographer_revealed_file.txt"
-                revealed_data = stegs.steganographer_reveal(args.input)
+                file_name = stegs._header.file_name.decode('utf-8')
 
                 with open(file_name, 'wb') as rev_file:
                     rev_file.write(revealed_data)
