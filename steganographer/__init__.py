@@ -1,4 +1,4 @@
-"""Given an image and a message steganographer will hide the message in the bits of the image."""
+"""Given an image and a message or file steganographer will hide the message or file in the bits of the image."""
 import pkg_resources
 
 try:

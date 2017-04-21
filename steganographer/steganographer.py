@@ -1,4 +1,4 @@
-"""Given an image and a message steganographer will hide the message in the bits of the image."""
+"""Given an image and a message or file steganographer will hide the message or file in the bits of the image."""
 from PIL import Image
 import sys
 import os.path
@@ -106,7 +106,7 @@ class Header:
 
     @property
     def header_as_bytes(self):
-        """Coverts the header into a bytes object."""
+        """Converts the header into a bytes object."""
         header = bytes(self._HEADER_TITLE, 'utf-8') + \
             bytes(self.data_len.to_bytes(self._HEADER_DATA_SIZE, "little")) + \
             bytes(self.bits_used.to_bytes(self._HEADER_BITS_SIZE, "little")) + \
@@ -141,7 +141,7 @@ class Header:
 
 class Steganographer:
 
-    """Takes care of hiding a revealing messages in images."""
+    """Takes care of hiding and revealing messages and files in an image."""
 
     _BYTELEN = 8
     _header = Header()
@@ -183,10 +183,10 @@ class Steganographer:
 
     def _hide_byte(self, clean_data, val):
         """
-        Hides a byte val in data. Returns bytes.
+        Hides a byte val in clean_data. Returns bytes.
 
         Expects a bytes of length 8 and a character value. Will return a bytes with the character's bits hidden
-        in the least significant bit.
+        in the least significant bits of clean_data.
         """
         hidden_data = bytearray(len(clean_data))
         mask = 1 << (self._BYTELEN - 1)
@@ -221,7 +221,7 @@ class Steganographer:
         Hides a string val in clean_data. Returns a bytes.
 
         Expects a bytes of any length and a string value. Will return a bytes with the string's bits hidden
-        in the least significant bits. Adds null terminator to the end of the string.
+        in the least significant bits.
         """
         return self._hide_data(clean_data, bytes(val, 'utf-8'))
 
@@ -317,7 +317,7 @@ class Steganographer:
         return output_file
 
     def steganographer_reveal(self, fimage):
-        """Reveals whatever string is hidden in the fimage."""
+        """Reveals whatever data is hidden in the fimage file least significant bits."""
         dirty_data = _open_image_file(fimage)
 
         if self._retrieve_header(dirty_data[1]) is False:

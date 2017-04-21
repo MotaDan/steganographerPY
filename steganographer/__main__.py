@@ -1,10 +1,10 @@
-"""The main routine."""
+"""Given an image and a message or file steganographer will hide the message or file in the bits of the image."""
 import argparse
 from steganographer.steganographer import Steganographer
 
 
 def main():
-    """The main routine."""
+    """Given an image and a message or file steganographer will hide the message or file in the bits of the image."""
     parser = argparse.ArgumentParser(description="hides a message in a file or returns a message hidden in a file")
     parser.add_argument("input", help="file to hide a message in or file to reveal a message from")
     parser.add_argument("-m", "--message", help="message to be hidden in the input file")
