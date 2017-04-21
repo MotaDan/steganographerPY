@@ -23,4 +23,8 @@ Compatiable with python 3 and up.
 To install:
 pip install steganographer
 
+For development:
+After cloning run
+pip-sync dev-requirements.txt requirements.txt test-requirements.txt
+
 https://pypi.python.org/pypi/steganographer
