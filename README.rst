@@ -10,17 +10,21 @@ steganographer
    :alt: Code Health
 
 
-Hide messages inside an image. 
+Hide messages and files inside an image. 
 
 
 Description
 ===========
 
-Given an image and a message steganographer will hide the message in the bits of the image. Currently only works for pngs.
+Given an image and a message or a file steganographer will hide the message or file in the bits of the image. Works best when PNGs are passed in. Will convert JPGs to PNGs because of compression.
 
 Compatiable with python 3 and up.
 
 To install:
 pip install steganographer
+
+For development:
+After cloning run
+pip-sync dev-requirements.txt requirements.txt test-requirements.txt
 
 https://pypi.python.org/pypi/steganographer

@@ -24,9 +24,9 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.1.1',
+    version='2.0.0',
 
-    description='Hides a message inside an image.',
+    description='Hides a message or file inside an image.',
     long_description=long_description,
 
     # The project's main homepage.
@@ -62,6 +62,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Environment :: Console',
         'Environment :: Win32 (MS Windows)',
 
@@ -73,7 +74,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='steganography hidden',
+    keywords='steganography hidden watermark',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -95,6 +96,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'test': ['pytest', 'coverage', 'pytest-cov', 'coveralls', 'hypothesis', 'pytest-xdist'],
+        'dev': ['pip-tools'],
     },
 
     # To provide executable scripts, use entry points in preference to the
