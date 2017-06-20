@@ -29,18 +29,22 @@ pip install steganographer
 Usage:
 ------
 Hide a message in an image.
+
 - steganographer inputImage.png -m "Message to hide."
 - steganographer inputImage.png -m "Message to hide." -o outputImage.png
 
 Reveal a hidden message.
+
 - steganographer inputImage.png
 - steganographer inputImage.png -o revealedMessage.txt
 
 Hide a file in an image.
+
 - steganographer inputImage.png -f fileToHide.zip
 - steganographer inputImage.png -f fileToHide.zip -o fileHiddenImage.png
 
 Reveal a file in an image.
+
 - steganographer inputImage.png -r
 - steganographer inputImage.png -r -o revealedFile.zip
 
@@ -48,4 +52,5 @@ Reveal a file in an image.
 Development Notes:
 ------------------
 After cloning have pip-tools installed and run this command to get the correct requirements.
+
 - pip-sync dev-requirements.txt requirements.txt test-requirements.txt
