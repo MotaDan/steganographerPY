@@ -12,19 +12,40 @@ steganographer
 
 Hide messages and files inside an image. 
 
+https://pypi.python.org/pypi/steganographer
+
 
 Description
-===========
+-----------
 
-Given an image and a message or a file steganographer will hide the message or file in the bits of the image. Works best when PNGs are passed in. Will convert JPGs to PNGs because of compression.
+Given an image and a message or a file, steganographer will hide the message or file in the bits of the image. Works best when PNGs are passed in. Will convert JPGs to PNGs because of compression. Only tested with png and jpg.
 
 Compatiable with python 3 and up.
 
-To install:
+Install:
+--------
 pip install steganographer
 
-For development:
-After cloning run
-pip-sync dev-requirements.txt requirements.txt test-requirements.txt
+Usage:
+------
+Hide a message in an image.
+- steganographer inputImage.png -m "Message to hide."
+- steganographer inputImage.png -m "Message to hide." -o outputImage.png
 
-https://pypi.python.org/pypi/steganographer
+Reveal a hidden message.
+- steganographer inputImage.png
+- steganographer inputImage.png -o revealedMessage.txt
+
+Hide a file in an image.
+- steganographer inputImage.png -f fileToHide.zip
+- steganographer inputImage.png -f fileToHide.zip -o fileHiddenImage.png
+
+Reveal a file in an image.
+- steganographer inputImage.png -r
+- steganographer inputImage.png -r -o revealedFile.zip
+
+
+Development Notes:
+------------------
+After cloning have pip-tools installed and run this command to get the correct requirements.
+- pip-sync dev-requirements.txt requirements.txt test-requirements.txt
