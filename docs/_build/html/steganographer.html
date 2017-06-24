@@ -1,0 +1,172 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>steganographer package &#8212; Steganographer 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Steganographer’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="steganographer-package">
+<h1>steganographer package<a class="headerlink" href="#steganographer-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="steganographer-steganographer-module">
+<h2>steganographer.steganographer module<a class="headerlink" href="#steganographer-steganographer-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-steganographer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-steganographer" title="Permalink to this headline">¶</a></h2>
+<p>Given an image and a message or file steganographer will hide the message or file in the bits of the image.</p>
+<dl class="class">
+<dt id="steganographer.Header">
+<em class="property">class </em><code class="descclassname">steganographer.</code><code class="descname">Header</code><span class="sig-paren">(</span><em>data_len=0</em>, <em>bits_used=1</em>, <em>file_name=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/steganographer.html#Header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steganographer.Header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The header that is stored at the beginning of steganogrified images.</p>
+<dl class="attribute">
+<dt id="steganographer.Header.header_as_bytes">
+<code class="descname">header_as_bytes</code><a class="headerlink" href="#steganographer.Header.header_as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the header into a bytes object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="steganographer.Header.header_length">
+<code class="descname">header_length</code><a class="headerlink" href="#steganographer.Header.header_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the length of the header data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="steganographer.Header.retrieve_header">
+<code class="descname">retrieve_header</code><span class="sig-paren">(</span><em>potential_header</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/steganographer.html#Header.retrieve_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steganographer.Header.retrieve_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the header from the data passed in and sets the appropriate attributes.</p>
+<p>Returns if there is a valid header or not.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="steganographer.Steganographer">
+<em class="property">class </em><code class="descclassname">steganographer.</code><code class="descname">Steganographer</code><a class="reference internal" href="_modules/steganographer.html#Steganographer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steganographer.Steganographer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Takes care of hiding and revealing messages and files in an image.</p>
+<dl class="method">
+<dt id="steganographer.Steganographer.steganographer_hide">
+<code class="descname">steganographer_hide</code><span class="sig-paren">(</span><em>clean_image_file</em>, <em>text</em>, <em>dirty_image_file=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/steganographer.html#Steganographer.steganographer_hide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steganographer.Steganographer.steganographer_hide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hides text inside clean_image_file and outputs dirty_image_file.</p>
+<p>Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in
+clean_image_file and outputs it to dirty_image_file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="steganographer.Steganographer.steganographer_hide_file">
+<code class="descname">steganographer_hide_file</code><span class="sig-paren">(</span><em>clean_image_file</em>, <em>file_to_hide</em>, <em>dirty_image_file=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/steganographer.html#Steganographer.steganographer_hide_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steganographer.Steganographer.steganographer_hide_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hides file_to_hide inside clean_image_file and outputs to dirty_image_file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="steganographer.Steganographer.steganographer_reveal">
+<code class="descname">steganographer_reveal</code><span class="sig-paren">(</span><em>fimage</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/steganographer.html#Steganographer.steganographer_reveal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steganographer.Steganographer.steganographer_reveal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reveals whatever data is hidden in the fimage file least significant bits.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">steganographer package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#steganographer-steganographer-module">steganographer.steganographer module</a></li>
+<li><a class="reference internal" href="#module-steganographer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Steganographer’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/steganographer.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Daniel Mota.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/steganographer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

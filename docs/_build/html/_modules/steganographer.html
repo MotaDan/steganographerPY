@@ -1,0 +1,415 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>steganographer &#8212; Steganographer 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for steganographer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Given an image and a message or file steganographer will hide the message or file in the bits of the image.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+
+<span class="k">def</span> <span class="nf">_unpack_image</span><span class="p">(</span><span class="n">pixels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flatten out pixels and returns a tuple. The first entry is the size of each pixel.&quot;&quot;&quot;</span>
+    <span class="n">unpacked_pixels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pix</span> <span class="ow">in</span> <span class="n">pixels</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pix</span><span class="p">:</span>
+                <span class="n">unpacked_pixels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">unpacked_pixels</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">pixels</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_pack_image</span><span class="p">(</span><span class="n">pixels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Do create 2d list of pixels and return the list.&quot;&quot;&quot;</span>
+    <span class="n">packed_pixels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pixel_length</span> <span class="o">=</span> <span class="n">pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">pixel_length</span><span class="p">):</span>
+        <span class="n">packed_pixels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">pixel_length</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">packed_pixels</span>
+
+
+<span class="k">def</span> <span class="nf">_open_bin_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads the file fname and returns bytes for all of its data.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fimage</span><span class="p">:</span>
+            <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">fimage</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">image_bytes</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not find file&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_write_bin_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a file fname and writes the passed in data to it.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fdirty</span><span class="p">:</span>
+            <span class="n">fdirty</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not create file&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_open_image_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads the file fname and returns bytes for all it&#39;s data.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
+            <span class="n">pixels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">getdata</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">_unpack_image</span><span class="p">(</span><span class="n">pixels</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not read file&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_write_image_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">og_fname</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a image fname and writes the passed in data to it. Returns name of image created.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">og_fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">ogim</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">ogim</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">ogim</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">img</span><span class="o">.</span><span class="n">putdata</span><span class="p">(</span><span class="n">_pack_image</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">fname_no_ext</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname_no_ext</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fname_no_ext</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not read file&quot;</span><span class="p">,</span> <span class="n">og_fname</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Header"><a class="viewcode-back" href="../steganographer.html#steganographer.Header">[docs]</a><span class="k">class</span> <span class="nc">Header</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;The header that is stored at the beginning of steganogrified images.&quot;&quot;&quot;</span>
+
+    <span class="n">_HEADER_TITLE</span> <span class="o">=</span> <span class="s2">&quot;STEGS&quot;</span>
+    <span class="n">_HEADER_DATA_SIZE</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># The size of the data segment in the header.</span>
+    <span class="n">_HEADER_BITS_SIZE</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># The size of the header segment for storing the number of bits from a byte used.</span>
+    <span class="n">_HEADER_FILE_LENGTH_SIZE</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># The size of the header segment for storing the file length.</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_len</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bits_used</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_TITLE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_len</span> <span class="o">=</span> <span class="n">data_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bits_used</span> <span class="o">=</span> <span class="n">bits_used</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">header_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the length of the header data.&quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_TITLE</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span> <span class="o">+</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_FILE_LENGTH_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name_len</span>
+
+        <span class="k">return</span> <span class="n">length</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">header_as_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts the header into a bytes object.&quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_TITLE</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_len</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">))</span> <span class="o">+</span> \
+            <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bits_used</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">))</span> <span class="o">+</span> \
+            <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name_len</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_FILE_LENGTH_SIZE</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">))</span> <span class="o">+</span> \
+            <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">header</span>
+
+<div class="viewcode-block" id="Header.retrieve_header"><a class="viewcode-back" href="../steganographer.html#steganographer.Header.retrieve_header">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">potential_header</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the header from the data passed in and sets the appropriate attributes.</span>
+
+<span class="sd">        Returns if there is a valid header or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header_title</span> <span class="o">=</span> <span class="n">potential_header</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_len</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span>
+            <span class="n">potential_header</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">):</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span><span class="p">],</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bits_used</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span>
+            <span class="n">potential_header</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span><span class="p">:</span>
+                             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span><span class="p">],</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name_len</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span>
+            <span class="n">potential_header</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span><span class="p">:</span>
+                             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span> <span class="o">+</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_FILE_LENGTH_SIZE</span><span class="p">],</span> <span class="s2">&quot;little&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">potential_header</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span> <span class="o">+</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_FILE_LENGTH_SIZE</span><span class="p">:</span>
+                                          <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_DATA_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_BITS_SIZE</span> <span class="o">+</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">_HEADER_FILE_LENGTH_SIZE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name_len</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">header_title</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Steganographer"><a class="viewcode-back" href="../steganographer.html#steganographer.Steganographer">[docs]</a><span class="k">class</span> <span class="nc">Steganographer</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Takes care of hiding and revealing messages and files in an image.&quot;&quot;&quot;</span>
+
+    <span class="n">_BYTELEN</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">_header</span> <span class="o">=</span> <span class="n">Header</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setting header data_len, so retrieving the header knows how much data to grab.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">data_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_length</span>  <span class="c1"># The only data is the header.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">bits_used</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_generate_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_size</span><span class="p">,</span> <span class="n">bits_to_use</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the header that will be placed at the beginning of the image.</span>
+
+<span class="sd">        Returns header as bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">data_size</span><span class="p">,</span> <span class="n">bits_to_use</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_as_bytes</span>
+
+    <span class="k">def</span> <span class="nf">_retrieve_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the header from the data passed in and sets the appropriate attributes.</span>
+
+<span class="sd">        Returns if there is a valid header or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bytes_to_hide_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">data_len</span> <span class="o">=</span> <span class="n">bytes_to_hide_header</span>  <span class="c1"># The only data is the header.</span>
+        <span class="n">header_as_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reveal_data</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="n">bytes_to_hide_header</span><span class="p">])</span>
+        <span class="n">is_header_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">retrieve_header</span><span class="p">(</span><span class="n">header_as_bytes</span><span class="p">)</span>
+
+        <span class="c1"># Getting the file name if one exist and updating the header.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">file_name_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bytes_to_hide_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">data_len</span> <span class="o">=</span> <span class="n">bytes_to_hide_header</span>  <span class="c1"># The only data is the header.</span>
+            <span class="n">header_as_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reveal_data</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="n">bytes_to_hide_header</span><span class="p">])</span>
+            <span class="n">is_header_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">retrieve_header</span><span class="p">(</span><span class="n">header_as_bytes</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">is_header_valid</span>
+
+    <span class="k">def</span> <span class="nf">_hide_byte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean_data</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hides a byte val in clean_data. Returns bytes.</span>
+
+<span class="sd">        Expects a bytes of length 8 and a character value. Will return a bytes with the character&#39;s bits hidden</span>
+<span class="sd">        in the least significant bits of clean_data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hidden_data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clean_data</span><span class="p">))</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">)):</span>
+            <span class="n">masked_bit</span> <span class="o">=</span> <span class="n">val</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">masked_bit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">masked_bit</span> <span class="o">&gt;&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span>
+                <span class="n">hidden_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="n">masked_bit</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">masked_bit</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">mask</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">hidden_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">masked_bit</span>
+
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_reveal_byte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Expects a bytes of length 8. Will pull out the least significant bit from each byte and return them.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">()</span>
+
+        <span class="n">revealed_data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">)):</span>
+            <span class="n">least_sig_bit</span> <span class="o">=</span> <span class="n">hidden_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mi">1</span>
+            <span class="n">revealed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">|=</span> <span class="n">least_sig_bit</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">revealed_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_hide_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean_data</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hides a string val in clean_data. Returns a bytes.</span>
+
+<span class="sd">        Expects a bytes of any length and a string value. Will return a bytes with the string&#39;s bits hidden</span>
+<span class="sd">        in the least significant bits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hide_data</span><span class="p">(</span><span class="n">clean_data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_reveal_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string hidden in hidden_data.</span>
+
+<span class="sd">        Expects a bytes of any length. Will pull out the least significant bits from each byte and return them as</span>
+<span class="sd">        a string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">revealed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reveal_data</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">revealed_string</span> <span class="o">=</span> <span class="n">revealed_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The hidden message could not be decoded.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">revealed_string</span>
+
+    <span class="k">def</span> <span class="nf">_hide_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean_data</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hides val inside clean_data. Returns a bytes.</span>
+
+<span class="sd">        Expects a bytes clean_data of any length and another bytes val. Will return a bytes with the val&#39;s</span>
+<span class="sd">        bits hidden in the least significant bits of clean_data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hidden_data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">data_index</span><span class="p">,</span> <span class="n">str_index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">clean_data</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">))):</span>
+            <span class="n">clean_byte</span> <span class="o">=</span> <span class="n">clean_data</span><span class="p">[</span><span class="n">data_index</span><span class="p">:</span><span class="n">data_index</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">]</span>
+            <span class="n">hidden_byte</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hide_byte</span><span class="p">(</span><span class="n">clean_byte</span><span class="p">,</span> <span class="n">val</span><span class="p">[</span><span class="n">str_index</span><span class="p">])</span>
+            <span class="n">hidden_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">hidden_byte</span><span class="p">)</span>
+
+        <span class="n">hidden_data</span> <span class="o">=</span> <span class="n">hidden_data</span> <span class="o">+</span> <span class="n">clean_data</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">):]</span>
+
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_reveal_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the data hidden in hidden_data.</span>
+
+<span class="sd">        Expects a bytes hidden_data of any length. Will pull out the least significant bits from each byte and</span>
+<span class="sd">        return them as a bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">revealed_data_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">data_len</span>
+        <span class="n">revealed_data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">revealed_data_len</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">):</span>
+            <span class="n">revealed_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reveal_byte</span><span class="p">(</span><span class="n">hidden_data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">revealed_data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Steganographer.steganographer_hide"><a class="viewcode-back" href="../steganographer.html#steganographer.Steganographer.steganographer_hide">[docs]</a>    <span class="k">def</span> <span class="nf">steganographer_hide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean_image_file</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">dirty_image_file</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hides text inside clean_image_file and outputs dirty_image_file.</span>
+
+<span class="sd">        Takes in a clean image file name, a dirty image file name and text that will be hidden. Hides the text in</span>
+<span class="sd">        clean_image_file and outputs it to dirty_image_file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_header</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)),</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">clean_data</span> <span class="o">=</span> <span class="n">_open_image_file</span><span class="p">(</span><span class="n">clean_image_file</span><span class="p">)</span>  <span class="c1"># Is a tuple with the size of a pixel and the pixels.</span>
+        <span class="n">dirty_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hide_data</span><span class="p">(</span><span class="n">clean_data</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">],</span> <span class="n">header</span><span class="p">)</span>
+        <span class="n">dirty_data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hide_string</span><span class="p">(</span><span class="n">clean_data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">:],</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">dirty_image_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dirty_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dirty_image_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">clean_name</span> <span class="o">=</span> <span class="n">clean_image_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">clean_extension</span> <span class="o">=</span> <span class="n">clean_image_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dirty_image_file</span> <span class="o">=</span> <span class="n">clean_name</span> <span class="o">+</span> <span class="s2">&quot;Steganogrified.&quot;</span> <span class="o">+</span> <span class="n">clean_extension</span>
+
+        <span class="n">output_file</span> <span class="o">=</span> <span class="n">_write_image_file</span><span class="p">(</span><span class="n">dirty_image_file</span><span class="p">,</span> <span class="n">clean_image_file</span><span class="p">,</span> <span class="n">dirty_image_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_file</span></div>
+
+<div class="viewcode-block" id="Steganographer.steganographer_hide_file"><a class="viewcode-back" href="../steganographer.html#steganographer.Steganographer.steganographer_hide_file">[docs]</a>    <span class="k">def</span> <span class="nf">steganographer_hide_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean_image_file</span><span class="p">,</span> <span class="n">file_to_hide</span><span class="p">,</span> <span class="n">dirty_image_file</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Hides file_to_hide inside clean_image_file and outputs to dirty_image_file.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_to_hide</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_header</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">file_to_hide</span><span class="p">)</span>
+            <span class="n">input_file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">clean_data</span> <span class="o">=</span> <span class="n">_open_image_file</span><span class="p">(</span><span class="n">clean_image_file</span><span class="p">)</span>  <span class="c1"># Is a tuple with the size of a pixel and the pixels.</span>
+            <span class="n">dirty_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hide_data</span><span class="p">(</span><span class="n">clean_data</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">],</span> <span class="n">header</span><span class="p">)</span>
+            <span class="n">dirty_data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hide_data</span><span class="p">(</span><span class="n">clean_data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">:],</span> <span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="n">dirty_image_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dirty_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dirty_image_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">clean_name</span> <span class="o">=</span> <span class="n">clean_image_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">clean_extension</span> <span class="o">=</span> <span class="n">clean_image_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dirty_image_file</span> <span class="o">=</span> <span class="n">clean_name</span> <span class="o">+</span> <span class="s2">&quot;Steganogrified.&quot;</span> <span class="o">+</span> <span class="n">clean_extension</span>
+
+        <span class="n">output_file</span> <span class="o">=</span> <span class="n">_write_image_file</span><span class="p">(</span><span class="n">dirty_image_file</span><span class="p">,</span> <span class="n">clean_image_file</span><span class="p">,</span> <span class="n">dirty_image_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_file</span></div>
+
+<div class="viewcode-block" id="Steganographer.steganographer_reveal"><a class="viewcode-back" href="../steganographer.html#steganographer.Steganographer.steganographer_reveal">[docs]</a>    <span class="k">def</span> <span class="nf">steganographer_reveal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fimage</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reveals whatever data is hidden in the fimage file least significant bits.&quot;&quot;&quot;</span>
+        <span class="n">dirty_data</span> <span class="o">=</span> <span class="n">_open_image_file</span><span class="p">(</span><span class="n">fimage</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_header</span><span class="p">(</span><span class="n">dirty_data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This file </span><span class="si">%s</span><span class="s2"> has no hidden message.&quot;</span> <span class="o">%</span> <span class="n">fimage</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+        <span class="n">revealed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reveal_data</span><span class="p">(</span><span class="n">dirty_data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">header_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BYTELEN</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">revealed_data</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Daniel Mota.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
