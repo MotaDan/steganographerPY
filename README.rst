@@ -8,6 +8,9 @@ steganographer
 .. image:: https://landscape.io/github/MotaDan/steganographerPY/master/landscape.svg?style=flat
    :target: https://landscape.io/github/MotaDan/steganographerPY/master
    :alt: Code Health
+.. image:: https://readthedocs.org/projects/steganographer/badge/?version=latest
+   :target: http://steganographer.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 
 Hide messages and files inside an image. 
