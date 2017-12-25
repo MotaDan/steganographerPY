@@ -57,3 +57,5 @@ Development Notes:
 After cloning have pip-tools installed and run this command to get the correct requirements.
 
 - pip-sync dev-requirements.txt requirements.txt test-requirements.txt
+
+Adding project site
