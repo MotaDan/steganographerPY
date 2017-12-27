@@ -9,3 +9,5 @@ dist/
 steganographer.egg-info/
 env/
 .idea/
+*.swp
+*~

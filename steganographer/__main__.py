@@ -1,5 +1,6 @@
 """Given an image and a message or file steganographer will hide the message or file in the bits of the image."""
 import argparse
+import pkg_resources
 from steganographer.steganographer import Steganographer
 
 
@@ -12,6 +13,7 @@ def main():
                         help="name of output file to hide message in or to write revealed message")
     parser.add_argument("-f", "--file", help="file to be hidden in the input file")
     parser.add_argument("-r", "--reveal", action='store_true', help="a file will be revealed")
+    parser.add_argument("-v", "--version", action='version', version="steganographer {}".format(pkg_resources.get_distribution('steganographer').version), help="show version and exit")
     args = parser.parse_args()
 
     stegs = Steganographer()
