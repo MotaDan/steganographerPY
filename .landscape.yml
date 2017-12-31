@@ -6,4 +6,4 @@ autodetect: true
 python-targets:
   - 3
 ignore-paths:
-  - ./docs/
+  - docs

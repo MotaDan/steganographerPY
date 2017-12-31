@@ -325,4 +325,4 @@ class Steganographer:
             sys.exit()
 
         revealed_data = self._reveal_data(dirty_data[1][self._header.header_length * self._BYTELEN:])
-        return revealed_data, _header.file_name.decode('utf-8')
+        return revealed_data, self._header.file_name.decode('utf-8')
