@@ -13,8 +13,8 @@ def main():
                         help="name of output file to hide message in or to write revealed message", default='')
     parser.add_argument("-f", "--file", help="file to be hidden in the input file")
     parser.add_argument("-r", "--reveal", action='store_true', help="a file will be revealed")
-    parser.add_argument("-v", "--version", action='version', 
-                        version="steganographer {}".format(pkg_resources.get_distribution('steganographer').version), 
+    parser.add_argument("-v", "--version", action='version',
+                        version="steganographer {}".format(pkg_resources.get_distribution('steganographer').version),
                         help="show version and exit")
     args = parser.parse_args()
 
@@ -42,7 +42,7 @@ def main():
         print("The hidden file was revealed in " + file_name)
     # Revealing a message.
     else:
-        hidden_message, _ = stegs.steganographer_reveal(args.input).decode('utf-8')
+        hidden_message = stegs.steganographer_reveal(args.input)[0].decode('utf-8')
 
         if args.output:
             open(args.output, 'w', encoding='utf-8').write(hidden_message)

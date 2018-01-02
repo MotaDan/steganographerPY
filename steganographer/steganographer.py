@@ -1,7 +1,7 @@
 """Given an image and a message or file steganographer will hide the message or file in the bits of the image."""
-from PIL import Image
 import sys
 import os.path
+from PIL import Image
 
 
 def _unpack_image(pixels):
