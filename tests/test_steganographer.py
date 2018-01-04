@@ -644,7 +644,7 @@ def test_steganographer_inverse(hidden_message):
 
     stegs = Steganographer()
     revealed_message = stegs.steganographer_reveal(stegs.steganographer_hide(
-        clean_image, hidden_message, dirty_image))[1].decode('utf-8')
+        clean_image, hidden_message, dirty_image))[0].decode('utf-8')
     assert revealed_message == hidden_message
 
     os.remove(dirty_image)
@@ -656,7 +656,7 @@ def test_unicode_inverse():
 
     stegs = Steganographer()
     assert message == stegs.steganographer_reveal(stegs.steganographer_hide(CLEAN_PNG_LOCATION, message,
-                                                                            "tests/dirtyImage.png"))[1].decode('utf-8')
+                                                                            "tests/dirtyImage.png"))[0].decode('utf-8')
 
 
 def test_main_hide_msg_with_output(capfd):
