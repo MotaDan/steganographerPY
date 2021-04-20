@@ -4,22 +4,35 @@
 #
 #    pip-compile --output-file test-requirements.txt test-requirements.in
 #
-apipkg==1.4               # via execnet
-appdirs==1.4.3            # via setuptools
-colorama==0.3.7           # via pytest
-coverage==4.3.4           # via coveralls, pytest-cov
+apipkg==1.4
+    # via execnet
+coverage==4.3.4
+    # via
+    #   coveralls
+    #   pytest-cov
 coveralls==1.1
-docopt==0.6.2             # via coveralls
-execnet==1.4.1            # via pytest-xdist
+    # via -r test-requirements.in
+docopt==0.6.2
+    # via coveralls
+execnet==1.4.1
+    # via pytest-xdist
 hypothesis==3.7.3
-packaging==16.8           # via setuptools
-py==1.4.33                # via pytest, pytest-xdist
-pyparsing==2.2.0          # via packaging
+    # via -r test-requirements.in
+py==1.10.0
+    # via
+    #   pytest
+    #   pytest-xdist
 pytest-cov==2.4.0
+    # via -r test-requirements.in
 pytest-xdist==1.15.0
+    # via -r test-requirements.in
 pytest==3.0.7
-requests==2.13.0          # via coveralls
-six==1.10.0               # via packaging, setuptools
+    # via
+    #   -r test-requirements.in
+    #   pytest-cov
+    #   pytest-xdist
+requests==2.13.0
+    # via coveralls
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools                # via pytest
+# setuptools
